@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 
+
 @Setter
 @Getter
 @Entity
@@ -21,10 +22,16 @@ public class Flat implements Serializable
     private long id;
 
     @Column
-    private Boolean isActive;
+    private String name;
 
     @Column
-    private String name;
+    private int maxGuests;
+
+    @Column
+    private int price;
+
+    @Enumerated(EnumType.STRING)
+    private FlatType flatType;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Address address;
