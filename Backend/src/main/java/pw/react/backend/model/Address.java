@@ -1,5 +1,6 @@
 package pw.react.backend.model;
 
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,21 +13,19 @@ import java.io.Serializable;
 @Table(name = "addresses")
 public class Address implements Serializable
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column
+    @NotNull
     private String country;
-    @Column
+    @NotNull
     private String city;
-    @Column
+    @NotNull
     private String streetName;
-    @Column
+    @NotNull
     private String postCode;
-    @Column
+    @NotNull
     private String buildingNumber;
-    @Column
     private String flatNumber;
 
     @OneToOne(mappedBy = "address")
