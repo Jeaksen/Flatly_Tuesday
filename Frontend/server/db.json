@@ -1,0 +1,30 @@
+{
+  "flats": [
+    {
+      "id": 1,
+      "name": "Pineska-Tulipan",
+      "address": {
+        "country": "Poland",
+        "city": "Warsaw",
+        "streetName": "Uniwersytecka",
+        "buildingNumberail": "5",
+        "postCode": "02-036",
+        "flatNumber": "5"
+      }
+    },
+    {
+      "id": 1610843665525,
+      "name": "Akademicka Dom",
+      "maxGuests": "5",
+      "price": "600",
+      "address": {
+        "country": "Poland",
+        "city": "Warszawa",
+        "streetName": "Akademicka",
+        "postCode": "02-038",
+        "buildingNumber": "4524",
+        "flatNumber": "453453"
+      }
+    }
+  ]
+}

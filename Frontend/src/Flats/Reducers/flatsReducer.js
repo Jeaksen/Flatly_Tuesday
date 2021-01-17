@@ -1,36 +1,52 @@
+import {
+  FLATS_LOADED,
+  FLATS_LOADING,
+  FLATS_LOADING_ERROR,
+  FLATS_SAVING,
+  FLATS_SAVING_ERROR,
+  FLATS_DELETING,
+  FLATS_DELETING_ERROR,
+  FLATS_SHOWING_FORM
+} from '../../AppConstants/AppConstants'
 
-const baseState = {list: [], loading: false, saving: false, error: null}
+const baseState = {
+  flats: [], 
+  loading: false, 
+  saving: false,
+  isShowingForm: false,
+  error: null,
+  idDeleting: -1
+}
 
 export default function flatListReducer(state = baseState, action) 
 {
-    switch(action.type) 
-    {
-        case "flatListLoaded":
-            return {...state, list: action.payload, loading: false}
+  switch(action.type) 
+  {
+    case FLATS_LOADED:
+      return {...state, flats: action.payload, loading: false, error: null}
 
-        case "flatListLoading":
-            return {...state, loading: true}
+    case FLATS_LOADING:
+      return {...state, loading: action.payload, error: null}
 
-        case "flatListLoadingError":
-            return {...state, loading: false, saving: false, error: action.payload}
+    case FLATS_LOADING_ERROR:
+      return {...state, loading: false, saving: false, isShowingForm: false, error: action.payload}
 
-        case "flatListSaved":
-            return {...state, loading: false, saving: false}
+    case FLATS_SAVING:
+      return {...state, loading: false, saving: action.payload, isShowingForm: false, error: null}
 
-        case "flatListSaving":
-            return {...state, loading: false, saving: true}
+    case FLATS_SAVING_ERROR:
+      return {...state, loading: false, saving: false,  isShowingForm: false, error: action.payload}
 
-        case "flatListSavingError":
-            return {...state, loading: false, saving: false, error: action.payload}
+    case FLATS_DELETING:
+      return {...state, loading: false, saving: false, isShowingForm: false, idDeleting: action.payload, error: null}
 
-        case "flatDeleting":
-            const updatedList = state.list.map(flat => flat.id === action.payload ? {...flat, deleting: true} : flat)
-            return {...state, list: updatedList, loading: false, saving: false}
+    case FLATS_DELETING_ERROR:
+      return {...state, loading: false, saving: false,  isShowingForm: false, error: action.payload}
 
-        case "flatDeletingError":
-            return {...state, loading: false, saving: false, error: action.payload}
-            
-        default:
-            return state;
-    }
+    case FLATS_SHOWING_FORM:
+      return {...state, loading: false, saving: false,  isShowingForm: action.payload, error: null}
+        
+    default:
+      return state;
+  }
 }

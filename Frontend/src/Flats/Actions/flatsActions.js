@@ -1,22 +1,56 @@
-export function flatListLoaded(list) {
-    return ({type: "flatListLoaded", payload: list})
+import {
+    FLATS_LOADED,
+    FLATS_LOADING,
+    FLATS_LOADING_ERROR,
+    FLATS_SAVING,
+    FLATS_SAVING_ERROR,
+    FLATS_DELETING,
+    FLATS_DELETING_ERROR,
+    FLATS_SHOWING_FORM,
+    FLATS_URL
+} from '../../AppConstants/AppConstants';
+
+export function flatListLoaded(flats){
+    return ({ type: FLATS_LOADED, payload: flats })
 }
 
-export function flatListLoading() {
-    return ({type: "flatListLoading"})
+export function flatListLoading(b){
+    return ({ type: FLATS_LOADING, payload: b })
 }
+
 
 export function flatListLoadingError(error) {
-    return ({type: "flatListLoadingError", payload: error})
+    return ({type: FLATS_LOADING_ERROR, payload: error})
+}
+
+export function flatSaving(b){
+    return ({ type: FLATS_SAVING, payload: b })
+}
+
+export function flatSavingError(error) {
+    return ({type: FLATS_SAVING_ERROR, payload: error})
+}
+
+export function flatDeleting(flatId) {
+    return ({type: FLATS_DELETING, payload: flatId })
+}
+
+export function flatDeletingError(error) {
+    return ({type: FLATS_DELETING_ERROR, payload: error})
+}
+
+export function flatListShowingForm(b){
+    return ({ type: FLATS_SHOWING_FORM, payload: b })
 }
 
 export function loadFlatListAsync() {
     return async (dispatch) => {
         try {
-            dispatch(flatListLoading());
-            const response = await fetch("http://localhost:8080/flats/");
-            const json = await response.json();
-            dispatch(flatListLoaded(json));
+            dispatch(flatListLoading(true));
+            let promise = fetch(FLATS_URL);
+            promise.then(response => response.json())
+                .then(json => dispatch(flatListLoaded(json)))
+                .then(() => dispatch(flatListLoading(false)));
         } catch(error) {
             console.error(error);
             dispatch(flatListLoadingError(error));
@@ -24,52 +58,34 @@ export function loadFlatListAsync() {
     }
 }
 
-export function flatListSaved(list) {
-    return ({type: "flatListSaved", payload: list})
-}
-
-export function flatListSaving() {
-    return ({type: "flatListSaving"})
-}
-
-export function flatListSavingError(error) {
-    return ({type: "flatListSavingError", payload: error})
-}
-
 export function addNewFlat(flat) {
-    const flats = [flat]
     return async (dispatch) => {
         try {
-            dispatch(flatListSaving());
-            await fetch("http://localhost:8080/flats/", {
+            dispatch(flatListShowingForm(false));
+            dispatch(flatSaving(true));
+            let promise = fetch(FLATS_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json',},
-                body: JSON.stringify(flats)
+                body: JSON.stringify(flat)
             });
-            dispatch(flatListSaved());
+            promise.then(response => response.json())
+                .then(() => dispatch(flatSaving(false)))
+                .then(() => dispatch(loadFlatListAsync()));
         } catch(error) {
             console.error(error);
-            dispatch(flatListSavingError(error));
-        } finally {
-            dispatch(loadFlatListAsync());
+            dispatch(flatSavingError(error));
         }
     }
-}
-
-export function flatDeleting(flatId) {
-    return {type: "flatDeleting", payload: flatId}
-}
-
-export function flatDeletingError(error) {
-    return ({type: "flatDeletingError", payload: error})
 }
 
 export function deleteFlat(flatId) {
     return async (dispatch) => {
         try {
             dispatch(flatDeleting(flatId))
-            await fetch("http://localhost:8080/flats/" + flatId, {method: 'DELETE'});
-            dispatch(loadFlatListAsync());
+            let promise = fetch(FLATS_URL + flatId, {method: "DELETE"});
+            promise.then(response => response.json())
+                .then(() => dispatch(flatDeleting(-1)))
+                .then(() => dispatch(loadFlatListAsync()));
         } catch(error) {
             console.error(error);
             dispatch(flatDeletingError(error))
