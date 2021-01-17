@@ -5,7 +5,7 @@ import reduxThunk from 'redux-thunk'
 
 import appReducers from './AppReducers/appReducers'
 import {composeWithDevTools} from 'redux-devtools-extension';
-import FlatsList from './Flats/FlatsList' 
+import BookingsList from './Bookings/BookingsList' 
 
 import './App.css';
 
@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="App">
       <Provider store = {store}>
-        <FlatsList />
+        <BookingsList />
       </Provider>
     </div>
   );

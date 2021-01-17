@@ -1,0 +1,17 @@
+.BookingsList {
+    padding: 0 0 0 1em;
+}
+
+.BookingsList > .BookingsListItem {
+    border: 2px solid black;
+    padding: 10px;
+    margin: 10px;
+}
+
+.BookingsListItem > ul {
+    list-style-type: none;
+    padding: 0;
+    width: 300px;
+}
+
+.BookingsListItem > ul > li {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif}
