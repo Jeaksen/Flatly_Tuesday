@@ -1,5 +1,7 @@
 package pw.react.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.Getter;
@@ -26,5 +28,6 @@ public class Customer implements Serializable
     private String phoneNo;
 
     @OneToMany(mappedBy = "customer")
+    @JsonBackReference
     private List<Booking> bookings;
 }

@@ -1,5 +1,8 @@
 package pw.react.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 import lombok.Data;
 
@@ -10,8 +13,13 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "bookings")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Booking implements Serializable
 {
+    private static final long serialVersionUID = -6783504532088859179L;
+
+    public static Booking EMPTY = new Booking();
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -29,10 +37,12 @@ public class Booking implements Serializable
     @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonManagedReference
     private Customer customer;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "flat_id")
+    @JsonManagedReference
     private Flat flat;
 }

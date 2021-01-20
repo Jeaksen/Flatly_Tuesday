@@ -1,6 +1,8 @@
 package pw.react.backend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.NotFound;
@@ -32,5 +34,6 @@ public class Flat implements Serializable
     private Address address;
 
     @OneToMany(mappedBy = "flat")
+    @JsonBackReference
     private List<Booking> bookings;
 }
