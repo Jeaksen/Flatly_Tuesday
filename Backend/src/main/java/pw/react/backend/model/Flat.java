@@ -1,32 +1,36 @@
 package pw.react.backend.model;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import com.sun.istack.NotNull;
+import lombok.Data;
+import org.hibernate.annotations.NotFound;
 
+import java.util.List;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Setter
-@Getter
+@Data
 @Entity
 @Table(name = "flats")
 public class Flat implements Serializable
 {
     private static final long serialVersionUID = -6783504532088859179L;
 
+    public static Flat Empty() {return new Flat();}
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
-    @Column
-    private Boolean isActive;
-
-    @Column
+    @NotNull
     private String name;
-
-    @OneToOne(cascade = CascadeType.ALL)
+    @NotNull
+    private int maxGuests;
+    @NotNull
+    private int price;
+    @NotNull @Enumerated(EnumType.STRING)
+    private FlatType flatType;
+    @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
+    @OneToMany(mappedBy = "flat")
+    private List<Booking> bookings;
 }
