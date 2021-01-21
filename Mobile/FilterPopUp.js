@@ -19,19 +19,18 @@ const cities=[
 ]
 //For animation
 //animateView:
-const initPos=-10
-const endiPos =5
-var currentPos=initPos
-const initOpacity=0
-const endiOpacity=1
-var currentOpacity=initOpacity
-const initBRadious=0
-const endiBRadious=20
-var currentBRadious=initBRadious
+const initPos = -10
+const endiPos = 5
+var currentPos = initPos
+const initOpacity = 0
+const endiOpacity = 1
+var currentOpacity = initOpacity
+const initBRadious = 0
+const endiBRadious = 20
+var currentBRadious = initBRadious
 
-export default class FilterPopUp extends Component{
-
-    
+export default class FilterPopUp extends Component
+{    
     state={
             //view aniamtion
             posAnimation: new Animated.Value(initPos),
@@ -105,17 +104,15 @@ export default class FilterPopUp extends Component{
         Animated.timing(this.state.hei2Animation,{toValue:  20,duration: 200,useNativeDriver: true}).start();
     }
 
-    render(){
+    render() {
 
-        const hei1Animation={transform: [{translateY: this.state.hei1Animation,}],}
-        const hei2Animation={transform: [{translateY: this.state.hei2Animation,}],}
+        const hei1Animation = {transform: [{translateY: this.state.hei1Animation,}],}
+        const hei2Animation = {transform: [{translateY: this.state.hei2Animation,}],}
 
-        
-        const BorderAnimation={
+        const BorderAnimation = {
             borderRadius: this.state.borAnimation,
         }
-
-        const ViewAnimation={
+        const ViewAnimation = {
             transform: [
                 {
                 translateY: this.state.posAnimation,
@@ -130,21 +127,21 @@ export default class FilterPopUp extends Component{
                     <Animated.View style={[styles.filterPanel, BorderAnimation]}>
                         <Animated.View style={[styles.SearchBar]}>
                             <Icon name='search'/>
-                            <TextInput style={styles.textinput} placeholder="Search by flat name"/>
+                            <TextInput style={styles.textinput} placeholder="Search by flat name" />
                         </Animated.View>
                         <View>
-                            <DropDownPicker items={contries} placeholder="Country" searchable={true} labelStyle={{color: '#000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCountry: item.value})}/>                        
+                            <DropDownPicker items={contries} placeholder="Country" searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCountry: item.value})}/>                        
                         </View>
                         <View>
-                            <DropDownPicker items={cities}   placeholder="City"    searchable={true} labelStyle={{color: '#000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCity: item.value})}/>                        
+                            <DropDownPicker items={cities}   placeholder="City"    searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCity: item.value})}/>                        
                         </View>
                         <Animated.View style={[styles.priceBar,hei1Animation]}>
-                            <Text style={{fontSize: 25, marginRight:'auto'}} >Price: </Text>
+                            <Text style={{fontSize: 20, marginRight:'auto'}} >Price: </Text>
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
                         </Animated.View>
                         <Animated.View style={[styles.guestsBar,hei2Animation]}>
-                            <Text style={{fontSize: 25,marginRight:'auto'}} >Max Guests: </Text>
+                            <Text style={{fontSize: 20, marginRight:'auto'}} >Max Guests: </Text>
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
                         </Animated.View>
@@ -154,14 +151,12 @@ export default class FilterPopUp extends Component{
                      </Animated.View>
                 </Animated.View>
             </View>
-
         )
     }
 }
 
-const backgroundPopUpColor="white"
+const backgroundPopUpColor = '#FFFFFF'
 const styles = StyleSheet.create({
-
     dropdown1:{
         zIndex: 50000,
     },
@@ -176,22 +171,35 @@ const styles = StyleSheet.create({
         flexDirection:'row', 
         height:40, 
         width: width*0.7,
+        marginTop: 10,
     },
     SearchBar:{
         flexDirection:'row',
-
+        marginBottom:6,
+        borderColor: '#000000',
+        borderWidth: 1,
+        borderRadius: 5,
+        width: 300,
+        marginBottom: 15,
+        marginTop: 10,
     },
     SearchButton:{
         marginTop: 'auto',
+        marginBottom: 15,
     },
     textprice: {
-        fontSize: 20,
-        width: 60,
-        marginHorizontal: 5,
+        fontSize: 16,
+        height: 30,
+        width: 70,
+        marginLeft: 10,
+        borderColor: '#000000',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingLeft: 5,
     },
     textinput: {
         fontSize: 20,
-        textAlign: 'center'
+        textAlign: 'center',
     },
     container: {
       flex: 1,
@@ -221,4 +229,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
       }
-})
+});

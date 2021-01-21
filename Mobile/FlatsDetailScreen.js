@@ -8,7 +8,7 @@ export default function FlatsDetailScreen({route, navigation}) {
     return (
         <SafeAreaView>
             <View style={styles.country}>
-            <Text style={styles.title}>{item.flatName}</Text>
+            <Text style={styles.title}>{item.name}</Text>
             <View style={styles.container}>
                 <Image
                     style={styles.flag}
@@ -16,11 +16,11 @@ export default function FlatsDetailScreen({route, navigation}) {
                     uri: `https://www.countryflags.io/pl/flat/64.png`,
                 }}/>
             </View>
-            <Text style={styles.info}> {`Price:  ${item.price} PLN`} </Text>
-            <Text style={styles.info}> {`Max guest number:  ${item.maxGuestNo}` } </Text>
-            <Text style={styles.info}> {`Location:  ${item.country}, ${item.city}`} </Text>
-            <Text style={styles.info}> {`Address:  ${item.address}`} </Text>
-            <Text style={styles.info}> {`Availability:  ${item.isAvailable}`} </Text>
+            <Text style={styles.info}> {`Price:  ${item.alpha2Code} PLN`} </Text>
+            <Text style={styles.info}> {`Max guest number:  ${item.population}` } </Text>
+            <Text style={styles.info}> {`Location:  ${item.region}, ${item.subregion}`} </Text>
+            <Text style={styles.info}> {`Address:  ${item.capital}`} </Text>
+            <Text style={styles.info}> {`Availability:  ${item.alpha3Code}`} </Text>
             {/* <Button title="Back" onPress={() => navigation.navigate('List')} ></Button> */}
             </View>
         </SafeAreaView>
