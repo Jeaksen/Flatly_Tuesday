@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import pw.react.backend.model.Flat;
 import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.ImageService;
+import pw.react.backend.service.general.SecurityProvider;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,12 +27,14 @@ public class FlatController
 
     private final FlatsService flatsService;
     private final ImageService imageService;
+    private final SecurityProvider securityService;
 
     @Autowired
-    public FlatController(FlatsService flatsService, ImageService imageService)
+    public FlatController(FlatsService flatsService, ImageService imageService, SecurityProvider securityService)
     {
         this.flatsService = flatsService;
         this.imageService = imageService;
+        this.securityService = securityService;
     }
 
     private void logHeaders(@RequestHeader HttpHeaders headers) {
@@ -48,48 +52,64 @@ public class FlatController
     public ResponseEntity<Collection<Flat>> getFlats(@RequestHeader HttpHeaders headers)
     {
         logHeaders(headers);
-        return ResponseEntity.ok(flatsService.getFlats());
+        if (securityService.isAuthorized(headers))
+        {
+            return ResponseEntity.ok(flatsService.getFlats());
+        } else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ArrayList<>());
     }
 
     @PostMapping(path = "")
     public ResponseEntity<String> createFlat(@RequestHeader HttpHeaders headers, @RequestBody List<Flat> flats)
     {
         logHeaders(headers);
-        List<Flat> result = flatsService.saveFlats(flats);
-        if (result.isEmpty())
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the flats");
-        else
-            return ResponseEntity.ok(result.stream().map(c -> String.valueOf(c.getId())).collect(joining(",")));
+        if (securityService.isAuthorized(headers)) {
+            List<Flat> result = flatsService.saveFlats(flats);
+            if (result.isEmpty())
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the flats");
+            else
+                return ResponseEntity.ok(result.stream().map(c -> String.valueOf(c.getId())).collect(joining(",")));
+        } else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
     }
 
     @DeleteMapping(path = "/{flatId}")
     public ResponseEntity<String> deleteFlat(@RequestHeader HttpHeaders headers, @PathVariable Long flatId)
     {
         logHeaders(headers);
-        boolean result = flatsService.deleteFlat(flatId);
-        if (result)
-            return ResponseEntity.ok(String.format("Flat with id %s deleted.", flatId));
-        else
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Flat with id %s not found.", flatId));
+        if (securityService.isAuthorized(headers))
+        {
+            boolean result = flatsService.deleteFlat(flatId);
+            if (result)
+                return ResponseEntity.ok(String.format("Flat with id %s deleted.", flatId));
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Flat with id %s not found.", flatId));
+        } else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
     }
 
     @GetMapping(path = "/{flatId}")
     public ResponseEntity<Flat> getFlatDetails(@RequestHeader HttpHeaders headers, @PathVariable Long flatId)
     {
         logHeaders(headers);
-        return flatsService.getFlat(flatId).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Flat.Empty));
+        if (securityService.isAuthorized(headers))
+        {
+            return flatsService.getFlat(flatId).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Flat.Empty));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Flat.Empty);
     }
 
     @PutMapping(path = "/{flatId}")
     public ResponseEntity<Flat> updateCompany(@RequestHeader HttpHeaders headers, @PathVariable Long flatId, @RequestBody Flat updatedFlat) {
         logHeaders(headers);
-        Flat result;
-        result = flatsService.updateFlat(flatId, updatedFlat);
-        if (Flat.Empty.equals(result))
+        if (securityService.isAuthorized(headers))
         {
-            return ResponseEntity.badRequest().body(updatedFlat);
-        }
-        return ResponseEntity.ok(result);
+            Flat result = flatsService.updateFlat(flatId, updatedFlat);
+            if (Flat.Empty.equals(result))
+                return ResponseEntity.badRequest().body(updatedFlat);
+            return ResponseEntity.ok(result);
+        } else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Flat.Empty);
     }
 
 }
