@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button } from 'react-native';
+import { useRef } from 'react';
+import { forwardRef } from 'react';
+import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button, Dimensions } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import { debug } from 'react-native-reanimated';
+import FilterPopUp from './FilterPopUp';
 
 function ListItem({ item, navigation }) {
     return (
@@ -29,10 +32,17 @@ function ListItem({ item, navigation }) {
     );
 }
 
+
 export default function FlatsScreen({navigation}) {
     const [isLoading, setLoading] = useState(true);
     const [flats, setFlats] = useState([]);
     const [searchString, setSearchString] = useState('');
+    const {width,height} = Dimensions.get("screen")
+    const FilterRef = useRef(null);
+
+    const buttonW=width*0.3
+    const centerMargin =(width-3*buttonW)/4;
+    const bigButtonW=3*buttonW + 2*centerMargin
     //const [searchLength, setSearchLength] = useState({last: 111, newest: 0})
   
     const onRefresh = () => {
@@ -52,27 +62,34 @@ export default function FlatsScreen({navigation}) {
     useEffect(() => {
       fetchData();
     }, []);
-  
+
+    const FilterManager =() =>{
+      console.log("filter manager")
+      FilterRef.current.animateView()
+    }
+    
     return (
       <SafeAreaView >
-        <View style={{flexDirection:'column',alignItems: 'stretch',marginHorizontal:15,marginVertical:10}}>
-            <View style={{flexDirection:'row', height:40}}>
-                <View style={{width:110}}>
+        <View style={{flexDirection:'column', justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{flexDirection:'row', height:40, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{width:buttonW}}>
                     <Button title="Flats"></Button>
                 </View>
-                <View style={{width:130,backgroundColor:'#ffffff'}}>
+                <View style={{width:buttonW, marginHorizontal: centerMargin}}>
                     <Button title="Bookings"></Button>
                 </View>
-                <View style={{width:120}}>
+                <View style={{width:buttonW}}>
                     <Button title="Log out"></Button>
                 </View>
             </View>
-            <View>
-                <Button title="Filter"></Button>
+            <View style={{width:bigButtonW}}>
+                <Button title="Filter" onPress={() =>FilterManager()}></Button>
             </View>     
         </View>
+        <View>
         { isLoading ? <Text style={styles.lenCount}>Loading...</Text> :
-          <View style={styles.container}> 
+          <View style={styles.container}>
+             
             {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
             <FlatList style={{marginBottom: 80}}
               data={flats.length > 0 ? flats.slice(0, flats.length) : []}
@@ -81,6 +98,10 @@ export default function FlatsScreen({navigation}) {
               refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
             />
           </View>}
+          <View style={{position: 'absolute'}}>
+            <FilterPopUp ref={FilterRef}/>
+          </View>
+        </View>
       </SafeAreaView>
     );
   }
@@ -89,6 +110,7 @@ export default function FlatsScreen({navigation}) {
     container: {
       flex: 1,
       marginTop: StatusBar.currentHeight || 0,
+      marginVertical: 10,
     },
     item: {
       backgroundColor: '#e6ffff', 
