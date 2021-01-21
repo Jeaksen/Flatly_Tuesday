@@ -19,20 +19,6 @@ const cities=[
 ]
 //For animation
 //animateView:
-<<<<<<< HEAD
-const initPos = -10
-const endiPos = 5
-var currentPos = initPos
-const initOpacity = 0
-const endiOpacity = 1
-var currentOpacity = initOpacity
-const initBRadious = 0
-const endiBRadious = 20
-var currentBRadious = initBRadious
-
-export default class FilterPopUp extends Component
-{    
-=======
 const initPos=-15
 const endiPos =10
 var currentPos=initPos
@@ -45,7 +31,6 @@ var currentBRadious=initBRadious
 
 export default class FilterPopUp extends Component{
 
->>>>>>> 901d6fb6b5a7dc84cb4203e35ee261dc25030761
     state={
             //This obj is allways on top need to be programatically switch active or not
             Active: true,
@@ -131,17 +116,6 @@ export default class FilterPopUp extends Component{
         Animated.timing(this.state.opa2Animation,{toValue:   1,duration: 200,useNativeDriver: true}).start();
     }
 
-<<<<<<< HEAD
-    render() {
-
-        const hei1Animation = {transform: [{translateY: this.state.hei1Animation,}],}
-        const hei2Animation = {transform: [{translateY: this.state.hei2Animation,}],}
-
-        const BorderAnimation = {
-            borderRadius: this.state.borAnimation,
-        }
-        const ViewAnimation = {
-=======
     render(){
         const hei1Animation={transform: [{translateY: this.state.hei1Animation,}],};
         const hei2Animation={transform: [{translateY: this.state.hei2Animation,}],};
@@ -159,7 +133,6 @@ export default class FilterPopUp extends Component{
         };
 
         const ViewAnimation={
->>>>>>> 901d6fb6b5a7dc84cb4203e35ee261dc25030761
             transform: [
                 {
                 translateY: this.state.posAnimation,
@@ -234,7 +207,6 @@ const styles = StyleSheet.create({
     },
     SearchButton:{
         marginTop: 'auto',
-<<<<<<< HEAD
         marginBottom: 15,
     },
     textprice: {
@@ -246,16 +218,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingLeft: 5,
-=======
-        backgroundColor: 'white',
-        width: 0.2*width,
-        margin: 0.05*width,
-    },
-    textprice: {
-        fontSize: 20,
-        width: 50,
-        marginHorizontal: 5,
->>>>>>> 901d6fb6b5a7dc84cb4203e35ee261dc25030761
     },
     textinput: {
         fontSize: 20,

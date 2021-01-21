@@ -16,15 +16,9 @@ const MainNavigator = createStackNavigator(
     FlatDetails: {
       screen: FlatsDetailScreen,
     },
-<<<<<<< HEAD
     //  Bookings: {
     //    screen: BookingScreen,
     //  },
-=======
-    // Bookings: {
-    //   screen: BookingScreen,
-    // },
->>>>>>> 901d6fb6b5a7dc84cb4203e35ee261dc25030761
   },
   {
     initialRouteName: 'Home',
