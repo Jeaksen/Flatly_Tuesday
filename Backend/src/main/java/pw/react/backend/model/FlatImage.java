@@ -1,6 +1,5 @@
 package pw.react.backend.model;
 
-import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -17,20 +16,23 @@ public class FlatImage
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
-    @NotNull
+    @Column(nullable = false)
     private String fileName;
-    @NotNull
+    @Column(nullable = false)
     private String fileType;
-    @NotNull
+    @Column(nullable = false)
     private long flatId;
-    @NotNull @Lob
+    @Column(nullable = false)
+    private boolean isHeaderImage;
+    @Column(nullable = false) @Lob
     private byte[] data;
 
-    public FlatImage(String fileName, String fileType, long flatId, byte[] data)
+    public FlatImage(String fileName, String fileType, long flatId, boolean isHeaderImage, byte[] data)
     {
         this.fileName = fileName;
         this.fileType = fileType;
         this.flatId = flatId;
+        this.isHeaderImage = isHeaderImage;
         this.data = data;
     }
 }

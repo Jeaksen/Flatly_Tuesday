@@ -3,7 +3,6 @@ package pw.react.backend.model;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
-import org.hibernate.annotations.NotFound;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,17 +15,17 @@ public class Flat implements Serializable
 {
     private static final long serialVersionUID = -6783504532088859179L;
 
-    public static Flat Empty() {return new Flat();}
+    public static Flat Empty;
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @NotNull
+    @Column(nullable = false)
     private String name;
-    @NotNull
+    @Column(nullable = false)
     private int maxGuests;
-    @NotNull
+    @Column(nullable = false)
     private int price;
-    @NotNull @Enumerated(EnumType.STRING)
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
     private FlatType flatType;
     @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;

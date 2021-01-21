@@ -1,6 +1,5 @@
 package pw.react.backend.model;
 
-import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,15 +15,15 @@ public class Address implements Serializable
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @NotNull
+    @Column(nullable = false)
     private String country;
-    @NotNull
+    @Column(nullable = false)
     private String city;
-    @NotNull
+    @Column(nullable = false)
     private String streetName;
-    @NotNull
+    @Column(nullable = false)
     private String postCode;
-    @NotNull
+    @Column(nullable = false)
     private String buildingNumber;
     private String flatNumber;
 

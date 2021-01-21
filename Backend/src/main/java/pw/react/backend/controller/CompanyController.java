@@ -13,7 +13,9 @@ import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.CompanyRepository;
 import pw.react.backend.model.Company;
 import pw.react.backend.model.CompanyLogo;
-import pw.react.backend.service.*;
+import pw.react.backend.service.company.CompanyService;
+import pw.react.backend.service.company.LogoService;
+import pw.react.backend.service.general.SecurityProvider;
 import pw.react.backend.web.UploadFileResponse;
 
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package pw.react.backend.service;
+package pw.react.backend.service.company;
 
 import org.springframework.web.multipart.MultipartFile;
 import pw.react.backend.model.CompanyLogo;

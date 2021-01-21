@@ -1,7 +1,6 @@
 package pw.react.backend.service;
 
 import lombok.NoArgsConstructor;
-import org.hibernate.PropertyValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class FlatMainService implements FlatsService
 {
-    private final Logger logger = LoggerFactory.getLogger(CompanyMainService.class);
+    private final Logger logger = LoggerFactory.getLogger(FlatMainService.class);
 
     FlatRepository repository;
 
@@ -31,12 +30,12 @@ public class FlatMainService implements FlatsService
     @Override
     public Flat updateFlat(Long flatId, Flat updatedFlat)
     {
-        Flat result = Flat.Empty();
+        Flat result = Flat.Empty;
         if (repository.existsById(flatId))
         {
             updatedFlat.setId(flatId);
             result = repository.save(updatedFlat);
-            logger.info("Company with id {} updated.", flatId);
+            logger.info("Flat with id {} updated.", flatId);
         }
         return result;
     }
@@ -48,7 +47,7 @@ public class FlatMainService implements FlatsService
         if (repository.existsById(flatId))
         {
             repository.deleteById(flatId);
-            logger.info("Company with id {} deleted.", flatId);
+            logger.info("Flat with id {} deleted.", flatId);
             result = true;
         }
         return result;
