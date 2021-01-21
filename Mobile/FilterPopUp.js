@@ -19,8 +19,8 @@ const cities=[
 ]
 //For animation
 //animateView:
-const initPos=-10
-const endiPos =5
+const initPos=-15
+const endiPos =10
 var currentPos=initPos
 const initOpacity=0
 const endiOpacity=1
@@ -31,8 +31,10 @@ var currentBRadious=initBRadious
 
 export default class FilterPopUp extends Component{
 
-    
     state={
+            //This obj is allways on top need to be programatically switch active or not
+            Active: true,
+            FPanelHeight: height*0.4,
             //view aniamtion
             posAnimation: new Animated.Value(initPos),
             opaAnimation: new Animated.Value(initOpacity),
@@ -41,6 +43,7 @@ export default class FilterPopUp extends Component{
             //keyboard show/hide animation:
             hei1Animation: new Animated.Value(10),
             hei2Animation: new Animated.Value(30),
+            opa2Animation: new Animated.Value(1),
             //DropDowns
             selectedCountry: 'Poland',
             selectedCity: 'Płock'
@@ -61,6 +64,7 @@ export default class FilterPopUp extends Component{
     animateView = () =>{
         if (currentPos==initPos)
         {
+            this.setState({ Active: true });
             currentPos=endiPos;
             currentOpacity=endiOpacity;
             currentBRadious=endiBRadious;
@@ -76,11 +80,13 @@ export default class FilterPopUp extends Component{
             duration: 300,
             useNativeDriver: true
         }).start(()=>{
+            if(currentPos==initPos)this.setState({ Active: false });
             Animated.timing(this.state.posAnimation,{
                 toValue:  currentPos-2,
                 duration: 150,
                 useNativeDriver: true
-            }).start();
+            }).start(()=>{
+            });
         }
         );
         Animated.timing(this.state.opaAnimation,{
@@ -98,22 +104,33 @@ export default class FilterPopUp extends Component{
     onKeyboardShow =() =>{
         Animated.timing(this.state.hei1Animation,{toValue:  0,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.hei2Animation,{toValue:  0,duration: 200,useNativeDriver: true}).start();
+        Animated.timing(this.state.opa2Animation,{toValue:  0,duration: 20,useNativeDriver: true}).start(
+            () =>{this.setState({ FPanelHeight: height*0.3 })}
+        );
     }
 
     onKeyboardHide =() =>{
+        this.setState({ FPanelHeight: height*0.4 })
         Animated.timing(this.state.hei1Animation,{toValue:  10,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.hei2Animation,{toValue:  20,duration: 200,useNativeDriver: true}).start();
+        Animated.timing(this.state.opa2Animation,{toValue:   1,duration: 200,useNativeDriver: true}).start();
     }
 
     render(){
-
-        const hei1Animation={transform: [{translateY: this.state.hei1Animation,}],}
-        const hei2Animation={transform: [{translateY: this.state.hei2Animation,}],}
-
+        const hei1Animation={transform: [{translateY: this.state.hei1Animation,}],};
+        const hei2Animation={transform: [{translateY: this.state.hei2Animation,}],};
+        const Opa2Animation={
+            transform: [
+                {
+                    scale: this.state.opa2Animation
+                }
+            ],
+            opacity: this.state.opa2Animation,
+            };
         
         const BorderAnimation={
             borderRadius: this.state.borAnimation,
-        }
+        };
 
         const ViewAnimation={
             transform: [
@@ -124,10 +141,12 @@ export default class FilterPopUp extends Component{
             opacity: this.state.opaAnimation,
         };
         return(
-            <View style={styles.container}>
+            
+            <View style={styles.container} >
+                {this.state.Active ? 
                 <Animated.View style={[styles.PopUp, ViewAnimation]}>
                     <View style={[styles.triangle, this.props.style]} />
-                    <Animated.View style={[styles.filterPanel, BorderAnimation]}>
+                    <Animated.View style={[styles.filterPanel, {height: this.state.FPanelHeight}, BorderAnimation]}>
                         <Animated.View style={[styles.SearchBar]}>
                             <Icon name='search'/>
                             <TextInput style={styles.textinput} placeholder="Search by flat name"/>
@@ -148,11 +167,11 @@ export default class FilterPopUp extends Component{
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
                         </Animated.View>
-                        <Animated.View style={[styles.SearchButton]}>
-                            <Button title="Search" onPress={() => this.animateView()}></Button>
+                        <Animated.View style={[styles.SearchButton, Opa2Animation]}>
+                            <Button title="Search"  onPress={() => this.animateView()}></Button>
                         </Animated.View>
                      </Animated.View>
-                </Animated.View>
+                </Animated.View>: <View/>}
             </View>
 
         )
@@ -183,10 +202,13 @@ const styles = StyleSheet.create({
     },
     SearchButton:{
         marginTop: 'auto',
+        backgroundColor: 'white',
+        width: 0.2*width,
+        margin: 0.05*width,
     },
     textprice: {
         fontSize: 20,
-        width: 60,
+        width: 50,
         marginHorizontal: 5,
     },
     textinput: {
@@ -216,7 +238,6 @@ const styles = StyleSheet.create({
       },
       filterPanel: {
         width: width*0.9,
-        height: height*0.4,
         backgroundColor: backgroundPopUpColor,
         alignItems: 'center',
         padding: 10,
