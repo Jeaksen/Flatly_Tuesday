@@ -1,7 +1,6 @@
 package pw.react.backend;
 
 import net.kaczmarzyk.spring.data.jpa.web.SpecificationArgumentResolver;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

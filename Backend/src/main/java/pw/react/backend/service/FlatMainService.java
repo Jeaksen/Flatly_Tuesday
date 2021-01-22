@@ -10,9 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pw.react.backend.dao.FlatRepository;
-import pw.react.backend.dao.specifications.FlatSpecification;
 import pw.react.backend.model.Flat;
-
 
 import java.util.ArrayList;
 import java.util.List;

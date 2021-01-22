@@ -1,16 +1,12 @@
 package pw.react.backend.controller.internal;
 
 
-import net.kaczmarzyk.spring.data.jpa.domain.Between;
-import net.kaczmarzyk.spring.data.jpa.domain.Equal;
-import net.kaczmarzyk.spring.data.jpa.domain.Like;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,9 +18,7 @@ import pw.react.backend.model.Flat;
 import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.ImageService;
 import pw.react.backend.service.general.SecurityProvider;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import java.util.Collection;
+
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
@@ -39,7 +33,6 @@ public class FlatController
     private final FlatsService flatsService;
     private final ImageService imageService;
     private final SecurityProvider securityService;
-    private final Pageable defaultPageable = PageRequest.of(0, 10);
 
     @Autowired
     public FlatController(FlatsService flatsService, ImageService imageService, SecurityProvider securityService)
