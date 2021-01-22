@@ -1,23 +1,34 @@
 package pw.react.backend.controller.internal;
 
 
+import net.kaczmarzyk.spring.data.jpa.domain.Between;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pw.react.backend.appException.UnauthorizedException;
+import pw.react.backend.dao.specifications.FlatSpecification;
 import pw.react.backend.model.Flat;
 import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.ImageService;
 import pw.react.backend.service.general.SecurityProvider;
-
-import java.util.ArrayList;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Collection;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
+
 
 @RestController
 @RequestMapping("/flats")
@@ -28,6 +39,7 @@ public class FlatController
     private final FlatsService flatsService;
     private final ImageService imageService;
     private final SecurityProvider securityService;
+    private final Pageable defaultPageable = PageRequest.of(0, 10);
 
     @Autowired
     public FlatController(FlatsService flatsService, ImageService imageService, SecurityProvider securityService)
@@ -49,18 +61,21 @@ public class FlatController
 
 
     @GetMapping(path = "")
-    public ResponseEntity<Collection<Flat>> getFlats(@RequestHeader HttpHeaders headers)
+    public ResponseEntity<Page<Flat>> getFlats(@RequestHeader HttpHeaders headers,
+                                               FlatSpecification flatSpecification,
+                                               @PageableDefault(size = 10) Pageable pageable)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
         {
-            return ResponseEntity.ok(flatsService.getFlats());
+            return ResponseEntity.ok(flatsService.getFlats(flatSpecification, pageable));
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ArrayList<>());
+            throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
     @PostMapping(path = "")
-    public ResponseEntity<String> createFlat(@RequestHeader HttpHeaders headers, @RequestBody List<Flat> flats)
+    public ResponseEntity<String> createFlat(@RequestHeader HttpHeaders headers,
+                                             @RequestBody List<Flat> flats)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers)) {
@@ -70,11 +85,12 @@ public class FlatController
             else
                 return ResponseEntity.ok(result.stream().map(c -> String.valueOf(c.getId())).collect(joining(",")));
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
+            throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
     @DeleteMapping(path = "/{flatId}")
-    public ResponseEntity<String> deleteFlat(@RequestHeader HttpHeaders headers, @PathVariable Long flatId)
+    public ResponseEntity<String> deleteFlat(@RequestHeader HttpHeaders headers,
+                                             @PathVariable Long flatId)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
@@ -85,22 +101,25 @@ public class FlatController
             else
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Flat with id %s not found.", flatId));
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
+            throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
     @GetMapping(path = "/{flatId}")
-    public ResponseEntity<Flat> getFlatDetails(@RequestHeader HttpHeaders headers, @PathVariable Long flatId)
+    public ResponseEntity<Flat> getFlatDetails(@RequestHeader HttpHeaders headers,
+                                               @PathVariable Long flatId)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
         {
             return flatsService.getFlat(flatId).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Flat.Empty));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Flat.Empty);
+        throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
     @PutMapping(path = "/{flatId}")
-    public ResponseEntity<Flat> updateCompany(@RequestHeader HttpHeaders headers, @PathVariable Long flatId, @RequestBody Flat updatedFlat) {
+    public ResponseEntity<Flat> updateCompany(@RequestHeader HttpHeaders headers,
+                                              @PathVariable Long flatId,
+                                              @RequestBody Flat updatedFlat) {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
         {
@@ -109,7 +128,7 @@ public class FlatController
                 return ResponseEntity.badRequest().body(updatedFlat);
             return ResponseEntity.ok(result);
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Flat.Empty);
+            throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
 }

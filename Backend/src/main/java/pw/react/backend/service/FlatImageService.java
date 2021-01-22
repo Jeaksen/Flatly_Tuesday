@@ -25,7 +25,6 @@ public class FlatImageService implements ImageService
     @Override
     public boolean deleteFlatImage(long flatId, String imageId)
     {
-
         return false;
     }
 }

@@ -5,9 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pw.react.backend.dao.FlatRepository;
+import pw.react.backend.dao.specifications.FlatSpecification;
 import pw.react.backend.model.Flat;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,9 +72,9 @@ public class FlatMainService implements FlatsService
     }
 
     @Override
-    public List<Flat> getFlats()
+    public Page<Flat> getFlats(Specification<Flat> flatSpecification, Pageable pageable)
     {
-        return repository.findAll();
+        return repository.findAll(flatSpecification, pageable);
     }
 
     @Override
