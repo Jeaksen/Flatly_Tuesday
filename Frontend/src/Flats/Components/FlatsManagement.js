@@ -30,14 +30,14 @@ function FlatsManagement(props) {
       <div hidden={props.loading || !props.isShowingForm} >
         <FlatForm />
       </div>
-      <div class="text-center">
+      {/* <div class="text-center">
         <Button variant="primary" type="button"
             hidden={props.loading || props.isShowingForm || props.saving}
             disabled={props.idDeleting !== -1}
             onClick={() => props.flatListShowingForm(true)}>
               Add new flat
         </Button>
-      </div>
+      </div> */}
       <div hidden={!props.saving}><Alert variant='primary'>Saving...</Alert></div>
       <div hidden={props.isShowingForm}><FlatsList /></div>
 

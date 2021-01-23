@@ -44,51 +44,46 @@ export function flatListShowingForm(b){
 }
 
 export function loadFlatListAsync() {
-    return async (dispatch) => {
-        try {
-            dispatch(flatListLoading(true));
-            let promise = fetch(FLATS_URL);
-            promise.then(response => response.json())
-                .then(json => dispatch(flatListLoaded(json)))
-                .then(() => dispatch(flatListLoading(false)));
-        } catch(error) {
-            console.error(error);
-            dispatch(flatListLoadingError(error));
-        }
-    }
+  return async (dispatch) => {
+    dispatch(flatListLoading(true));
+    let promise = fetch(FLATS_URL);
+    promise.then(response => response.json())
+        .then(json => dispatch(flatListLoaded(json)))
+        .then(() => dispatch(flatListLoading(false)))
+        .catch((error) => dispatch(flatSavingError(error)));
+  }
 }
 
 export function addNewFlat(flat) {
-    return async (dispatch) => {
-        try {
-            dispatch(flatListShowingForm(false));
-            dispatch(flatSaving(true));
-            let promise = fetch(FLATS_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json',},
-                body: JSON.stringify(flat)
-            });
-            promise.then(response => response.json())
-                .then(() => dispatch(flatSaving(false)))
-                .then(() => dispatch(loadFlatListAsync()));
-        } catch(error) {
-            console.error(error);
-            dispatch(flatSavingError(error));
-        }
-    }
+  return async (dispatch) => {
+    dispatch(flatListShowingForm(false));
+    dispatch(flatSaving(true));
+    let promise = fetch(FLATS_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json',},
+        body: JSON.stringify(flat)
+    });
+    promise.then(response => response.json())
+      .then(() => dispatch(flatSaving(false)))
+      .catch((error) => dispatch(flatSavingError(error)))
+      .finally(() => dispatch(loadFlatListAsync()));
+  }
 }
 
 export function deleteFlat(flatId) {
-    return async (dispatch) => {
-        try {
-            dispatch(flatDeleting(flatId))
-            let promise = fetch(FLATS_URL + flatId, {method: "DELETE"});
-            promise.then(response => response.json())
-                .then(() => dispatch(flatDeleting(-1)))
-                .then(() => dispatch(loadFlatListAsync()));
-        } catch(error) {
-            console.error(error);
-            dispatch(flatDeletingError(error))
-        }
-    }
+  return async (dispatch) => {
+    dispatch(flatDeleting(flatId))
+    let promise = fetch(FLATS_URL + flatId, {method: "DELETE"});
+    promise.then(response => response.json())
+        .then(() => dispatch(flatDeleting(-1)))
+        .catch((error) => dispatch(flatDeletingError(error)))
+        .finally(() => dispatch(loadFlatListAsync()));
+  }
+}
+
+export function adjustForm(b) {
+  return async (dispatch) => { 
+    dispatch(flatListShowingForm(b));
+    dispatch(loadFlatListAsync());
+  }
 }

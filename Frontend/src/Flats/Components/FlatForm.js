@@ -1,22 +1,21 @@
 import React, { useState } from "react";
 import { connect } from 'react-redux';
-import { addNewFlat, flatListShowingForm } from '../Actions/flatsActions';
+import { addNewFlat, adjustForm } from '../Actions/flatsActions';
 import {Form, Row, Col, Button, Card, CardDeck } from 'react-bootstrap';
 import AddressForm from "./AddressForm";
 import placeholder_img from '../../placeholder_img.png';
-import Dropzone from 'react-dropzone-uploader';
-import Preview from './Preview.tsx';
+import FlatImageDropzone from './FlatImageDropzone'
 
 const mapDispatchToProps = (dispatch) => ({
   addNewFlat: flat => dispatch(addNewFlat(flat)),
-  flatListShowingForm: (b) => dispatch(flatListShowingForm(b))
+  adjustForm: (b) => dispatch(adjustForm(b))
 })
 
 function FlatForm(props) {
-  const [flat, setflat] = useState({
+  const initialFlat = {
     id: Math.round((new Date()).getTime()),
     name: "",       
-    maxGuests: 0,
+    maxGuests: 1,
     price: 0,
     flatType: "",
     address: {
@@ -28,7 +27,11 @@ function FlatForm(props) {
       flatNumber: ""
     },
     images: []
-  });
+  }
+  
+  const [flat, setflat] = useState(initialFlat);
+  const [files, setFiles] = useState([]);
+  const [showedImg, setShowedImg] = useState(placeholder_img);
 
   const onflatChange = event => {
     const name = event.target.name;
@@ -47,45 +50,52 @@ function FlatForm(props) {
       }
     });
   }
-  const handleChangeStatus = ({ meta }, status) => {
-    if (status === 'done') {
-      setflat({
-        ...flat,
-        images: [
-          ...flat.images,
-          meta
-        ]
-      });
-    }
-    else if (status === 'removed'){
-      setflat({
-        ...flat,
-        images: flat.images.filter(item => item.name !== meta.name)
-      });
-    }
-  }  
 
-  const onSubmit = (flat) => {
+  const onAddingFiles = (acceptedFiles) => {
+    const currentFileNames = files.map(f => f.name);
+    const filteredAddedFiles = acceptedFiles.filter(file => currentFileNames.indexOf(file.name) === -1);
+    setFiles([
+      ...files,
+      ...filteredAddedFiles.map(file => ({fileValue: file, preview: URL.createObjectURL(file)}))
+    ]);
+    // filteredAddedFiles.forEach((file) => {
+    //   const reader = new FileReader();
+    //   reader.onabort = () => console.log('file reading was aborted');
+    //   reader.onerror = () => console.log('file reading has failed');
+    //   reader.onload = () => {
+    //     const array = new Int8Array(reader.result);
+    //     setflat({...flat, images: [...flat.images, { key: file.name, value: array}]});
+    //   }//JSON.stringify(array, null, '  ')
+    //   reader.readAsArrayBuffer(file);
+    // });
+  }
+
+  const onRemovingFile = (file) =>  {
+    URL.revokeObjectURL(file.preview);
+    const filesAferRemoving = files.filter(f => f.fileValue.name !== file.fileValue.name);
+    setFiles(filesAferRemoving);
+    //setflat({...flat, images: flat.images.filter(f => f.key !== file.name)});
+  }
+
+  const onSubmit = async (flat) => {
     props.addNewFlat(flat);
-    setflat({
-      id: Math.round((new Date()).getTime()),
-      name: "", 
-      maxGuests: 0,
-      price: 0,
-      flatType: "",
-      address: {
-        country: "", 
-        city: "", 
-        streetName: "", 
-        postCode: "", 
-        buildingNumber: "", 
-        flatNumber: ""
-      },
-      images: []
-    });
+    setInitial();
+  }
+
+  const onCancel = () => {
+    setInitial();
+    props.adjustForm(false);
+  }
+
+  function setInitial() {
+    setflat(initialFlat);
+    files.forEach(file => URL.revokeObjectURL(file.preview));
+    setFiles([]);
+    setShowedImg(placeholder_img);
   }
 
   return (
+    <div >
     <CardDeck>
       <Card bg="light" border="info"> 
         <Card.Body>
@@ -100,14 +110,14 @@ function FlatForm(props) {
             <Form.Group as={Row} controlId="maxGuests">
               <Form.Label column sm="2">Max guests</Form.Label>
               <Col sm="10">
-                <Form.Control type="text" name="maxGuests" value={flat.maxGuests} onChange={onflatChange} />
+                <Form.Control type="number" min={1} name="maxGuests" value={flat.maxGuests} onChange={onflatChange} />
               </Col>
             </Form.Group>
 
             <Form.Group as={Row} controlId="price">
               <Form.Label column sm="2">Price</Form.Label>
               <Col sm="10">
-                <Form.Control type="text" name="price" value={flat.price} onChange={onflatChange} />
+                <Form.Control type="number" name="price" value={flat.price} onChange={onflatChange} />
               </Col>
             </Form.Group>
     
@@ -117,38 +127,32 @@ function FlatForm(props) {
               //validate={onAddressFormValidating}
               isReadOnly={false} />
     
-            <Button 
-                variant="primary" 
-                type="button" 
-                onClick={() => onSubmit(flat)}>Submit</Button>
-            <Button
-                variant="danger" 
-                type="button" 
-                onClick={() => props.flatListShowingForm(false)}>Cancel</Button>
+
           </Form>
         </Card.Body>
       </Card>
 
-      <Card bg="light" border="info">
-        <Card.Img  src={placeholder_img} alt="Card image"/>
+      <Card style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <Card.Img  src={showedImg}/>
       </Card>
 
       <Card bg="light" border="info">
         <Card.Header>Uploaded Pictures</Card.Header>
         <Card.Body>
-        <Dropzone
-          onChangeStatus={handleChangeStatus}
-          accept="image/*"
-          PreviewComponent={Preview}
-          styles={{ dropzone: { minHeight: 200, maxHeight: 600 },  inputLabelWithFiles: { alignSelf: 'center', backgroundColor: '#007bff', color: '#fff' }}}
-          inputWithFilesContent= 'Upload new pictures'
-          //initialFiles={flat.images}
-        />
+        <FlatImageDropzone 
+          files = {files}
+          onAddingFiles = {onAddingFiles} 
+          onRemovingFile = {onRemovingFile}
+          onShowingImg= {(img) => setShowedImg(img)}/>
         </Card.Body>
 
       </Card>
     </CardDeck>
-    )
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+      <Button variant="primary" type="button" onClick={() => onSubmit(flat)}>Submit</Button>
+      <Button variant="danger" type="button" onClick={onCancel}>Cancel</Button>
+    </div>
+    </div>)
 }
 
 export default connect(
