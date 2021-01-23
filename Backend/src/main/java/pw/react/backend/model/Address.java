@@ -1,19 +1,19 @@
 package pw.react.backend.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.sun.istack.NotNull;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Data
 @Entity
-@Setter
-@Getter
 @Table(name = "addresses")
 public class Address implements Serializable
 {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
 
     @Column(nullable = false)
     private String country;

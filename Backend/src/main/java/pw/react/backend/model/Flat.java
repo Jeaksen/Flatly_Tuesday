@@ -1,9 +1,8 @@
 package pw.react.backend.model;
 
-
 import com.sun.istack.NotNull;
 import lombok.Data;
-
+import java.util.List;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -26,8 +25,12 @@ public class Flat implements Serializable
     @Column(nullable = false)
     private int price;
     @Column(nullable = false) @Enumerated(EnumType.STRING)
+
     private FlatType flatType;
     @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
+    @OneToMany(mappedBy = "flat")
+    @JsonBackReference
+    private List<Booking> bookings;
 }

@@ -10,6 +10,7 @@ import java.util.List;
 
 @Configuration
 @EnableJpaRepositories
+
 public class SpringConfig implements WebMvcConfigurer
 {
     @Override
