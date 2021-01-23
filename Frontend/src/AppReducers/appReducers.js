@@ -1,11 +1,13 @@
 import { combineReducers } from 'redux';
 import flatsReducer from '../Flats/Reducers/flatsReducer';
-import bookingsReducer from '../Bookings/Reducers/bookingsReducer';
+import bookingsListReducer from '../Bookings/Reducers/bookingsListReducer'
+import bookingDetailsReducer from '../Bookings/Reducers/bookingDetailsReducer'
 
 
  const appReducers = combineReducers({
-     flats: flatsReducer,
-     bookings: bookingsReducer
+    flats: flatsReducer,
+    bookingsList: bookingsListReducer,
+    bookingDetails: bookingDetailsReducer
  });
 
  export default appReducers;

@@ -3,6 +3,8 @@ import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reduxThunk from 'redux-thunk'
 
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+
 import appReducers from './AppReducers/appReducers'
 import {composeWithDevTools} from 'redux-devtools-extension';
 import BookingsList from './Bookings/BookingsList' 
@@ -13,11 +15,23 @@ const store = createStore(appReducers, {}, composeWithDevTools((applyMiddleware(
 
 function App() {
   return (
-    <div className="App">
-      <Provider store = {store}>
-        <BookingsList />
-      </Provider>
-    </div>
+    <Provider store = {store}>
+      <Router>
+        <Switch>
+          <Route path="/bookings">
+            <BookingsList />
+          </Route>
+          <Route path="/flats">
+            <span>Flats List Page</span>
+          </Route>
+          <Route path="/">
+            <span>Login Page</span>
+            <Link to="/bookings">Bookings</Link>
+            <Link to="/flats">Flats</Link>
+          </Route>
+        </Switch>
+      </Router>
+    </Provider>
   );
 }
 

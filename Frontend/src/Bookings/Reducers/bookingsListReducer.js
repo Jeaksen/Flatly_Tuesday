@@ -1,4 +1,3 @@
-
 const baseState = {list: [], loading: false, saving: false, error: null}
 
 export default function bookingsListReducer(state = baseState, action) 
