@@ -1,6 +1,8 @@
 import React from 'react';
 import "./BookingsList.css"
 
+import { BrowserRouter as Router, Switch, Route, Link, useRouteMatch, useParams } from "react-router-dom";
+
 function BookingsListItem(props) {
   if (props.booking.canceling)
     return (<li className="BookingsListItem"><label>Canceling...</label></li>)
@@ -14,7 +16,9 @@ function BookingsListItem(props) {
           <li>{`City: ${props.booking.flat.address.city}`}</li>
           <li>{`Date: ${props.booking.startDate} - ${props.booking.endDate}`}</li>
         </ul>
-        {props.detailsBooking}
+        <Link to={`/bookings/details/${props.booking.id}`}>
+          <button>Details</button>
+        </Link>
         <button onClick={() => props.cancelBooking(props.booking.id)}>Cancel</button>
       </li>
     );

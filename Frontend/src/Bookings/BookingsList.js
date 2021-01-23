@@ -3,9 +3,6 @@ import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions'
 import BookingsListItem from "./BookingsListItem";
 import "./BookingsList.css"
-import BookingDetails from "./BookingDetails";
-
-import { BrowserRouter as Router, Switch, Route, Link, useRouteMatch, useParams } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => ({ 
     bookings: state.bookingsList.list,
@@ -21,8 +18,6 @@ const mapDispatchToProps = (dispatch) => ({
 
 function BookingsList(props)
 {   
-    let match = useRouteMatch();
-
     useEffect(() => {props.loadBookingsListAsync()}, [])
     if (props.loading) {
         return (<label>Loading...</label>)
@@ -33,16 +28,9 @@ function BookingsList(props)
     if (props.bookings && props.bookings.length > 0)
         return (
             <div className="BookingsListPanel">
-                <Switch>
-                    <Route path={`${match.url}/details/:bookingId`}>
-                        <BookingDetails />
-                    </Route>
-                    <Route path={match.path}>
-                        <ul className="BookingsList">{props.bookings.map((booking) => {
-                            return <BookingsListItem key={booking.id} booking={booking} detailsBooking={<Link to={`${match.url}/details/${booking.id}`}><button>Details</button></Link>} cancelBooking={props.cancelBooking} />})}
-                        </ul>
-                    </Route>
-                </Switch>
+                <ul className="BookingsList">{props.bookings.map((booking) => {
+                    return <BookingsListItem key={booking.id} booking={booking} cancelBooking={props.cancelBooking} />})}
+                </ul>
             </div>
         )
     return <div />

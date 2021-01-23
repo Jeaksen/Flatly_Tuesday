@@ -8,6 +8,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import appReducers from './AppReducers/appReducers'
 import {composeWithDevTools} from 'redux-devtools-extension';
 import BookingsList from './Bookings/BookingsList' 
+import BookingDetails from "./Bookings/BookingDetails";
+
 
 import './App.css';
 
@@ -18,8 +20,14 @@ function App() {
     <Provider store = {store}>
       <Router>
         <Switch>
+          <Route path={`/bookings/details/:bookingId`}>
+            <BookingDetails />
+          </Route>
           <Route path="/bookings">
             <BookingsList />
+          </Route>
+          <Route path={`/flats/details/:flatId`}>
+            <span>Flat Details Page</span>
           </Route>
           <Route path="/flats">
             <span>Flats List Page</span>

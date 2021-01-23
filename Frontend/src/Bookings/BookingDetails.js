@@ -39,7 +39,9 @@ function BookingDetails(props) {
                         <li>{`City: ${props.booking.flat.address.city}`}</li>
                         <li>{`Address: ${props.booking.flat.address.streetName} ${props.booking.flat.address.buildingNumber}/${props.booking.flat.address.flatNumber}`}</li>
                     </ul>
-                    <button>Go to flat details</button>
+                    <Link to={`/flats/details/${props.booking.flat.id}`}>
+                        <button>Go to flat details</button>
+                    </Link>
                 </ul>
             </div>
         )
