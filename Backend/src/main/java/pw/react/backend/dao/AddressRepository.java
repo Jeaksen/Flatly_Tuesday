@@ -5,4 +5,5 @@ import pw.react.backend.model.Address;
 
 public interface AddressRepository extends JpaRepository<Address, Long>
 {
+
 }

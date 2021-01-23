@@ -1,68 +1,4 @@
 {
-  "flats": [
-    {
-      "id": 1,
-      "name": "Pineska-Tulipan",
-      "maxGuests": 3,
-      "price": 0,
-      "address": {
-        "country": "Poland",
-        "city": "Warsaw",
-        "streetName": "Uniwersytecka",
-        "buildingNumberail": "5",
-        "postCode": "02-036",
-        "flatNumber": "5"
-      }
-    },
-    {
-      "id": 1610843665525,
-      "name": "Akademicka Dom",
-      "maxGuests": 5,
-      "price": 600,
-      "address": {
-        "country": "Poland",
-        "city": "Warszawa",
-        "streetName": "Akademicka",
-        "postCode": "02-038",
-        "buildingNumber": "4524",
-        "flatNumber": "453453"
-      }
-    },
-    {
-      "id": 1611389413158,
-      "name": "Rose",
-      "maxGuests": 1,
-      "price": 500,
-      "flatType": "",
-      "address": {
-        "country": "Germany",
-        "city": "Munich",
-        "streetName": "Akademicka",
-        "postCode": "02-038",
-        "buildingNumber": "",
-        "flatNumber": ""
-      },
-      "images": []
-    },
-    {
-      "id": 1611425149462,
-      "name": "Cong Nguyen",
-      "maxGuests": 1,
-      "price": "1000",
-      "flatType": "",
-      "address": {
-        "country": "Poland",
-        "city": "Warszawa",
-        "streetName": "Akademicka",
-        "postCode": "02-038",
-        "buildingNumber": "",
-        "flatNumber": ""
-      },
-      "images": []
-    }
-  ]
-},
-
     "bookings": [
       {
         "id": "5dc9bdc63d2a39982fbf83d8",
@@ -80,10 +16,10 @@
         "flat":
           {
             "id": "09fkm1o2oijs18hiujwj09d2bu",
-            "name": "U Grażyny",
-            "flatType": "Apartment",
+            "flatName": "U Grażyny",
             "maxGuests": 6,
             "pricePerDay": 35,
+            "flatType": "Apartment",
             "address":
               {
                 "country": "Poland",
@@ -111,10 +47,10 @@
         "flat":
           {
             "id": "asfk112310918hiujwj09d2bu",
-            "name": "Złoty Taras",
-            "flatType": "Apartment",
+            "flatName": "Złoty Taras",
             "maxGuests": 6,
             "pricePerDay": 50,
+            "flatType": "Apartment",
             "address":
               {
                 "country": "Poland",

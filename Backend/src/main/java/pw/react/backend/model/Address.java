@@ -1,32 +1,30 @@
 package pw.react.backend.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.sun.istack.NotNull;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Data
 @Entity
-@Setter
-@Getter
 @Table(name = "addresses")
 public class Address implements Serializable
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column
+
+    @Column(nullable = false)
     private String country;
-    @Column
+    @Column(nullable = false)
     private String city;
-    @Column
+    @Column(nullable = false)
     private String streetName;
-    @Column
+    @Column(nullable = false)
     private String postCode;
-    @Column
+    @Column(nullable = false)
     private String buildingNumber;
-    @Column
     private String flatNumber;
 
     @OneToOne(mappedBy = "address")

@@ -7,7 +7,8 @@ import pw.react.backend.model.CompanyLogo;
 import java.util.Optional;
 
 @Transactional
-public interface CompanyLogoRepository extends JpaRepository<CompanyLogo, String> {
+public interface CompanyLogoRepository extends JpaRepository<CompanyLogo, String>
+{
     Optional<CompanyLogo> findByCompanyId(long companyId);
     void deleteByCompanyId(long companyId);
 }
