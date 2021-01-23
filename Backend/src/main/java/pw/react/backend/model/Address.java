@@ -12,21 +12,19 @@ import java.io.Serializable;
 @Table(name = "addresses")
 public class Address implements Serializable
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column
+    @Column(nullable = false)
     private String country;
-    @Column
+    @Column(nullable = false)
     private String city;
-    @Column
+    @Column(nullable = false)
     private String streetName;
-    @Column
+    @Column(nullable = false)
     private String postCode;
-    @Column
+    @Column(nullable = false)
     private String buildingNumber;
-    @Column
     private String flatNumber;
 
     @OneToOne(mappedBy = "address")

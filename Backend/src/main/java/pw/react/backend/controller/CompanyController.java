@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -13,9 +15,12 @@ import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.CompanyRepository;
 import pw.react.backend.model.Company;
 import pw.react.backend.model.CompanyLogo;
-import pw.react.backend.service.*;
+import pw.react.backend.service.company.CompanyService;
+import pw.react.backend.service.company.LogoService;
+import pw.react.backend.service.general.SecurityProvider;
 import pw.react.backend.web.UploadFileResponse;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -131,12 +136,18 @@ public class CompanyController {
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
-    @GetMapping(value = "/{companyId}/logo", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] getLog(@RequestHeader HttpHeaders headers, @PathVariable Long companyId) {
+//    @GetMapping(value = "/{companyId}/logo", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/{companyId}/logo", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MultiValueMap<String, Object>> getLog(@RequestHeader HttpHeaders headers, @PathVariable Long companyId) {
         logHeaders(headers);
         if (securityService.isAuthorized(headers)) {
+            MultiValueMap<String, Object> mpr = new LinkedMultiValueMap<String, Object>();
             CompanyLogo companyLogo = companyLogoService.getCompanyLogo(companyId);
-            return companyLogo.getData();
+            List<CompanyLogo> list = new ArrayList<>();
+            list.add(companyLogo);
+            list.add(companyLogo);
+            mpr.add("logos", list);
+            return new ResponseEntity<>(mpr, HttpStatus.OK);
         }
 
         throw new UnauthorizedException("Unauthorized access to resources.");
