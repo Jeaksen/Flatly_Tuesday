@@ -1,5 +1,6 @@
 package pw.react.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import java.util.List;
