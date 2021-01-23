@@ -17,18 +17,21 @@ import pw.react.backend.model.Booking;
 import pw.react.backend.service.BookingsService;
 import pw.react.backend.service.SecurityProvider;
 
+import java.util.Collection;
+import java.util.List;
+
 import static java.util.stream.Collectors.joining;
 
 @RestController
-@RequestMapping("/bookings")
-public class BookingsController
+@RequestMapping("/ext/bookings")
+public class BookingsExtController
 {
     private final Logger logger = LoggerFactory.getLogger(BookingsController.class);
     private final SecurityProvider securityService;
     private final BookingsService bookingsService;
 
     @Autowired
-    public BookingsController(SecurityProvider securityService, BookingsService bookingsService)
+    public BookingsExtController(SecurityProvider securityService, BookingsService bookingsService)
     {
         this.securityService = securityService;
         this.bookingsService = bookingsService;
@@ -54,6 +57,34 @@ public class BookingsController
         throw new UnauthorizedException("Get Bookings request is unauthorized");
     }
 
+    /*@PostMapping(path = "")
+    public ResponseEntity<String> postBooking(@RequestHeader HttpHeaders headers,
+                                              @RequestBody Booking booking) {
+        logHeaders(headers);
+        if (securityService.isAuthorized(headers)) {
+            boolean deleted = bookingsService.postBooking(booking);
+            if (!deleted) {
+                return ResponseEntity.badRequest().body(String.format("Booking with id %s already exists.", booking.getId()));
+            }
+            return ResponseEntity.ok(String.format("Booking with id %s posted.", booking.getId()));
+        }
+        throw new UnauthorizedException("Unauthorized access to resources.");
+    }*/
+
+    @PostMapping(path = "")
+    public ResponseEntity<String> postBookings(@RequestHeader HttpHeaders headers,
+                                               @RequestBody List<Booking> bookings) {
+        logHeaders(headers);
+        if (securityService.isAuthorized(headers)) {
+            List<Booking> result = bookingsService.postBookings(bookings);
+            if (result.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the bookings");
+            }
+            return ResponseEntity.ok(result.stream().map(c -> String.valueOf(c.getId())).collect(joining(",")));
+        }
+        throw new UnauthorizedException("Unauthorized access to resources.");
+    }
+
     @GetMapping(path = "/{bookingId}")
     public ResponseEntity<Booking> getBooking(@RequestHeader HttpHeaders headers,
                                               @PathVariable Long bookingId) {
@@ -73,7 +104,7 @@ public class BookingsController
             if (!deleted) {
                 return ResponseEntity.badRequest().body(String.format("Booking with id %s does not exist.", bookingId));
             }
-            return ResponseEntity.ok(String.format("Booking with id %s cancelled", bookingId));
+            return ResponseEntity.ok(String.format("Booking with id %s cancelled.", bookingId));
         }
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
