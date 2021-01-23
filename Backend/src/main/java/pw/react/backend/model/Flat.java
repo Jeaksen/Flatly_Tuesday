@@ -17,7 +17,7 @@ public class Flat implements Serializable
 
     public static Flat Empty = new Flat();
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "flat_id")
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @Column(nullable = false)
     private String name;
@@ -30,8 +30,4 @@ public class Flat implements Serializable
     private FlatType flatType;
     @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;
-
-//    @OneToMany(mappedBy = "flat")
-//    @JsonBackReference
-//    private List<Booking> bookings;
 }
