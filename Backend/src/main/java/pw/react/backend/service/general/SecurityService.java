@@ -4,7 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 @Service
-class SecurityService implements SecurityProvider {
+public class SecurityService implements SecurityProvider {
 
     private static final String SECURITY_HEADER = "security-header";
     private final String SECURITY_HEADER_VALUE = "secureMe";

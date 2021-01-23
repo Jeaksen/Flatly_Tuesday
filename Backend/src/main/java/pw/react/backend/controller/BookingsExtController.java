@@ -15,7 +15,7 @@ import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.specifications.BookingSpecification;
 import pw.react.backend.model.Booking;
 import pw.react.backend.service.BookingsService;
-import pw.react.backend.service.SecurityProvider;
+import pw.react.backend.service.general.SecurityProvider;
 
 import java.util.Collection;
 import java.util.List;
