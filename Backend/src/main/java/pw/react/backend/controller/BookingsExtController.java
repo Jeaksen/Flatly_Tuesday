@@ -17,7 +17,6 @@ import pw.react.backend.model.Booking;
 import pw.react.backend.service.BookingsService;
 import pw.react.backend.service.general.SecurityProvider;
 
-import java.util.Collection;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
