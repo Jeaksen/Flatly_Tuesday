@@ -5,28 +5,34 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
-@Table(name = "company_logo")
+@Table(name = "flat_pictures")
 @Data
 @NoArgsConstructor
-public class CompanyLogo {
-
+public class FlatImage
+{
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
+    @Column(nullable = false)
     private String fileName;
+    @Column(nullable = false)
     private String fileType;
-    private long companyId;
-    @Lob
+    @Column(nullable = false)
+    private long flatId;
+    @Column(nullable = false)
+    private boolean isHeaderImage;
+    @Column(nullable = false) @Lob
     private byte[] data;
 
-    public CompanyLogo(String fileName, String fileType, long companyId, byte[] data) {
+    public FlatImage(String fileName, String fileType, long flatId, boolean isHeaderImage, byte[] data)
+    {
         this.fileName = fileName;
         this.fileType = fileType;
-        this.companyId = companyId;
+        this.flatId = flatId;
+        this.isHeaderImage = isHeaderImage;
         this.data = data;
     }
 }

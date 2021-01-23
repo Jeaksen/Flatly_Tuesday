@@ -1,4 +1,4 @@
-package pw.react.backend.service;
+package pw.react.backend.service.company;
 
 import pw.react.backend.model.Company;
 

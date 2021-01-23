@@ -4,3 +4,4 @@ public enum FlatType
 {
     Apartment, Flat, Mansion, Cottage, chatkapuchatka;
 }
+

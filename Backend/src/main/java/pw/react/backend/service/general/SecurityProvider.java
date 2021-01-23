@@ -1,4 +1,4 @@
-package pw.react.backend.service;
+package pw.react.backend.service.general;
 
 import org.springframework.http.HttpHeaders;
 
