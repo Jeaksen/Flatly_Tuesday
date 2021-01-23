@@ -37,12 +37,10 @@ public class Booking implements Serializable
     @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonManagedReference
     private Customer customer;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "flat_id")
-    @JsonManagedReference
     private Flat flat;
 }
