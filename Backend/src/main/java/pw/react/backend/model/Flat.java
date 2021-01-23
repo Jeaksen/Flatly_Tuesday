@@ -15,9 +15,9 @@ public class Flat implements Serializable
 {
     private static final long serialVersionUID = -6783504532088859179L;
 
-    public static Flat Empty;
+    public static Flat Empty = new Flat();
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "flat_id")
     private long id;
     @Column(nullable = false)
     private String name;
@@ -31,7 +31,7 @@ public class Flat implements Serializable
     @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
-    @OneToMany(mappedBy = "flat")
-    @JsonBackReference
-    private List<Booking> bookings;
+//    @OneToMany(mappedBy = "flat")
+//    @JsonBackReference
+//    private List<Booking> bookings;
 }
