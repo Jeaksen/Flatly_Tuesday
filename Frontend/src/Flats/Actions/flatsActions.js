@@ -50,7 +50,7 @@ export function loadFlatListAsync() {
     promise.then(response => response.json())
         .then(json => dispatch(flatListLoaded(json)))
         .then(() => dispatch(flatListLoading(false)))
-        .catch((error) => dispatch(flatSavingError(error)));
+        .catch((error) => dispatch(flatListLoadingError(error)));
   }
 }
 
