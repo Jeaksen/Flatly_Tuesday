@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ImageService
 {
-    FlatImage storeImage(long flatId, MultipartFile file);
+    List<FlatImage> storeImages(long flatId, List<MultipartFile> file);
     List<FlatImage> getFlatImages(long flatId);
     boolean deleteFlatImage(long flatId, String imageId);
 }
