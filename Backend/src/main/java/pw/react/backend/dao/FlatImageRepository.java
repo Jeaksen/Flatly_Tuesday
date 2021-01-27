@@ -10,7 +10,8 @@ import java.util.Optional;
 @Transactional
 public interface FlatImageRepository extends JpaRepository<FlatImage, String>
 {
-    Optional<FlatImage> findByFlatId(long flatId);
     List<FlatImage> getAllByFlatId(Long flatId);
+    Optional<FlatImage> getFirstByFlatId(Long flatId);
     void deleteByFlatId(long flatId);
+    void deleteByIdNotIn(List<String> ids);
 }

@@ -9,10 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import pw.react.backend.dao.FlatRepository;
 import pw.react.backend.model.Flat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,21 +23,32 @@ public class FlatMainService implements FlatsService
     private final Logger logger = LoggerFactory.getLogger(FlatMainService.class);
 
     FlatRepository repository;
+    FlatImageService imageService;
 
     @Autowired
-    FlatMainService(FlatRepository repository)
+    FlatMainService(FlatRepository repository, FlatImageService imageService)
     {
         this.repository = repository;
+        this.imageService = imageService;
     }
 
     @Override
-    public Flat updateFlat(Long flatId, Flat updatedFlat)
+    public Flat updateFlat(Long flatId, Flat updatedFlat, List<MultipartFile> newImages)
     {
         Flat result = Flat.Empty;
         if (repository.existsById(flatId))
         {
+            if (!newImages.isEmpty())
+            {
+                var addedImages = imageService.storeImages(flatId, newImages);
+                updatedFlat.getImages().addAll(addedImages);
+            }
             updatedFlat.setId(flatId);
             result = repository.save(updatedFlat);
+            updatedFlat.getImages().forEach(flatImage -> flatImage.setData(null));
+            imageService.deleteRemovedImages(updatedFlat.getImages());
+
+            result.setImages(updatedFlat.getImages());
             logger.info("Flat with id {} updated.", flatId);
         }
         return result;
@@ -50,6 +61,7 @@ public class FlatMainService implements FlatsService
         if (repository.existsById(flatId))
         {
             repository.deleteById(flatId);
+            imageService.deleteImagesForFlat(flatId);
             logger.info("Flat with id {} deleted.", flatId);
             result = true;
         }
@@ -57,27 +69,37 @@ public class FlatMainService implements FlatsService
     }
 
     @Override
-    public List<Flat> saveFlats(List<Flat> flats)
+    public Optional<Flat> saveFlat(Flat flat, List<MultipartFile> newImages)
     {
-        List<Flat> results = new ArrayList<>();
+        Optional<Flat> result = Optional.empty();
         try {
-            results = repository.saveAll(flats);
+            result = Optional.of(repository.save(flat));
+            var addedImages = imageService.storeImages(result.get().getId(), newImages);
+            addedImages.forEach(flatImage -> flatImage.setData(null));
+            result.get().setImages(addedImages);
         } catch (DataIntegrityViolationException e) {
             logger.error(String.format("Failed to save flats %s", e.getMessage()));
         }
 
-        return results;
+        return result;
     }
 
     @Override
     public Page<Flat> getFlats(Specification<Flat> flatSpecification, Pageable pageable)
     {
-        return repository.findAll(flatSpecification, pageable);
+        var flats = repository.findAll(flatSpecification, pageable);
+        flats.forEach(flat -> {
+            var image = imageService.getFirstImage(flat.getId());
+            image.ifPresent(flatImage -> flat.setImages(List.of(flatImage)));
+        });
+        return flats;
     }
 
     @Override
     public Optional<Flat> getFlat(Long flatId)
     {
-        return repository.findById(flatId);
+        var flat = repository.findById(flatId);
+        flat.ifPresent(flat1 -> flat1.setImages(imageService.getFlatImages(flat1.getId())));
+        return flat;
     }
 }

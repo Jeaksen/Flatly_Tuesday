@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 
 @Data
@@ -29,4 +30,5 @@ public class Flat implements Serializable
     private FlatType flatType;
     @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;
+    private transient List<FlatImage> images;
 }
