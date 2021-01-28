@@ -38,15 +38,15 @@ public class FlatMainService implements FlatsService
         Flat result = Flat.Empty;
         if (repository.existsById(flatId))
         {
+            updatedFlat.setId(flatId);
+            result = repository.save(updatedFlat);
+            imageService.deleteRemovedImages(updatedFlat.getImages());
             if (!newImages.isEmpty())
             {
                 var addedImages = imageService.storeImages(flatId, newImages);
                 updatedFlat.getImages().addAll(addedImages);
             }
-            updatedFlat.setId(flatId);
-            result = repository.save(updatedFlat);
             updatedFlat.getImages().forEach(flatImage -> flatImage.setData(null));
-            imageService.deleteRemovedImages(updatedFlat.getImages());
 
             result.setImages(updatedFlat.getImages());
             logger.info("Flat with id {} updated.", flatId);

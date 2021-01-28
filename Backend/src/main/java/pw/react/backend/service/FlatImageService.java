@@ -47,6 +47,7 @@ public class FlatImageService implements ImageService
                     throw new InvalidFileException("Sorry! Filename contains invalid path sequence " + fileName);
                 FlatImage newImage = new FlatImage(fileName, file.getContentType(), flatId, file.getBytes());
                 saved.add(repository.save(newImage));
+                logger.info(String.format("Saved picture with id %s for flat %d", newImage.getId(), newImage.getFlatId()));
             } catch (IOException ex) {
                 throw new InvalidFileException("Could not store file " + fileName + ". Please try again!", ex);
             }

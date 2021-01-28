@@ -1,5 +1,4 @@
-package pw.react.backend.controller.internal;
-
+package pw.react.backend.controller.external;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +25,17 @@ import static java.util.stream.Collectors.joining;
 
 
 @RestController
-@RequestMapping("/flats")
-public class FlatController
+@RequestMapping("/ext/flats")
+public class FlatExtController
 {
-    private final Logger logger = LoggerFactory.getLogger(FlatController.class);
+    private final Logger logger = LoggerFactory.getLogger(FlatExtController.class);
 
     private final FlatsService flatsService;
     private final ImageService imageService;
     private final SecurityProvider securityService;
 
     @Autowired
-    public FlatController(FlatsService flatsService, ImageService imageService, SecurityProvider securityService)
+    public FlatExtController(FlatsService flatsService, ImageService imageService, SecurityProvider securityService)
     {
         this.flatsService = flatsService;
         this.imageService = imageService;
@@ -122,15 +121,15 @@ public class FlatController
             Flat result = flatsService.updateFlat(flatId, updatedFlat, newImages);
             if (Flat.Empty.equals(result))
                 return ResponseEntity.badRequest().body(result);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(Flat.Empty);
         } else
             throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
     @PostMapping(path = "/{flatId}/images")
     public ResponseEntity<String> uploadImages(@RequestHeader HttpHeaders headers,
-                                              @PathVariable Long flatId,
-                                              @RequestParam("images") List<MultipartFile> images)
+                                               @PathVariable Long flatId,
+                                               @RequestParam("images") List<MultipartFile> images)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
