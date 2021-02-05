@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Select from 'react-select';
-import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
+import AsyncSelect from 'react-select/async';
 import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
 import BookingsListItem from "./BookingsListItem";
@@ -29,47 +26,45 @@ function BookingsList(props)
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
     const [country, setCountry] = useState("");
-    const [date, setDate] = useState([
+    const [date, setDate] = useState(
         {
-          startDate: new Date(),
-          endDate: new Date(),
-          key: 'selection'
-        }
-      ]);
-
-    const countryOptions = [
-        { value: 'poland', label: 'Poland' },
-        { value: 'england', label: 'England' },
-        { value: 'russia', label: 'Russia' },
-        { value: 'arstotzka', label: 'Arstotzka' }
-    ]
-    const cityOptions = [
-        { value: 'warsaw', label: 'Warsaw' },
-        { value: 'moscow', label: 'Moscow' },
-        { value: 'london', label: 'London' }
-    ]
+          startDate: null,
+          endDate: null
+        });
 
     useEffect(() => {props.loadBookingsListAsync()}, [])
     return (
         <div className="BookingsListPanel">
             <ul className="BookingsFilterPanel">
-                <SingleSelect 
+                <AsyncSelect className="single-select" classNamePrefix="select" 
+                    isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
                     name="countrySelect"
                     placeholder="Select Country..."
-                    options={countryOptions}
+                    cacheOptions
+                    defaultOptions
+                    loadOptions = {(inputValue, callback) => {
+                      setTimeout(() => {
+                          fetch("http://localhost:8080/countryOptions")
+                              .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                              .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
+                        }, 1000)
+                    }}
                     onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
                 />
-                <SingleSelect 
+                <AsyncSelect className="single-select" classNamePrefix="select" 
+                    isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
                     name="citySelect"
                     placeholder="Select City..."
-                    options={cityOptions} onChange={(opt) => { opt != null ? setCity(opt.value) : setCity("")}}
-                />
-                <DateRange
-                    editableDateInputs={true}
-                    onChange={item => setDate([item.selection])}
-                    moveRangeOnFirstSelection={false}
-                    ranges={date}
-                    color={"#ff9900"}
+                    cacheOptions
+                    defaultOptions
+                    loadOptions = {(inputValue, callback) => {
+                      setTimeout(() => {
+                          fetch("http://localhost:8080/cityOptions")
+                              .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                              .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
+                        }, 1000)
+                    }}
+                    onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
                 />
                 <input className="FlatNameInput" 
                     placeholder="Search by Flat's Name"
@@ -81,9 +76,11 @@ function BookingsList(props)
                     if (name !== "") opt_str += `&name=${name}`;
                     if (country !== "") opt_str += `&country=${country}`;
                     if (city !== "") opt_str += `&city=${city}`;
-                    console.log(date);
+                    if (date.startDate instanceof Date) opt_str += `&dateFrom=${date.startDate.getFullYear()}-${date.startDate.getMonth()}-${date.startDate.getDate()}`;
+                    if (date.endDate instanceof Date) opt_str += `&dateTo=${date.endDate.getFullYear()}-${date.endDate.getMonth()}-${date.endDate.getDate()}`;
                     console.log(opt_str);
                     props.loadBookingsListAsync();
+                    // props.loadBookingsListAsync(opt_str);
                 }}>
                     Apply Filters
                 </button>
@@ -94,25 +91,6 @@ function BookingsList(props)
                 </ul> :
             <div />}
         </div>
-    );
-}
-
-function SingleSelect (props)
-{
-    return(
-        <Select
-          className="single-select"
-          classNamePrefix="select"
-          isDisabled={false}
-          isLoading={false}
-          isClearable={true}
-          isRtl={false}
-          isSearchable={true}
-          name={props.name}
-          placeholder={props.placeholder}
-          options={props.options}
-          onChange={props.onChange}
-        />
     );
 }
 
