@@ -13,7 +13,7 @@ export default function FlatsDetailScreen({route, navigation}) {
     const item = navigation.getParam('flat');
 
     return (
-        <View >
+        <SafeAreaView >
             <View style={styles.circle}></View>
             <HeaderNavBar page={"Flats"} navigation={navigation}/>
             <View style={styles.topPanel}>
@@ -42,10 +42,10 @@ export default function FlatsDetailScreen({route, navigation}) {
                 <Text style={styles.info}> {`Address:  ${item.capital}`} </Text>
                 <Text style={styles.info}> {`Availability:  ${item.alpha3Code}`} </Text>
                 <View  style={styles.button}>
-                    <Button title="Back" color='black' onPress={() => navigation.navigate('Home')}></Button>
+                    <Button title="Back" color='black' onPress={() => navigation.navigate('Flats')}></Button>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 

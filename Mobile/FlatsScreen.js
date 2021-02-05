@@ -17,9 +17,9 @@ const bigButtonW = 3*buttonW + 2*centerMargin
 
 function ListItem({ item, navigation }) {
   return (
-        <View style={styles.item}>
+        <SafeAreaView style={styles.item}>
                 <View style={{flex: 1, flexDirection:'row'}}>
-                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item})}>
+                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.push('FlatDetails',{flat: item})}>
                         <View>
                             <Text style={styles.itemtitle}>{item.name}</Text>
                         </View>
@@ -36,7 +36,7 @@ function ListItem({ item, navigation }) {
                       <View/>
                     </View>
                 </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
