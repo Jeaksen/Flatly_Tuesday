@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, Dimensions,Animated,Button } from 'react-native';
 import { HeaderBackButton } from 'react-navigation-stack';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Icon } from 'react-native-elements'
 import HeaderNavBar from './HeaderNavBar';
 
 const {width, height} = Dimensions.get("screen")
-
-//            <View style={styles.circle}></View>
+const butColor = '#38373c';
+const butsize=50;
 
 export default function FlatsDetailScreen({route, navigation}) {
     const item = navigation.getParam('flat');
 
     return (
-        <View>
+        <View >
             <View style={styles.circle}></View>
             <HeaderNavBar page={"Flats"} navigation={navigation}/>
             <View style={styles.topPanel}>
-                <View style={styles.country}>
-                <Text style={styles.title}>{item.name}</Text>
-                <View style={styles.container}>
-                    <Image
-                        style={styles.flag}
-                        source={{
-                            uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
-                </View>
+                    <Text style={styles.title}>{item.name}</Text>
+                    <View style={styles.container}>
+                        <Image
+                            style={styles.flag}
+                            source={{
+                                uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
+                    </View>
+            </View>
+            <View style={styles.midPanel}>
+                <TouchableOpacity style={styles.roundButton}>
+                    <Icon name="arrow-left" color='white' size={butsize}/>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.roundButtonLeft}>
+                    <Icon name="arrow-right" color='white' size={butsize}/>
+                </TouchableOpacity>
             </View>
             <View style={styles.bottomPanel}>
                 <View style={styles.row}>
@@ -36,7 +45,6 @@ export default function FlatsDetailScreen({route, navigation}) {
                     <Button title="Back" color='black' onPress={() => navigation.navigate('Home')}></Button>
                 </View>
             </View>
-            </View>
         </View>
     );
 }
@@ -48,10 +56,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     topPanel:{
+        height: 0.4*height,
+    },
+    midPanel:{
+        flexDirection:'row',
+        height: 0.1*height,
     },
     bottomPanel:{
         padding: 10,
-        height: height*0.35,
+        height: 0.3*height,
+        marginTop:'auto',
     },
     row:{
         flexDirection:'row',   
@@ -93,6 +107,24 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: 'red',
         marginTop: 'auto',
+    },
+    roundButton:{
+        width: butsize,
+        height: butsize,
+        borderRadius: butsize/2,
+        backgroundColor: butColor,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 10,
+    },
+    roundButtonLeft:{
+        width: butsize,
+        height: butsize,
+        borderRadius: butsize/2,
+        backgroundColor: butColor,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: width-2*butsize-2*10,
     },
     circle:{
         width: circlesize,

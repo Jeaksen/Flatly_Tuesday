@@ -27,7 +27,7 @@ export default function HeaderNavBar({navigation,page}) {
       <View style={{flexDirection:'column', justifyContent: 'center', alignItems: 'center'}}>
         <View style={styles.naviPanel}>
             <View style={getStyle("Flats")}>
-                <Button color = '#38373c' title="Flats"  onPress={() => navigation.navigate('Home')}></Button>
+                <Button color = '#38373c' title="Flats"  onPress={() => navigation.navigate('Flats')}></Button>
             </View>
             <View style={getStyle("Bookings")}>
                 <Button color = '#38373c' title="Bookings" onPress={() =>navigation.navigate('Bookings')}></Button>

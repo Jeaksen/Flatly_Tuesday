@@ -142,26 +142,6 @@ export default function FlatsScreen({navigation}) {
       paddingLeft: flagSize*0.6,
       paddingVertical: flagSize*0.1,
     },
-    naviPanel:{
-      backgroundColor: '#38373c',
-      flexDirection:'row', 
-      height:height*0.1, 
-      width: width,
-      justifyContent: 'center', 
-      alignItems: 'center', 
-    },
-    naviButtons:{
-      width: buttonW,
-      marginTop: 'auto',
-      marginVertical: 5,    
-    },
-    naviSelectedButtons:{
-      width: buttonW,
-      marginTop: 'auto',
-      marginVertical: 5,
-      borderBottomColor: 'white',
-      borderBottomWidth: 1,    
-    },
     naviFilter:{
       paddingHorizontal: 10,
       marginVertical: 5,

@@ -8,11 +8,26 @@ import { createStackNavigator } from "react-navigation-stack";
 import FlatsScreen from './FlatsScreen'
 import BookingScreen from './BookingScreen'
 import FlatsDetailScreen from './FlatsDetailScreen'
+import LoginScreen from './LoginScreen';
 
 
 const MainNavigator = createStackNavigator(
   {
     Home: { 
+      screen: LoginScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
+    },
+    Bookings: {
+      screen: BookingScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
+    },
+    Flats: {
       screen: FlatsScreen,
       navigationOptions: {
         headerShown: false,
@@ -26,13 +41,6 @@ const MainNavigator = createStackNavigator(
         animationEnabled: false,
         }
     },
-      Bookings: {
-        screen: BookingScreen,
-        navigationOptions: {
-          headerShown: false,
-          animationEnabled: false,
-          }
-      },
   },
   {
     initialRouteName: 'Home',
