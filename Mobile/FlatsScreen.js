@@ -4,31 +4,38 @@ import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, I
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { debug } from 'react-native-reanimated';
 import FilterPopUp from './FilterPopUp';
-import flatData from './server/db.json'
+import flatData from './server/db.json';
+import HeaderNavBar from './HeaderNavBar';
+import LoadingAnim from './LoadingAnim';
 
+const {width,height} = Dimensions.get("screen")
+const flagSize=100
+const infoBarSize=width*0.78
+const buttonW = width*0.3
+const centerMargin = (width - 3*buttonW)/4;
+const bigButtonW = 3*buttonW + 2*centerMargin
 
 function ListItem({ item, navigation }) {
-    return (
+  return (
         <View style={styles.item}>
-            <TouchableOpacity onPress={() => navigation.navigate('FlatDetails',{flat: item})}>
                 <View style={{flex: 1, flexDirection:'row'}}>
-                    <View style={{flex: 1}}>
-                    <Image
-                        style={styles.flag}
-                        source={{
-                        uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
-                    </View>
-                    <View style={{flexDirection:'column'}}>
-                        <View style={{}}>
-                            <Text style={styles.title}>{item.name}</Text>
+                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item})}>
+                        <View>
+                            <Text style={styles.itemtitle}>{item.name}</Text>
                         </View>
-                        <View style={{}}>
-                            <Text> {`Location: ${item.region}, ${item.capital}`}</Text>
-                            <Text> {`Price: ${item.population} per night`} </Text>
+                        <View>
+                            <Text style={styles.itemtext}>  {`Location: ${item.region}, ${item.capital}`}</Text>
+                            <Text style={styles.itemtext}> {`Price: ${item.population} per night`} </Text>
                         </View>
+                    </TouchableOpacity>
+                    <View>
+                      <Image
+                          style={styles.itemFlag}
+                          source={{
+                          uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
+                      <View/>
                     </View>
                 </View>
-            </TouchableOpacity>
         </View>
     );
 }
@@ -38,9 +45,10 @@ export default function FlatsScreen({navigation}) {
     const [isLoading, setLoading] = useState(true);
     const [flats, setFlats] = useState([]);
     const [searchString, setSearchString] = useState('');
-    const {width,height} = Dimensions.get("screen")
     const FilterRef = useRef(null);
 
+    const flagSize=150
+    const infoBarSize=width*0.78
     const buttonW = width*0.3
     const centerMargin = (width - 3*buttonW)/4;
     const bigButtonW = 3*buttonW + 2*centerMargin
@@ -60,7 +68,9 @@ export default function FlatsScreen({navigation}) {
         .then((response) => response.json())
         .then((json) => setFlats(json))
         .catch((error) => console.error(error))
-        .finally(() => setLoading(false));
+        .finally(() => setTimeout(()=>setLoading(false),2000));
+
+
     }
   
     useEffect(() => {
@@ -74,24 +84,13 @@ export default function FlatsScreen({navigation}) {
     
     return (
       <SafeAreaView style={styles.container}>
-        <View style={{flexDirection:'column', justifyContent: 'center', alignItems: 'center'}}>
-            <View style={{flexDirection:'row', height:40, justifyContent: 'center', alignItems: 'center'}}>
-                <View style={{width:buttonW}}>
-                    <Button title="Flats"></Button>
-                </View>
-                <View style={{width:buttonW, marginHorizontal: centerMargin}}>
-                    <Button title="Bookings"></Button>
-                </View>
-                <View style={{width:buttonW}}>
-                    <Button title="Log out"></Button>
-                </View>
-            </View>
-            <View style={{width:bigButtonW,marginTop:6}}>
-                <Button title="Filter" onPress={() =>FilterManager()}></Button>
-            </View>     
-        </View>
+        <HeaderNavBar page={"Flats"} navigation={navigation}/>
+        <View style={styles.naviFilter}>
+                <Button color="#dc8033" title="Filter" onPress={() =>FilterManager()}></Button>
+        </View>     
+
         <View>
-        { isLoading ? <Text style={styles.lenCount}>Loading...</Text> :
+        { isLoading ? <LoadingAnim/>:
           <View>
             {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
             <FlatList style={{marginBottom: 80}}
@@ -111,25 +110,66 @@ export default function FlatsScreen({navigation}) {
   
 
   const styles = StyleSheet.create({
+    item: {
+      marginHorizontal: 15,
+    },
+    itemtitle: {
+      fontSize: 20,
+      color: 'black',
+    },
+    itemtext: {
+      fontSize: 14,
+      color: 'gray',
+    },
+    itemFlag: {
+      marginTop: 'auto',
+      marginBottom: flagSize/10,
+      height: flagSize,
+      width: flagSize,
+      borderColor: '#dc8033',
+      backgroundColor: 'white',
+      borderWidth: 5,
+      borderRadius: flagSize/2,
+      marginLeft: -infoBarSize-flagSize/2,
+    },
+    itemBackground:{
+      backgroundColor: 'white', 
+      borderBottomColor: '#dc8033',
+      borderBottomWidth: 5,
+      width: infoBarSize,
+      marginLeft: flagSize/2,
+      marginVertical: flagSize*0.1,
+      paddingLeft: flagSize*0.6,
+      paddingVertical: flagSize*0.1,
+    },
+    naviPanel:{
+      backgroundColor: '#38373c',
+      flexDirection:'row', 
+      height:height*0.1, 
+      width: width,
+      justifyContent: 'center', 
+      alignItems: 'center', 
+    },
+    naviButtons:{
+      width: buttonW,
+      marginTop: 'auto',
+      marginVertical: 5,    
+    },
+    naviSelectedButtons:{
+      width: buttonW,
+      marginTop: 'auto',
+      marginVertical: 5,
+      borderBottomColor: 'white',
+      borderBottomWidth: 1,    
+    },
+    naviFilter:{
+      paddingHorizontal: 10,
+      marginVertical: 5,
+      justifyContent: 'center',
+    },
     container: {
       flex: 1,
-      marginTop: StatusBar.currentHeight || 0,
-    },
-    item: {
-      backgroundColor: '#e6ffff', 
-      padding: 10,
-      marginVertical: 8,
-      marginHorizontal: 16,
-      borderRadius: 5,
-      borderColor: '#e6ffff', 
-      borderWidth: 1
-    },
-    title: {
-      fontSize: 20,
-    },
-    flag: {
-      height: 64,
-      width: 64
+      //marginTop: StatusBar.currentHeight || 0,
     },
     input: {
       borderRadius: 3,
