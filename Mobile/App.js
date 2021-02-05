@@ -6,19 +6,41 @@ import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 //import { StackNavigator } from 'react-navigation'
 import FlatsScreen from './FlatsScreen'
+import BookingScreen from './BookingScreen'
 import FlatsDetailScreen from './FlatsDetailScreen'
+import LoginScreen from './LoginScreen';
+
 
 const MainNavigator = createStackNavigator(
   {
     Home: { 
+      screen: LoginScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
+    },
+    Bookings: {
+      screen: BookingScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
+    },
+    Flats: {
       screen: FlatsScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
     },
     FlatDetails: {
       screen: FlatsDetailScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
     },
-    //  Bookings: {
-    //    screen: BookingScreen,
-    //  },
   },
   {
     initialRouteName: 'Home',

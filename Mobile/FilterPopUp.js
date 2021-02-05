@@ -33,7 +33,7 @@ export default class FilterPopUp extends Component{
 
     state={
             //This obj is allways on top need to be programatically switch active or not
-            Active: true,
+            Active: false,
             FPanelHeight: height*0.4,
             //view aniamtion
             posAnimation: new Animated.Value(initPos),
@@ -42,11 +42,12 @@ export default class FilterPopUp extends Component{
 
             //keyboard show/hide animation:
             hei1Animation: new Animated.Value(10),
-            hei2Animation: new Animated.Value(30),
+            hei2Animation: new Animated.Value(20),
             opa2Animation: new Animated.Value(1),
             //DropDowns
             selectedCountry: 'Poland',
-            selectedCity: 'Płock'
+            selectedCity: 'Płock',
+
     }
     
     //Keyboard:
@@ -75,6 +76,7 @@ export default class FilterPopUp extends Component{
             currentOpacity=initOpacity;
             currentBRadious=initBRadious;
         }
+        this.setState({ FPanelHeight: height*0.4 })
         Animated.timing(this.state.posAnimation,{
             toValue:  currentPos,
             duration: 300,
@@ -102,10 +104,10 @@ export default class FilterPopUp extends Component{
     };
 
     onKeyboardShow =() =>{
-        Animated.timing(this.state.hei1Animation,{toValue:  0,duration: 200,useNativeDriver: true}).start();
-        Animated.timing(this.state.hei2Animation,{toValue:  0,duration: 200,useNativeDriver: true}).start();
+        Animated.timing(this.state.hei1Animation,{toValue:  5,duration: 200,useNativeDriver: true}).start();
+        Animated.timing(this.state.hei2Animation,{toValue:  5,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.opa2Animation,{toValue:  0,duration: 20,useNativeDriver: true}).start(
-            () =>{this.setState({ FPanelHeight: height*0.3 })}
+            () =>{this.setState({ FPanelHeight: height*0.32 })}
         );
     }
 
@@ -145,10 +147,11 @@ export default class FilterPopUp extends Component{
             <View style={styles.container} >
                 {this.state.Active ? 
                 <Animated.View style={[styles.PopUp, ViewAnimation]}>
+                    <View style={[styles.shadow]} />
                     <View style={[styles.triangle, this.props.style]} />
                     <Animated.View style={[styles.filterPanel, {height: this.state.FPanelHeight}, BorderAnimation]}>
                         <Animated.View style={[styles.SearchBar]}>
-                            <Icon name='search'/>
+                            <Icon name='search' color='orange'/>
                             <TextInput style={styles.textinput} placeholder="Search by flat name" />
                         </Animated.View>
                         <View>
@@ -168,10 +171,10 @@ export default class FilterPopUp extends Component{
                             <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
                         </Animated.View>
                         <Animated.View style={[styles.SearchButton, Opa2Animation]}>
-                            <Button title="Search"  onPress={() => this.animateView()}></Button>
+                            <Button title="Search"  onPress={() => this.animateView()} color='#38373c'></Button>
                         </Animated.View>
                      </Animated.View>
-                </Animated.View>: <View/>}
+                </Animated.View>: <View style={{backgroundColor: 'red'}}/>}
             </View>
         )
     }
@@ -187,13 +190,14 @@ const styles = StyleSheet.create({
         flexDirection:'row', 
         height:40, 
         width: width*0.7,
+        marginBottom: 100,
     },
     priceBar:{
         zIndex: -1,
         flexDirection:'row', 
         height:40, 
         width: width*0.7,
-        marginTop: 10,
+        marginTop: 5,
     },
     SearchBar:{
         flexDirection:'row',
@@ -206,8 +210,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     SearchButton:{
-        marginTop: 'auto',
-        marginBottom: 15,
+        marginBottom: 5,
+        marginTop: 'auto'
     },
     textprice: {
         fontSize: 16,
@@ -249,5 +253,13 @@ const styles = StyleSheet.create({
         backgroundColor: backgroundPopUpColor,
         alignItems: 'center',
         padding: 10,
+      },
+      shadow:{
+        backgroundColor: '#38373c', 
+        position: 'absolute', 
+        width: width, 
+        height: 2*height, 
+        marginTop: -height, 
+        opacity: 0.2,
       }
 });
