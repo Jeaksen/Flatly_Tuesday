@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AsyncSelect from 'react-select/async';
+import DateSelect from './DateSelect';
 import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
 import BookingsListItem from "./BookingsListItem";
@@ -66,6 +67,7 @@ function BookingsList(props)
                     }}
                     onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
                 />
+                <DateSelect />
                 <input className="FlatNameInput" 
                     placeholder="Search by Flat's Name"
                     onChange={(e) => setName(e.target.value)}
