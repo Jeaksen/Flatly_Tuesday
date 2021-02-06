@@ -1,22 +1,16 @@
 package pw.react.backend.controller;
 
-import net.kaczmarzyk.spring.data.jpa.domain.Equal;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pw.react.backend.appException.UnauthorizedException;
-import pw.react.backend.model.Address;
 import pw.react.backend.model.FlatType;
 import pw.react.backend.service.AddressService;
 import pw.react.backend.service.general.SecurityProvider;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,7 +55,7 @@ public class MetadataController
     }
 
     @GetMapping(path = "/cities")
-    public ResponseEntity<List<Pair<String, String>>> getCities(@RequestHeader HttpHeaders headers,
+    public ResponseEntity<List<String>> getCities(@RequestHeader HttpHeaders headers,
                                           @RequestParam(value = "country", required = false) String country)
     {
         logHeaders(headers);
