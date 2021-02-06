@@ -26,8 +26,4 @@ public class Customer implements Serializable
     private String surname;
     @NotNull
     private String phoneNo;
-
-    @OneToMany(mappedBy = "customer")
-    @JsonBackReference
-    private List<Booking> bookings;
 }

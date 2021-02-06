@@ -9,8 +9,9 @@ const {width, height} = Dimensions.get("screen")
 const butColor = '#38373c';
 const butsize=50;
 
-export default function FlatsDetailScreen({route, navigation}) {
-    const item = navigation.getParam('flat');
+
+export default function BookingDetailScreen({route, navigation}) {
+    const item = navigation.getParam('booking');
 
     return (
         <SafeAreaView >
@@ -18,31 +19,37 @@ export default function FlatsDetailScreen({route, navigation}) {
             <HeaderNavBar page={"Flats"} navigation={navigation}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.name}</Text>
-                    <View style={styles.container}>
+                    {/* <View style={styles.container}>
                         <Image
                             style={styles.flag}
                             source={{
                                 uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
-                    </View>
+                    </View> */}
             </View>
-            <View style={styles.midPanel}>
+            {/* <View style={styles.midPanel}>
                 <TouchableOpacity style={styles.roundButton}>
                     <Icon name="arrow-left" color='white' size={butsize}/>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.roundButtonLeft}>
                     <Icon name="arrow-right" color='white' size={butsize}/>
                 </TouchableOpacity>
-            </View>
+            </View> */}
             <View style={styles.bottomPanel}>
                 <View style={styles.row}>
-                    <Text style={styles.infoBold}> {`Max guests:  ${item.population}` } </Text>
+                    <Text style={styles.infoBold}> {`Person renting:  ${item.population}` } </Text>
                     <Text style={styles.infoBoldLeft}> {`${item.alpha2Code} PLN`} </Text>
                 </View>
-                <Text style={styles.info}> {`Location:  ${item.region}, ${item.subregion}`} </Text>
-                <Text style={styles.info}> {`Address:  ${item.capital}`} </Text>
-                <Text style={styles.info}> {`Availability:  ${item.alpha3Code}`} </Text>
-                <View  style={styles.button}>
-                    <Button title="Back" color='black' onPress={() => navigation.navigate('Flats')}></Button>
+                <Text style={styles.info}> {`Date:  ${item.region}, ${item.subregion}`} </Text>
+                <Text style={styles.info}> {`Booking Price:  ${item.capital}`} </Text>
+                <Text style={styles.info}> {`Number of Guests:  ${item.alpha3Code}`} </Text>
+                <Text style={styles.info}> {`Flat Name:  ${item.alpha3Code}`} </Text>
+                <View style={styles.row}>
+                    <View style={styles.button1}> 
+                        <Button title="Go to Flat Details" color='black' onPress={() => navigation.navigate('Bookings')}></Button>
+                    </View>
+                    <View  style={styles.button}>
+                        <Button title="Back" color='black' onPress={() => navigation.navigate('Bookings')}></Button>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
@@ -56,7 +63,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     topPanel:{
-        height: 0.4*height,
+        height: 0.1*height,
     },
     midPanel:{
         flexDirection:'row',
@@ -103,10 +110,17 @@ const styles = StyleSheet.create({
     },
     button:{
         width: width/4,
-        marginTop: 10,
+        marginTop: 20,
         alignSelf: 'center',
         backgroundColor: 'red',
-        marginTop: 'auto',
+    },
+    button1:{
+        width: width/2,
+        marginTop: 20,
+        alignSelf: 'center',
+        backgroundColor: 'red',
+        marginRight: 20,
+        marginLeft: ((0.25*width)-20)/2,
     },
     roundButton:{
         width: butsize,
@@ -139,4 +153,3 @@ const styles = StyleSheet.create({
     }
 
   });
-  

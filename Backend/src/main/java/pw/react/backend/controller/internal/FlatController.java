@@ -109,7 +109,7 @@ public class FlatController
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
-    @PutMapping(path = "/{flatId}")
+    @PutMapping(path = "/{flatId}", consumes={"application/json;charset=UTF-8"})
     public ResponseEntity<Flat> updateCompany(@RequestHeader HttpHeaders headers,
                                               @PathVariable Long flatId,
                                               @RequestBody Flat updatedFlat) {
