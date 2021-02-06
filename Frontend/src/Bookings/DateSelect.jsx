@@ -161,7 +161,7 @@ const Option = props => {
   } else return <SelectComponents.Option {...props} />;
 };
 
-class DatePicker extends Component {
+export default class DateSelect extends Component {
   state = {
     options: defaultOptions,
   };
@@ -197,26 +197,8 @@ class DatePicker extends Component {
         onInputChange={this.handleInputChange}
         options={options}
         value={value}
+        placeholder={this.props.placeholder}
       />
-    );
-  }
-}
-
-export default class DateSelect extends Component {
-  state = {
-    value: 'null',
-  };
-  handleChange = (value) => {
-    this.setState({ value });
-  };
-  render() {
-    const { value } = this.state;
-    const displayValue = value && value.value ? value.value.toString() : 'null';
-    return (
-      <div>
-        <pre>Value: {displayValue}</pre>
-        <DatePicker value={value} onChange={this.handleChange} />
-      </div>
     );
   }
 }

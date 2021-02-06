@@ -27,11 +27,14 @@ function BookingsList(props)
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
     const [country, setCountry] = useState("");
-    const [date, setDate] = useState(
-        {
-          startDate: null,
-          endDate: null
-        });
+    const [startDate, setStartDate] = useState({
+        value: 'null',
+    });
+    const { startDateWrap } = startDate;
+    const [endDate, setEndDate] = useState({
+        value: 'null',
+    });
+    const { endDateWrap } = endDate;
 
     useEffect(() => {props.loadBookingsListAsync()}, [])
     return (
@@ -67,7 +70,8 @@ function BookingsList(props)
                     }}
                     onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
                 />
-                <DateSelect />
+                <DateSelect placeholder="Select Start Date..." value={startDateWrap} onChange={value => setStartDate({ value })} />
+                <DateSelect placeholder="Select End Date..." value={endDateWrap} onChange={value => setEndDate({ value })} />
                 <input className="FlatNameInput" 
                     placeholder="Search by Flat's Name"
                     onChange={(e) => setName(e.target.value)}
@@ -78,8 +82,8 @@ function BookingsList(props)
                     if (name !== "") opt_str += `&name=${name}`;
                     if (country !== "") opt_str += `&country=${country}`;
                     if (city !== "") opt_str += `&city=${city}`;
-                    if (date.startDate instanceof Date) opt_str += `&dateFrom=${date.startDate.getFullYear()}-${date.startDate.getMonth()}-${date.startDate.getDate()}`;
-                    if (date.endDate instanceof Date) opt_str += `&dateTo=${date.endDate.getFullYear()}-${date.endDate.getMonth()}-${date.endDate.getDate()}`;
+                    if (startDate.value) opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+                    if (endDate.value) opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
                     console.log(opt_str);
                     props.loadBookingsListAsync();
                     // props.loadBookingsListAsync(opt_str);
