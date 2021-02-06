@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pw.react.backend.dao.FlatRepository;
+import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Flat;
 
 import java.util.List;
@@ -24,12 +25,14 @@ public class FlatMainService implements FlatsService
 
     FlatRepository repository;
     FlatImageService imageService;
+    BookingsService bookingsService;
 
     @Autowired
-    FlatMainService(FlatRepository repository, FlatImageService imageService)
+    FlatMainService(FlatRepository repository, FlatImageService imageService, BookingsService bookingsService)
     {
         this.repository = repository;
         this.imageService = imageService;
+        this.bookingsService = bookingsService;
     }
 
     @Override
@@ -69,6 +72,13 @@ public class FlatMainService implements FlatsService
     }
 
     @Override
+    public long[] getBookedFlatsIndexes(BookingDatesSpecification bookingDatesSpecification)
+    {
+        var bookings = bookingsService.getBookingsInDateRange(bookingDatesSpecification);
+        return bookings.stream().mapToLong(booking -> booking.getFlat().getId()).toArray();
+    }
+
+    @Override
     public Optional<Flat> saveFlat(Flat flat, List<MultipartFile> newImages)
     {
         Optional<Flat> result = Optional.empty();
@@ -96,10 +106,17 @@ public class FlatMainService implements FlatsService
     }
 
     @Override
+    public List<Flat> getFlats(Specification<Flat> flatSpecification)
+    {
+        return repository.findAll(flatSpecification);
+    }
+
+    @Override
     public Optional<Flat> getFlat(Long flatId)
     {
         var flat = repository.findById(flatId);
         flat.ifPresent(flat1 -> flat1.setImages(imageService.getFlatImages(flat1.getId())));
         return flat;
     }
+
 }

@@ -5,21 +5,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 import pw.react.backend.appException.UnauthorizedException;
+import pw.react.backend.dao.specifications.BookingDatesSpecification;
+import pw.react.backend.dao.specifications.FlatIDFilteringSpecification;
 import pw.react.backend.dao.specifications.FlatSpecification;
 import pw.react.backend.model.Flat;
 import pw.react.backend.service.FlatsService;
-import pw.react.backend.service.ImageService;
 import pw.react.backend.service.general.SecurityProvider;
-
-import java.util.List;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -31,14 +32,12 @@ public class FlatExtController
     private final Logger logger = LoggerFactory.getLogger(FlatExtController.class);
 
     private final FlatsService flatsService;
-    private final ImageService imageService;
     private final SecurityProvider securityService;
 
     @Autowired
-    public FlatExtController(FlatsService flatsService, ImageService imageService, SecurityProvider securityService)
+    public FlatExtController(FlatsService flatsService, SecurityProvider securityService)
     {
         this.flatsService = flatsService;
-        this.imageService = imageService;
         this.securityService = securityService;
     }
 
@@ -49,57 +48,48 @@ public class FlatExtController
                         .map(entry -> String.format("%s->[%s]", entry.getKey(), String.join(",", entry.getValue())))
                         .collect(joining(","))
         );
-
     }
 
-
-    @GetMapping(path = "")
-    public ResponseEntity<Page<Flat>> getFlats(@RequestHeader HttpHeaders headers,
-                                               FlatSpecification flatSpecification,
-                                               @PageableDefault(size = 10) Pageable pageable)
+    @GetMapping("")
+    public RedirectView redirectWithUsingRedirectView(@RequestHeader HttpHeaders headers,
+                                                      RedirectAttributes attributes,
+                                                      @RequestParam(value = "apiKey", required = false) String apiKey,
+                                                      @PageableDefault(size = 10) Pageable pageable,
+                                                      BookingDatesSpecification bookingDatesSpecification,
+                                                      FlatSpecification flatSpecification)
     {
         logHeaders(headers);
-        if (securityService.isAuthorized(headers))
+        if(apiKey != null && !apiKey.isEmpty())
         {
-            return ResponseEntity.ok(flatsService.getFlats(flatSpecification, pageable));
+            long[] ids = flatsService.getBookedFlatsIndexes(bookingDatesSpecification);
+            attributes.addAttribute("bookedIds", ids);
+            attributes.addAttribute("apiKey", apiKey);
+            attributes.addFlashAttribute("spec", flatSpecification);
+            attributes.addFlashAttribute("pageable", pageable);
+            return new RedirectView("/ext/flats/free");
         } else
             throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
-    @PostMapping(path = "")
-    public ResponseEntity<String> createFlat(@RequestHeader HttpHeaders headers,
-                                             Flat flat,
-                                             @RequestParam("new_images") List<MultipartFile> newImages)
-    {
-        logHeaders(headers);
-        if (securityService.isAuthorized(headers)) {
-            Optional<Flat> result = flatsService.saveFlat(flat, newImages);
-            if (result.isEmpty())
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the flats");
-            else
-                return ResponseEntity.ok(Long.toString(result.get().getId()));
-        } else
-            throw new UnauthorizedException("Unauthorized access to resources.");
-    }
 
-    @DeleteMapping(path = "/{flatId}")
-    public ResponseEntity<String> deleteFlat(@RequestHeader HttpHeaders headers,
-                                             @PathVariable Long flatId)
+    @GetMapping(path = "/free")
+    public ResponseEntity<Page<Flat>> getFlats(@RequestParam(value = "apiKey", required = false) String apiKey,
+                                               FlatIDFilteringSpecification flatSpecification,
+                                               Model model)
     {
-        logHeaders(headers);
-        if (securityService.isAuthorized(headers))
+        var spec = (FlatSpecification)model.getAttribute("spec");
+        var pageable = (Pageable)model.getAttribute("pageable");
+        if(apiKey != null && !apiKey.isEmpty() && model.containsAttribute("spec"))
         {
-            boolean result = flatsService.deleteFlat(flatId);
-            if (result)
-                return ResponseEntity.ok(String.format("Flat with id %s deleted.", flatId));
-            else
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Flat with id %s not found.", flatId));
+            return ResponseEntity.ok(flatsService.getFlats(Specification.where(spec).and(flatSpecification), pageable));
         } else
             throw new UnauthorizedException("Unauthorized access to resources.");
     }
+
 
     @GetMapping(path = "/{flatId}")
     public ResponseEntity<Flat> getFlatDetails(@RequestHeader HttpHeaders headers,
+                                               @RequestParam(value = "apiKey", required = false) String apiKey,
                                                @PathVariable Long flatId)
     {
         logHeaders(headers);
@@ -109,49 +99,4 @@ public class FlatExtController
         }
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
-
-    @PutMapping(path = "/{flatId}")
-    public ResponseEntity<Flat> updateCompany(@RequestHeader HttpHeaders headers,
-                                              @PathVariable Long flatId,
-                                              Flat updatedFlat,
-                                              @RequestParam("new_images") List<MultipartFile> newImages ) {
-        logHeaders(headers);
-        if (securityService.isAuthorized(headers))
-        {
-            Flat result = flatsService.updateFlat(flatId, updatedFlat, newImages);
-            if (Flat.Empty.equals(result))
-                return ResponseEntity.badRequest().body(result);
-            return ResponseEntity.ok(Flat.Empty);
-        } else
-            throw new UnauthorizedException("Unauthorized access to resources.");
-    }
-
-    @PostMapping(path = "/{flatId}/images")
-    public ResponseEntity<String> uploadImages(@RequestHeader HttpHeaders headers,
-                                               @PathVariable Long flatId,
-                                               @RequestParam("images") List<MultipartFile> images)
-    {
-        logHeaders(headers);
-        if (securityService.isAuthorized(headers))
-        {
-            var addedImages = imageService.storeImages(flatId, images);
-            return ResponseEntity.ok(String.format("Images uploaded: %s", addedImages.stream().map(c -> String.valueOf(c.getId())).collect(joining(","))));
-        } else
-            throw new UnauthorizedException("Unauthorized access to resources.");
-    }
-
-    @DeleteMapping(path = "/{flatId}/images/{imageId}")
-    public ResponseEntity<String> deleteImage(@RequestHeader HttpHeaders headers,
-                                              @PathVariable Long flatId,
-                                              @PathVariable String imageId)
-    {
-        logHeaders(headers);
-        if (securityService.isAuthorized(headers))
-        {
-            imageService.deleteFlatImage(flatId, imageId);
-            return ResponseEntity.ok(String.format("Deleted image with id %s", imageId));
-        } else
-            throw new UnauthorizedException("Unauthorized access to resources.");
-    }
-
 }
