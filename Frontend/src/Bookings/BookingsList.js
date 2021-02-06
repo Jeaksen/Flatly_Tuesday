@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
 import BookingsListItem from "./BookingsListItem";
 import "./BookingsList.css";
+import "../BasicInputField.css"
 
 const mapStateToProps = (state, ownProps) => ({ 
     bookings: state.bookingsList.list,
@@ -47,10 +48,10 @@ function BookingsList(props)
                     cacheOptions
                     defaultOptions
                     loadOptions = {(inputValue, callback) => {
-                      setTimeout(() => {
-                          fetch("http://localhost:8080/countryOptions")
-                              .then(promise => {return promise.status === 404 ? [] : promise.json()})
-                              .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
+                        setTimeout(() => {
+                            fetch("http://localhost:8080/countryOptions")
+                                .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                                .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
                         }, 1000)
                     }}
                     onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
@@ -62,17 +63,17 @@ function BookingsList(props)
                     cacheOptions
                     defaultOptions
                     loadOptions = {(inputValue, callback) => {
-                      setTimeout(() => {
-                          fetch("http://localhost:8080/cityOptions")
-                              .then(promise => {return promise.status === 404 ? [] : promise.json()})
-                              .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
+                        setTimeout(() => {
+                            fetch("http://localhost:8080/cityOptions")
+                                .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                                .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
                         }, 1000)
                     }}
                     onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
                 />
                 <DateSelect placeholder="Select Start Date..." value={startDateWrap} onChange={value => setStartDate({ value })} />
                 <DateSelect placeholder="Select End Date..." value={endDateWrap} onChange={value => setEndDate({ value })} />
-                <input className="FlatNameInput" 
+                <input className="BasicInputField" 
                     placeholder="Search by Flat's Name"
                     onChange={(e) => setName(e.target.value)}
                 />
@@ -82,8 +83,8 @@ function BookingsList(props)
                     if (name !== "") opt_str += `&name=${name}`;
                     if (country !== "") opt_str += `&country=${country}`;
                     if (city !== "") opt_str += `&city=${city}`;
-                    if (startDate.value) opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-                    if (endDate.value) opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+                    if (startDate.value != null) opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+                    if (endDate.value != null) opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
                     console.log(opt_str);
                     props.loadBookingsListAsync();
                     // props.loadBookingsListAsync(opt_str);
