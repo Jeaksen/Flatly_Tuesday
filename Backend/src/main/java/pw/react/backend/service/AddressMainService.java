@@ -3,12 +3,11 @@ package pw.react.backend.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pw.react.backend.dao.AddressRepository;
-import pw.react.backend.model.Address;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,12 +26,30 @@ public class AddressMainService implements AddressService
     @Override
     public List<String> getCountries()
     {
-        return null;
+        return repository.getCountries();
     }
 
     @Override
-    public List<Pair<String, String>> getCities(Specification<Address> addressSpecification)
+    public List<Pair<String, String>> getCities(String country)
     {
-        return null;
+        var cities = repository.getCities(country);
+        return createPairs(cities);
+    }
+
+    @Override
+    public List<Pair<String, String>> getCities()
+    {
+        var cities = repository.getCities();
+        return createPairs(cities);
+    }
+
+    private List<Pair<String, String>> createPairs(List<Object[]> cityCountryList)
+    {
+        List<Pair<String, String>> output = new ArrayList<>();
+        for (var array:cityCountryList)
+        {
+            output.add(Pair.of(array[0].toString(), array[1].toString()));
+        }
+        return output;
     }
 }

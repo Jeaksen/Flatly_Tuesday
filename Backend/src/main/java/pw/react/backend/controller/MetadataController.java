@@ -12,10 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.model.Address;
+import pw.react.backend.model.FlatType;
 import pw.react.backend.service.AddressService;
 import pw.react.backend.service.general.SecurityProvider;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 
@@ -58,13 +62,27 @@ public class MetadataController
 
     @GetMapping(path = "/cities")
     public ResponseEntity<List<Pair<String, String>>> getCities(@RequestHeader HttpHeaders headers,
-                                          @Spec(path = "country", spec = Equal.class) Specification<Address> addressSpecification,
                                           @RequestParam(value = "country", required = false) String country)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
         {
-            return ResponseEntity.ok(addressService.getCities(addressSpecification));
+            if (country != null && !country.isEmpty())
+                return ResponseEntity.ok(addressService.getCities(country));
+            else
+                return ResponseEntity.ok(addressService.getCities());
+        }
+        throw new UnauthorizedException("Get Bookings request is unauthorized");
+    }
+
+    @GetMapping(path = "/flat_types")
+    public ResponseEntity<List<String>> getCities(@RequestHeader HttpHeaders headers)
+    {
+        logHeaders(headers);
+        if (securityService.isAuthorized(headers))
+        {
+            var enumNames = Arrays.stream(FlatType.values()).map(FlatType::name).collect(Collectors.toList());
+            return ResponseEntity.ok(enumNames);
         }
         throw new UnauthorizedException("Get Bookings request is unauthorized");
     }
