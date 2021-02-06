@@ -106,12 +106,6 @@ public class FlatMainService implements FlatsService
     }
 
     @Override
-    public List<Flat> getFlats(Specification<Flat> flatSpecification)
-    {
-        return repository.findAll(flatSpecification);
-    }
-
-    @Override
     public Optional<Flat> getFlat(Long flatId)
     {
         var flat = repository.findById(flatId);
