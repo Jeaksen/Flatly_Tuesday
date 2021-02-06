@@ -47,3 +47,7 @@
     box-sizing: border-box;
     padding: 2px 8px;
 }
+
+.FlatNameInput:focus {
+    box-shadow: 0 0 0 2px #2684ff;
+}
