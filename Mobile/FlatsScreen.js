@@ -19,7 +19,7 @@ function ListItem({ item, navigation }) {
   return (
         <SafeAreaView style={styles.item}>
                 <View style={{flex: 1, flexDirection:'row'}}>
-                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.push('FlatDetails',{flat: item})}>
+                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item})}>
                         <View>
                             <Text style={styles.itemtitle}>{item.name}</Text>
                         </View>
