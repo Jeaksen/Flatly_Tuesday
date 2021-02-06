@@ -62,7 +62,7 @@
     }
   ],
 
-    "bookings": [
+  "bookings": [
       {
         "id": "5dc9bdc63d2a39982fbf83d8",
         "customer":
@@ -125,5 +125,16 @@
               }
           }
       }
-    ]
+  ],
+  "cityOptions": [
+    { "value": "warsaw", "label": "Warsaw" },
+    { "value": "moscow", "label": "Moscow" },
+    { "value": "london", "label": "London" }
+  ],
+  "countryOptions": [
+    { "value": "poland", "label": "Poland" },
+    { "value": "england", "label": "England" },
+    { "value": "russia", "label": "Russia" },
+    { "value": "arstotzka", "label": "Arstotzka" }
+  ]
   }

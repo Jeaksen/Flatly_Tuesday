@@ -14,6 +14,8 @@ import './App.scss';
 import BookingsList from './Bookings/BookingsList' 
 import BookingDetails from "./Bookings/BookingDetails";
 
+import LoginPage from './LoginPage'
+
 import './App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
@@ -26,47 +28,55 @@ function App() {
       <Router>
         <div>
           <span>FLATLY</span>
-          <ul>
-            <li>
-              <Link to="/bookings">
-                Bookings
-              </Link>
-            </li>
-            <li>
-              <Link to="/flats">
-                Flats
-              </Link>
-            </li>
-            <li>
-              <button>Log Out</button>
-            </li>
-          </ul>
           <Switch>
             <Route path={`/bookings/details/:bookingId`}>
+              <NavigatorBar />
               <BookingDetails />
             </Route>
             <Route path="/bookings">
+              <NavigatorBar />
               <BookingsList />
             </Route>
             <Route path="/flats/add">
+              <NavigatorBar />
               <span>Add New Flat Page</span>
             </Route>
             <Route path={`/flats/details/:flatId`}>
+              <NavigatorBar />
               <span>Flat Details Page</span>
             </Route>
             <Route path="/flats">
+              <NavigatorBar />
               <FlatsManagement />
             </Route>
             <Route path="/">
-              <span>Login Page</span>
-              <Link to="/bookings">Bookings</Link>
-              <Link to="/flats">Flats</Link>
+              <LoginPage />
             </Route>
           </Switch>
         </div>
       </Router>
     </Provider>
   );
+}
+
+function NavigatorBar() {
+  return(
+    <ul>
+      <li>
+        <Link to="/bookings">
+          Bookings
+        </Link>
+      </li>
+      <li>
+        <Link to="/flats">
+          Flats
+        </Link>
+      </li>
+      <li>
+        <button>Log Out</button>
+      </li>
+    </ul>
+  )
 }
 
 export default App;
