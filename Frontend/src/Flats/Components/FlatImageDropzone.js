@@ -1,8 +1,6 @@
-import React, {useMemo, useState} from 'react';
+import React, {useMemo} from 'react';
 import {useDropzone} from 'react-dropzone';
-import {Button } from 'react-bootstrap';
-import BootstrapTable from 'react-bootstrap-table-next';
-import placeholder_img from '../../placeholder_img.png';
+import {Button, Table } from 'react-bootstrap';
 
 const baseStyle = {
   flex: 1,
@@ -46,8 +44,6 @@ function FlatImageDropzone(props) {
       props.onAddingFiles(acceptedFiles);
     }
   });
-  const [clickedRow, setClickedRow] = useState(0);
-
   const prettyBytes = require('pretty-bytes');
   const style = useMemo(() => ({
     ...baseStyle,
@@ -56,63 +52,46 @@ function FlatImageDropzone(props) {
     ...(isDragReject ? rejectStyle : {})
   }), [isDragActive,isDragReject,isDragAccept]);
   
-  const headerStyleFileTable = () => {return { width: 0 , 'visibility': 'hidden'}}
-  const columns = [{
-    dataField: 'preview',
-    headerStyle: headerStyleFileTable,
-    formatter: (cellContent, row) => (
-      <div style={thumb} key={row.id}>
-        <div style={thumbInner}>
-          <img src={cellContent} style={img} />
-        </div>
-      </div>)
-  }, { 
-    dataField: 'fileValue.name',
-    headerStyle: headerStyleFileTable
-  }, {
-    dataField: 'fileValue.size',    
-    headerStyle: headerStyleFileTable,
-    formatter: (cellContent) => (<span>{prettyBytes(cellContent)}</span>)
-  }, {
-    dataField: 'cancel',
-    isDummyField: true,   
-    headerStyle: headerStyleFileTable,
-    formatter: (cellContent, row) => (
-      <Button variant="danger" type="button" 
-        onClick={() => props.onRemovingFile(row)} >X
-      </Button>
-    )
-  }];
-
-  const rowStyle = (row, rowIndex) => {
-    if (rowIndex === clickedRow) {
-      rowEvents.onClick(null, row, rowIndex);
+  const rowStyle = (rowIndex) => {
+    if (rowIndex === props.clickedRow) {
       return {backgroundColor: '#24a0ed' };
     }
   };
-
-  const rowEvents = {
-    onClick: (e, row, rowIndex) => {
-      setClickedRow(rowIndex);
-      props.onShowingImg(row.preview ?? placeholder_img);
-    }
-  };
+  const renderTableData = () => {
+    return props.files.map((file, index) => (
+        <tr key={index} 
+            style={rowStyle(index)}
+            onClick={() => props.onRowClick(index, file.preview)}>
+          <td>
+            <div style={thumb}>
+              <div style={thumbInner}>
+                <img src={file.preview} style={img} />
+              </div>
+            </div>
+          </td>
+          <td>{file.fileName}</td>
+          <td>{prettyBytes(file.file.size)}</td>
+          <td>      
+            <Button variant="danger" type="button" 
+              onClick={(e) => props.onRemovingFile(e, index, file.preview)} >X
+            </Button>
+          </td>
+        </tr>
+      )
+    )
+  }
   return (
     <div {...getRootProps({style})} >
       <input {...getInputProps()} />
-      <div style={{height:'90%', maxHeight: '600px', overflow: 'scroll'}}>
-        <BootstrapTable keyField='name' 
-          data={ props.files } 
-          columns={ columns }  
-          rowEvents={ rowEvents }
-          rowStyle={ rowStyle } />
+      <div style={{height:'90%', maxHeight: '600px', overflow: 'scroll', width: '100%'}}>
+        <Table>
+          <tbody>{renderTableData()}</tbody>
+        </Table>
       </div>
       <Button variant="primary" type="button" style={{position: 'absolute', bottom: 20}}
         onClick={open}>UPLOAD MORE IMAGES
       </Button>
-      {/* <p>Drag 'n' drop some files here, or click to select files</p> */}
     </div>
-
   );
 }
 
