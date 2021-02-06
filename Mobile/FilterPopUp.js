@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
         flexDirection:'row', 
         height:40, 
         width: width*0.7,
-        marginBottom: 100,
+        marginBottom: 10,
     },
     priceBar:{
         zIndex: -1,
@@ -210,8 +210,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     SearchButton:{
-        marginBottom: 5,
-        marginTop: 'auto'
+        marginTop: 10,
     },
     textprice: {
         fontSize: 16,

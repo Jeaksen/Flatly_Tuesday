@@ -9,6 +9,7 @@ import FlatsScreen from './FlatsScreen'
 import BookingScreen from './BookingScreen'
 import FlatsDetailScreen from './FlatsDetailScreen'
 import LoginScreen from './LoginScreen';
+import BookingDetailScreen from './BookingDetailScreen';
 
 
 const MainNavigator = createStackNavigator(
@@ -36,6 +37,13 @@ const MainNavigator = createStackNavigator(
     },
     FlatDetails: {
       screen: FlatsDetailScreen,
+      navigationOptions: {
+        headerShown: false,
+        animationEnabled: false,
+        }
+    },
+    BookingDetails: {
+      screen: BookingDetailScreen,
       navigationOptions: {
         headerShown: false,
         animationEnabled: false,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRef, forwardRef } from 'react';
-import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button, Dimensions } from 'react-native';
+import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, Alert, RefreshControl, Button, Dimensions } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { debug } from 'react-native-reanimated';
 import FilterPopUp from './FilterPopUp';
@@ -18,17 +18,35 @@ const bigButtonW = 3*buttonW + 2*centerMargin
 function ListItem({ item, navigation }) {
   return (
         <View style={styles.item}>
+          <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item})}>
           <View  style={styles.itemrow}>
             <Text style={styles.itemOwner}>{item.alpha3Code}</Text>
             <Text style={styles.itemLocalization}>{item.name}</Text>
           </View>
           <Text style={styles.itemName}>{item.capital}</Text>
           <Text style={styles.itemData}>20.03.2020 - 20.03.2020</Text>
-          <TouchableOpacity style={styles.itembuttoncancel}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.itembuttoncancel} onPress={() => createAlert()}>
               <Text style={styles.itemcancel}>Cancel</Text>
           </TouchableOpacity>
         </View>
     );
+}
+
+function createAlert() {
+  Alert.alert(
+    "Warning",
+    "Are you sure you want to cancel this booking?",
+    [
+      {
+        text: "NO",
+        onPress: () => console.log("NO Pressed"),
+        style: "cancel"
+      },
+      { text: "YES", onPress: () => console.log("YES Pressed") }
+    ],
+    { cancelable: false }
+  );
 }
 
 export default function BookingScreen({navigation}) {
