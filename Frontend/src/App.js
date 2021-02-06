@@ -8,17 +8,19 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import appReducers from './AppReducers/appReducers'
 import {composeWithDevTools} from 'redux-devtools-extension';
 
-import FlatsManagement from './Flats/Components/FlatsManagement' 
+import FlatsList from './Flats/Components/FlatsList' 
+import FlatForm from './Flats/Components/FlatForm';
+
 import './App.scss';
+import './App.css';
 
 import BookingsList from './Bookings/BookingsList' 
 import BookingDetails from "./Bookings/BookingDetails";
 
+
 import LoginPage from './LoginPage'
 
 import './App.css';
-import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
-import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 
 const store = createStore(appReducers, {}, composeWithDevTools((applyMiddleware(reduxThunk))));
 
@@ -39,7 +41,7 @@ function App() {
             </Route>
             <Route path="/flats/add">
               <NavigatorBar />
-              <span>Add New Flat Page</span>
+              <FlatForm />
             </Route>
             <Route path={`/flats/details/:flatId`}>
               <NavigatorBar />
@@ -47,7 +49,7 @@ function App() {
             </Route>
             <Route path="/flats">
               <NavigatorBar />
-              <FlatsManagement />
+              <FlatsList />
             </Route>
             <Route path="/">
               <LoginPage />
