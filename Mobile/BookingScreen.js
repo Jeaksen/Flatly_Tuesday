@@ -59,8 +59,6 @@ export default function BookingScreen({navigation}) {
       .then((json) => setFlats(json))
       .catch((error) => console.error(error))
       .finally(() => setTimeout(()=>setLoading(false),2000));
-
-
   }
 
   useEffect(() => {
