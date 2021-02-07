@@ -74,7 +74,7 @@ class SecurityService implements SecurityProvider
         var savedUser = userRepository.findByUsername(user.getUsername());
         String token = "";
 
-        if (savedUser.isPresent() && encoder.matches(user.getPassword(), savedUser.get().getPassword()))
+        if (savedUser.isPresent() && user.getPassword() != null && encoder.matches(user.getPassword(), savedUser.get().getPassword()))
         {
             Long uid = savedUser.get().getId();
             token = Jwts.builder()
