@@ -1,19 +1,10 @@
-import React, { useEffect, Fragment } from "react";
+import React, { Fragment } from "react";
 import { connect } from 'react-redux';
-import { onFlatsLoadingWithParams } from '../Actions/flatsActions';
-import "../Layout/Pagination.scss"
+import  './Pagination.scss';
 
 const mapStateToProps = (state) => ({ 
-  pageNumber: state.flats.pageable.pageNumber,
-  totalPages: state.flats.totalPages,
-  pageSize: state.flats.pageable.pageSize,
-  totalElements: state.flats.totalElements,
   pageNeighbours: state.flats.pageNeighbours
 });
-
-const mapDispatchToProps = (dispatch) => ({
-  onFlatsLoadingWithParams: (data) => dispatch(onFlatsLoadingWithParams(data))
-})
 
 function Pagination(props) {
   const LEFT_PAGE = 'LEFT';
@@ -79,7 +70,8 @@ function Pagination(props) {
   const pages = fetchPageNumbers();
 
   const gotoPage = page => {
-    props.onFlatsLoadingWithParams(page-1);
+    const currentPage = Math.max(1, Math.min(page, props.totalPages));
+    props.onChangingPage(currentPage-1);
   }
 
   const handleClick = page => evt => {
@@ -123,7 +115,7 @@ function Pagination(props) {
               );
 
               return (
-                <li key={index} className={`page-item${ props.pageNumber === page-1 ? ' active' : ''}`}>
+                <li key={index} className={`page-item${ props.pageNumber == page-1 ? ' active' : ''}`}>
                   <a className="page-link" href="#" onClick={handleClick(page)}>{ page }</a>
                 </li>
               );
@@ -137,4 +129,4 @@ function Pagination(props) {
   )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Pagination);
+export default connect(mapStateToProps, null)(Pagination);

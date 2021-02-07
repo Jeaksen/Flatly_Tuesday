@@ -88,7 +88,7 @@ export function deleteFlat(flatId) {
   }
 }
 
-export function onFlatsLoadingWithParams(page) {
+export function onFlatsLoadingWithParams(params) {
   if (DEBUGGING) {
     return async (dispatch) => {
       dispatch(flatListLoading(true))
@@ -103,7 +103,7 @@ export function onFlatsLoadingWithParams(page) {
                 empty: true
               },
               offset: 0,
-              pageNumber: page,
+              pageNumber: params.pageNumber,
               pageSize: 10,
               unpaged: false,
               paged: true
@@ -128,7 +128,7 @@ export function onFlatsLoadingWithParams(page) {
   }
   return async (dispatch) => {
     dispatch(flatListLoading(true));
-    let promise = fetch(FLATS_URL);
+    let promise = fetch(FLATS_URL + params);
     promise.then(response => response.json())
         .then(json => dispatch(flatListLoaded(json)))
         .then(() => dispatch(flatListLoading(false)))
