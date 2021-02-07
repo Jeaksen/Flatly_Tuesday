@@ -63,7 +63,7 @@ public class BookingsExtController
         if (securityService.isApiKeyValid(apiKey)) {
             Booking result = bookingsService.postBooking(booking);
             if (result.getId() == 0) {
-                return ResponseEntity.ok(result);
+                return ResponseEntity.badRequest().body(result);
             }
             return ResponseEntity.ok(result);
         }
