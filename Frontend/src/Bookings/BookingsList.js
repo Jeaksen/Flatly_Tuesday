@@ -15,8 +15,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    loadBookingsListAsync: () => dispatch(loadBookingsListAsync()),
-    cancelBooking: (bookingId) => dispatch(cancelBooking(bookingId))
+    loadBookingsListAsync: (URL) => dispatch(loadBookingsListAsync(URL)),
+    cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
 })
 
 function BookingsList(props)
@@ -37,73 +37,12 @@ function BookingsList(props)
     const { endDateWrap } = endDate;
     const [optionsStr , setOptionsStr] = useState(`?size=${size}&page=${page}`);
 
-    useEffect(() => {props.loadBookingsListAsync()}, [])
-    // return (
-    //     <div className="BookingsListPanel">
-    //         <ul className="BookingsFilterPanel">
-    //             <AsyncSelect className="single-select" classNamePrefix="select" 
-    //                 isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
-    //                 name="countrySelect"
-    //                 placeholder="Select Country..."
-    //                 cacheOptions
-    //                 defaultOptions
-    //                 loadOptions = {(inputValue, callback) => {
-    //                     setTimeout(() => {
-    //                         fetch("http://localhost:8080/countryOptions")
-    //                             .then(promise => {return promise.status === 404 ? [] : promise.json()})
-    //                             .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
-    //                     }, 1000)
-    //                 }}
-    //                 onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
-    //             />
-    //             <AsyncSelect className="single-select" classNamePrefix="select" 
-    //                 isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
-    //                 name="citySelect"
-    //                 placeholder="Select City..."
-    //                 cacheOptions
-    //                 defaultOptions
-    //                 loadOptions = {(inputValue, callback) => {
-    //                     setTimeout(() => {
-    //                         fetch("http://localhost:8080/cityOptions")
-    //                             .then(promise => {return promise.status === 404 ? [] : promise.json()})
-    //                             .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
-    //                     }, 1000)
-    //                 }}
-    //                 onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
-    //             />
-    //             <DateSelect placeholder="Select Start Date..." value={startDateWrap} onChange={value => setStartDate({ value })} />
-    //             <DateSelect placeholder="Select End Date..." value={endDateWrap} onChange={value => setEndDate({ value })} />
-    //             <input className="BasicInputField" 
-    //                 placeholder="Search by Flat's Name"
-    //                 onChange={(e) => setName(e.target.value)}
-    //             />
-    //             <button onClick={() => {
-    //                 let opt_str = `?size=${size}&page=${page}`;
-    //                 if (sort !== "") opt_str += `&sort=${sort}&${sort}.dir=${sortDir}`;
-    //                 if (name !== "") opt_str += `&name=${name}`;
-    //                 if (country !== "") opt_str += `&country=${country}`;
-    //                 if (city !== "") opt_str += `&city=${city}`;
-    //                 if (startDate.value != null) opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-    //                 if (endDate.value != null) opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
-    //                 console.log(opt_str);
-    //                 props.loadBookingsListAsync();
-    //                 // props.loadBookingsListAsync(opt_str);
-    //             }}>
-    //                 Apply Filters
-    //             </button>
-    //         </ul>
-    //         {props.loading ? <label>Loading...</label> : props.error ? <label>Fetch error</label> : props.bookings && props.bookings.length > 0 ?  
-    //             <ul className="BookingsList">{props.bookings.map((booking) => {
-    //                 return <BookingsListItem key={booking.id} booking={booking} cancelBooking={props.cancelBooking} />})}
-    //             </ul> :
-    //         <div />}
-    //     </div>
-    // );
+    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings`)}, [])
 
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.cancelBooking(bookingId);
+    props.cancelBooking(props.mainURL, bookingId);
     setShowConfirmation(false);
   }
 
@@ -164,37 +103,47 @@ function BookingsList(props)
                     <Col>
                       <Form.Label>Country</Form.Label>
                       <AsyncSelect className="single-select" classNamePrefix="select" 
-                          isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
-                          name="countrySelect"
-                          placeholder="Select Country..."
-                          cacheOptions
-                          defaultOptions
-                          loadOptions = {(inputValue, callback) => {
-                              setTimeout(() => {
-                                  fetch("http://localhost:8080/countryOptions")
-                                      .then(promise => {return promise.status === 404 ? [] : promise.json()})
-                                      .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
-                              }, 1000)
-                          }}
-                          onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
+                        isDisabled={city !== ""} isClearable={true} isRtl={false} isSearchable={true}
+                        name="countrySelect"
+                        placeholder="Select Country..."
+                        defaultOptions
+                        loadOptions = {(inputValue, callback) => {
+                            setTimeout(() => {
+                                //fetch(`${props.mainURL}/metadata/countries`)
+                                fetch(`${props.mainURL}/countryOptions`)
+                                    .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                                    .then(json => 
+                                        {
+                                            let filtered = json.filter(i => i.toLowerCase().includes(inputValue.toLowerCase()));
+                                            callback(filtered.map((i) => {return {value: i, label: i}}));
+                                        }
+                                    );
+                            }, 1000)
+                        }}
+                        onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
                       />
                     </Col>
                     <Col>
                       <Form.Label>City</Form.Label>
                       <AsyncSelect className="single-select" classNamePrefix="select" 
-                          isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
-                          name="citySelect"
-                          placeholder="Select City..."
-                          cacheOptions
-                          defaultOptions
-                          loadOptions = {(inputValue, callback) => {
-                              setTimeout(() => {
-                                  fetch("http://localhost:8080/cityOptions")
-                                      .then(promise => {return promise.status === 404 ? [] : promise.json()})
-                                      .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
-                              }, 1000)
-                          }}
-                          onChange={(opt) => { opt != null ? setCity(opt.value) : setCity("")}}
+                        isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
+                        name="citySelect"
+                        placeholder="Select City..."
+                        defaultOptions
+                        loadOptions = {(inputValue, callback) => {
+                            setTimeout(() => {
+                                //fetch(`${props.mainURL}/metadata/cities${country !== "" ? `?country=${country}` : ""}`)
+                                fetch(`${props.mainURL}/cityOptions`)
+                                    .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                                    .then(json => 
+                                        {
+                                            let filtered = json.filter(i => i.toLowerCase().includes(inputValue.toLowerCase()));
+                                            callback(filtered.map((i) => {return {value: i, label: i}}));
+                                        }
+                                    );
+                            }, 1000)
+                        }}
+                        onChange={(opt) => { opt != null ? setCity(opt.value) : setCity("")}}
                       />
                     </Col>
                     <Col>
@@ -216,8 +165,8 @@ function BookingsList(props)
                       if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
                       setOptionsStr(opt_str);
                       console.log(opt_str);
-                      // props.loadBookingsListAsync();
-                      // props.loadBookingsListAsync(opt_str);
+                      // props.loadBookingsListAsync(`${props.mainURL}/bookings`);
+                      // props.loadBookingsListAsync(`${props.mainURL}/bookings${opt_str}`);
                     }}>
                       Apply Filters
                     </button>

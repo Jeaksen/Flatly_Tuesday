@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { connect } from 'react-redux';
 import { loadBookingDetailsAsync } from './Actions/bookingDetailsActions'
-import { BrowserRouter as Router, Switch, Route, Link, useRouteMatch, useParams } from "react-router-dom";
+import { cancelBooking } from './Actions/bookingsListActions';
+import { useParams } from "react-router-dom";
 import { Form, Row, Col, Button, Card, CardDeck, Modal } from 'react-bootstrap';
 import "./BookingsLayout.css";
 
@@ -13,7 +14,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  loadBookingDetailsAsync: (bookingId) => dispatch(loadBookingDetailsAsync(bookingId)),
+  loadBookingDetailsAsync: (URL, bookingId) => dispatch(loadBookingDetailsAsync(URL, bookingId)),
+  cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
 })
 
 function BookingDetails(props) {
@@ -24,11 +26,11 @@ function BookingDetails(props) {
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.cancelBooking(bookingId);
+    props.cancelBooking(props.mainURL, bookingId);
     setShowConfirmation(false);
   }
     
-  useEffect(() => {props.loadBookingDetailsAsync(bookingId)}, [])
+  useEffect(() => {props.loadBookingDetailsAsync(props.mainURL, bookingId)}, [])
 
   if (props.loading) {
     return (<label>Loading...</label>)
@@ -127,7 +129,7 @@ function BookingDetails(props) {
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleCloseConfirmation}>Close</Button>
-                <Button variant="primary" onClick={() => onDeleteBooking(props.booking.id)}>Delete</Button>
+                <Button variant="primary" href={`/bookings`} onClick={() => onDeleteBooking(props.booking.id)}>Delete</Button>
               </Modal.Footer>
             </Modal>
           </div>

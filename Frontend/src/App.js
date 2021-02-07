@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reduxThunk from 'redux-thunk'
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import appReducers from './AppReducers/appReducers'
 import {composeWithDevTools} from 'redux-devtools-extension';
 import {  Nav,  Navbar,  Form, Button} from 'react-bootstrap';
@@ -37,16 +37,18 @@ function NavigatorBar() {
 }
 const HeaderWithRouter = withRouter(NavigatorBar);
 function App() {
+  const mainURL = "http://localhost:8080";
+
   return (
     <Provider store = {store}>
       <Router>
         <Fragment>
           <HeaderWithRouter />
           <Route path={`/bookings/details/:bookingId`} exact>
-            <BookingDetails />
+            <BookingDetails mainURL={mainURL} />
           </Route>
           <Route path="/bookings" exact>
-            <BookingsList />
+            <BookingsList mainURL={mainURL} />
           </Route>
           <Route path="/flats/add" exact>
             <FlatForm mode='create'/>
