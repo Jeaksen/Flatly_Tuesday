@@ -2,8 +2,6 @@ import {
     FLATS_LOADED,
     FLATS_LOADING,
     FLATS_LOADING_ERROR,
-    FLATS_SAVING,
-    FLATS_SAVING_ERROR,
     FLATS_DELETING,
     FLATS_DELETING_ERROR,
     FLATS_URL,
@@ -11,32 +9,24 @@ import {
 } from '../../AppConstants/AppConstants';
 
 export function flatListLoaded(flatsResponse){
-    return ({ type: FLATS_LOADED, payload: flatsResponse })
+  return ({ type: FLATS_LOADED, payload: flatsResponse })
 }
 
 export function flatListLoading(b){
-    return ({ type: FLATS_LOADING, payload: b })
+  return ({ type: FLATS_LOADING, payload: b })
 }
 
 
 export function flatListLoadingError(error) {
-    return ({type: FLATS_LOADING_ERROR, payload: error})
-}
-
-export function flatSaving(b){
-    return ({ type: FLATS_SAVING, payload: b })
-}
-
-export function flatSavingError(error) {
-    return ({type: FLATS_SAVING_ERROR, payload: error})
+  return ({type: FLATS_LOADING_ERROR, payload: error})
 }
 
 export function flatDeleting(flatId) {
-    return ({type: FLATS_DELETING, payload: flatId })
+  return ({type: FLATS_DELETING, payload: flatId })
 }
 
 export function flatDeletingError(error) {
-    return ({type: FLATS_DELETING_ERROR, payload: error})
+  return ({type: FLATS_DELETING_ERROR, payload: error})
 }
 
 export function loadFlatListAsync() {
@@ -87,28 +77,6 @@ export function loadFlatListAsync() {
   }
 }
 
-export function addNewFlat(flat, uploadedFiles) {
-  return async (dispatch) => {
-    dispatch(flatSaving(true));
-    const formData = new FormData();
-    for (let i = 0 ; i < uploadedFiles.length ; i++) {
-      formData.append("new_images", uploadedFiles[i]);
-    }
-    for (var key in flat) {
-      formData.append(key, flat[key]);
-    }
-    let promise = fetch(FLATS_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'multipart/form-data'},
-        body: formData
-    });
-    promise.then(response => response.json())
-      .then(() => dispatch(flatSaving(false)))
-      .catch((error) => dispatch(flatSavingError(error)))
-      .finally(() => dispatch(loadFlatListAsync()));
-  }
-}
-
 export function deleteFlat(flatId) {
   return async (dispatch) => {
     dispatch(flatDeleting(flatId))
@@ -123,7 +91,7 @@ export function deleteFlat(flatId) {
 export function onFlatsLoadingWithParams(page) {
   if (DEBUGGING) {
     return async (dispatch) => {
-      dispatch(flatListLoading(true));
+      dispatch(flatListLoading(true))
       let promise = fetch(FLATS_URL);
       promise.then(response => response.json())
           .then(json => dispatch(flatListLoaded({
