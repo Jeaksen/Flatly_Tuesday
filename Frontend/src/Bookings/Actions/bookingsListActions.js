@@ -10,11 +10,11 @@ export function bookingsListLoadingError(error) {
     return ({type: "bookingsListLoadingError", payload: error})
 }
 
-export function loadBookingsListAsync() {
+export function loadBookingsListAsync(URL) {
     return async (dispatch) => {
         try {
             dispatch(bookingsListLoading());
-            const response = await fetch("http://localhost:8080/bookings/");
+            const response = await fetch(URL);
             const json = await response.json();
             dispatch(bookingsListLoaded(json));
         } catch(error) {
@@ -44,11 +44,11 @@ export function bookingCancelingError(error) {
     return ({type: "bookingCancelingError", payload: error})
 }
 
-export function cancelBooking(bookingId) {
+export function cancelBooking(URL, bookingId) {
     return async (dispatch) => {
         try {
             dispatch(bookingCanceling(bookingId))
-            await fetch("http://localhost:8080/bookings/" + bookingId, {method: 'DELETE'});
+            await fetch(`${URL}/bookings/` + bookingId, {method: 'DELETE'});
             dispatch(loadBookingsListAsync());
         } catch(error) {
             console.error(error);
