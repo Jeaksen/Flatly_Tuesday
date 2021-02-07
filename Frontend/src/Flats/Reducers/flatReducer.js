@@ -45,12 +45,14 @@ export default function flatReducer(state = baseState, action)
       return {...state, loading: action.payload, error: null}
 
     case FLAT_LOADING_ERROR:
+      alert('Error: ' + action.payload);
       return {...state, loading: false, saving: false, error: action.payload}
 
     case FLAT_SAVING:
       return {...state, loading: false, saving: action.payload, error: null}
 
     case FLAT_SAVING_ERROR:
+      alert('Error: ' + action.payload);
       return {...state, loading: false, saving: false,  error: action.payload}
 
     case FLAT_CHANGED:

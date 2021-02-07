@@ -1,6 +1,8 @@
-export const BACKEND_URL = 'http://localhost:8080/';
-export const FLATS_URL = 'http://localhost:8080/flats/';
-export const DEBUGGING = true;
+export const BACKEND_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/';
+export const FLATS_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/';
+export const DEBUGGING = false;
+export const TESTING = true;
+export const TOKEN = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiaWQiOjEsImlhdCI6MTYxMjcxODM3OH0.ctlB10GVA9pMvzNuRRBzKn3ktOuU9R3kYHgwYYPI31Mm31FPs1wusfXkTKj0YLOBruU5Wr5VIZEdRBVOwt022Q';
 
 export const FLATS_LOADING = 'FLATS_LOADING';
 export const FLATS_LOADED = 'FLATS_LOADED';
