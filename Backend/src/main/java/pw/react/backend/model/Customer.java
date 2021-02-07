@@ -20,6 +20,13 @@ public class Customer implements Serializable
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    /*@NotNull
+    private String name;
+    @NotNull
+    private String surname;
+    @NotNull
+    private String phoneNo;*/
+
     @NotNull
     private String name = "Krzysztof";
     @NotNull
