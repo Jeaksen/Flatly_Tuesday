@@ -10,30 +10,45 @@ export function bookingsListLoadingError(error) {
     return ({type: "bookingsListLoadingError", payload: error})
 }
 
-export function loadBookingsListAsync(URL) {
+export function loadBookingsListAsync(URL, pageNumber) {
     return async (dispatch) => {
         try {
             dispatch(bookingsListLoading());
             const response = await fetch(URL);
             const json = await response.json();
-            dispatch(bookingsListLoaded(json));
+            dispatch(bookingsListLoaded({
+                content: json,
+                pageable: {
+                  sort: {
+                    sorted: false,
+                    unsorted: true,
+                    empty: true
+                  },
+                  offset: 0,
+                  pageNumber: pageNumber,
+                  pageSize: 10,
+                  unpaged: false,
+                  paged: true
+                },
+                totalPages: 10,
+                totalElements: 95,
+                last: false,
+                size: json.length,
+                number: 0,
+                sort: {
+                  sorted: false,
+                  unsorted: true,
+                  empty: true
+                },
+                numberOfElements: json.length,
+                first: true,
+                empty: false
+              }));
         } catch(error) {
             console.error(error);
             dispatch(bookingsListLoadingError(error));
         }
     }
-}
-
-export function bookingsListSaved(list) {
-    return ({type: "bookingsListSaved", payload: list})
-}
-
-export function bookingsListSaving() {
-    return ({type: "bookingsListSaving"})
-}
-
-export function bookingsListSavingError(error) {
-    return ({type: "bookingsListSavingError", payload: error})
 }
 
 export function bookingCanceling(bookingId) {
