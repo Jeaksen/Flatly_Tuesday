@@ -5,7 +5,7 @@ import { deleteFlat, loadFlatListAsync } from '../Actions/flatsActions';
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import Pagination from '../../AppComponents/Pagination';
 import "../Layout/FlatsLayout.css";
-import {DEBUGGING} from '../../AppConstants/AppConstants'
+import {DEBUGGING, FLATS_URL} from '../../AppConstants/AppConstants'
 
 const mapStateToProps = (state) => ({ 
   flats: state.flats.flats,
@@ -22,7 +22,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   loadFlatListAsync: (URL, pageNumber) => dispatch(loadFlatListAsync(URL, pageNumber)),
-  deleteFlat: (URL, flatId) => dispatch(deleteFlat(URL, flatId)),
+  deleteFlat: (flatId) => dispatch(deleteFlat(flatId)),
 })
 
 function FlatsList(props) {
@@ -35,12 +35,12 @@ function FlatsList(props) {
   const [priceUpper, setPriceUpper] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  useEffect(() => {props.loadFlatListAsync(`${props.mainURL}/flats${getOptionsStr(props.pageNumber)}`, props.pageNumber)}, []);
+  useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`, props.pageNumber)}, []);
   
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteFlat = (flatId) => {
-    props.deleteFlat(props.mainURL, flatId);
+    props.deleteFlat(flatId);
     setShowConfirmation(false);
   }
 
@@ -181,7 +181,7 @@ function FlatsList(props) {
                   <button onClick={(e) => {
                     e.preventDefault();
                     console.log(getOptionsStr(props.pageNumber));
-                    // props.loadFlatListAsync(`${props.mainURL}/bookings${opt_str}`, props.pageNumber);
+                    // props.loadFlatListAsync(`${FLATS_URL}${opt_str}`, props.pageNumber);
                   }}>
                     Apply Filters
                   </button>
@@ -211,7 +211,7 @@ function FlatsList(props) {
                 totalElements = {props.totalElements}
                 onChangingPage = {(pageNumber) => {
                   let optionsStr = getOptionsStr(pageNumber);
-                  props.loadFlatListAsync(`${props.mainURL}/flats${optionsStr}`, pageNumber);
+                  props.loadFlatListAsync(`${FLATS_URL}${optionsStr}`, pageNumber);
                 }}/>
             </div>
           </div>
