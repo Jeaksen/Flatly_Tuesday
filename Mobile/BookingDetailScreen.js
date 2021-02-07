@@ -16,7 +16,7 @@ export default function BookingDetailScreen({route, navigation}) {
     return (
         <SafeAreaView >
             <View style={styles.circle}></View>
-            <HeaderNavBar page={"Flats"} navigation={navigation}/>
+            <HeaderNavBar page={"Bookings"} navigation={navigation}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.name}</Text>
                     {/* <View style={styles.container}>
