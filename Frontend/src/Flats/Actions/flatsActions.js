@@ -7,8 +7,7 @@ import {
     FLATS_URL,
     DEBUGGING, TESTING
 } from '../../AppConstants/AppConstants';
-
-import {fetchGet, fetchPut, fetchPost, fetchDelete} from '../../AppComponents/ServerApiService'
+import {fetchGet, fetchDelete} from '../../AppComponents/ServerApiService'
 
 export function flatListLoaded(flatsResponse){
   return ({ type: FLATS_LOADED, payload: flatsResponse })
@@ -35,7 +34,7 @@ export function loadFlatListAsync(URL, pageNumber) {
   if (DEBUGGING) {
     return async (dispatch) => {
       dispatch(flatListLoading(true));
-      let promise = fetch(URL);
+      let promise = fetchGet(URL);
       promise.then(response => response.json())
           .then(json => dispatch(flatListLoaded({
             content: json,

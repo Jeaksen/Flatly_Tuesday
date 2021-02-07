@@ -5,7 +5,8 @@ import { deleteFlat, loadFlatListAsync } from '../Actions/flatsActions';
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import Pagination from '../../AppComponents/Pagination';
 import "../Layout/FlatsLayout.css";
-import {DEBUGGING, FLATS_URL} from '../../AppConstants/AppConstants'
+import { DEBUGGING, BACKEND_URL, FLATS_URL } from '../../AppConstants/AppConstants';
+import { fetchGet } from '../../AppComponents/ServerApiService';
 
 const mapStateToProps = (state) => ({ 
   flats: state.flats.flats,
@@ -21,7 +22,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  loadFlatListAsync: (URL, pageNumber) => dispatch(loadFlatListAsync(URL, pageNumber)),
+  loadFlatListAsync: (URL) => dispatch(loadFlatListAsync(URL)),
   deleteFlat: (flatId) => dispatch(deleteFlat(flatId)),
 })
 
@@ -35,7 +36,7 @@ function FlatsList(props) {
   const [priceUpper, setPriceUpper] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`, props.pageNumber)}, []);
+  useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
   
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
@@ -120,11 +121,9 @@ function FlatsList(props) {
                         isDisabled={city !== ""} isClearable={true} isRtl={false} isSearchable={true}
                         name="countrySelect"
                         placeholder="Select Country..."
-                        defaultOptions
                         loadOptions = {(inputValue, callback) => {
                           setTimeout(() => {
-                            //fetch(`${props.mainURL}/metadata/countries`)
-                            fetch(`${props.mainURL}/countryOptions`)
+                            fetchGet(`${BACKEND_URL}metadata/countries`)
                               .then(promise => {return promise.status === 404 ? [] : promise.json()})
                               .then(json => 
                                 {
@@ -143,11 +142,9 @@ function FlatsList(props) {
                     isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
                     name="citySelect"
                     placeholder="Select City..."
-                    defaultOptions
                     loadOptions = {(inputValue, callback) => {
                       setTimeout(() => {
-                        //fetch(`${props.mainURL}/metadata/cities${country !== "" ? `?country=${country}` : ""}`)
-                        fetch(`${props.mainURL}/cityOptions`)
+                        fetchGet(`${BACKEND_URL}metadata/cities${country !== "" ? `?country=${country}` : ""}`)
                           .then(promise => {return promise.status === 404 ? [] : promise.json()})
                           .then(json => 
                             {
@@ -180,8 +177,7 @@ function FlatsList(props) {
                   </Button>
                   <button onClick={(e) => {
                     e.preventDefault();
-                    console.log(getOptionsStr(props.pageNumber));
-                    // props.loadFlatListAsync(`${FLATS_URL}${opt_str}`, props.pageNumber);
+                    props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`);
                   }}>
                     Apply Filters
                   </button>
@@ -211,7 +207,7 @@ function FlatsList(props) {
                 totalElements = {props.totalElements}
                 onChangingPage = {(pageNumber) => {
                   let optionsStr = getOptionsStr(pageNumber);
-                  props.loadFlatListAsync(`${FLATS_URL}${optionsStr}`, pageNumber);
+                  props.loadFlatListAsync(`${FLATS_URL}${optionsStr}`);
                 }}/>
             </div>
           </div>

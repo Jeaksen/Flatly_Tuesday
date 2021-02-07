@@ -14,8 +14,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  loadBookingDetailsAsync: (URL, bookingId) => dispatch(loadBookingDetailsAsync(URL, bookingId)),
-  cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
+  loadBookingDetailsAsync: (bookingId) => dispatch(loadBookingDetailsAsync(bookingId)),
+  cancelBooking: (bookingId) => dispatch(cancelBooking(bookingId))
 })
 
 function BookingDetails(props) {
@@ -26,11 +26,11 @@ function BookingDetails(props) {
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.cancelBooking(props.mainURL, bookingId);
+    props.cancelBooking(bookingId);
     setShowConfirmation(false);
   }
     
-  useEffect(() => {props.loadBookingDetailsAsync(props.mainURL, bookingId)}, [])
+  useEffect(() => {props.loadBookingDetailsAsync(bookingId)}, [])
 
   if (props.loading) {
     return (<label>Loading...</label>)
