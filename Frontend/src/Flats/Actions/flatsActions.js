@@ -5,8 +5,10 @@ import {
     FLATS_DELETING,
     FLATS_DELETING_ERROR,
     FLATS_URL,
-    DEBUGGING
+    DEBUGGING, TESTING
 } from '../../AppConstants/AppConstants';
+
+import {fetchGet, fetchPut, fetchPost, fetchDelete} from '../../AppComponents/ServerApiService'
 
 export function flatListLoaded(flatsResponse){
   return ({ type: FLATS_LOADED, payload: flatsResponse })
@@ -69,7 +71,7 @@ export function loadFlatListAsync(URL, pageNumber) {
   }
   return async (dispatch) => {
     dispatch(flatListLoading(true));
-    let promise = fetch(URL);
+    let promise = fetchGet(FLATS_URL);
     promise.then(response => response.json())
         .then(json => dispatch(flatListLoaded(json)))
         .then(() => dispatch(flatListLoading(false)))
@@ -80,7 +82,7 @@ export function loadFlatListAsync(URL, pageNumber) {
 export function deleteFlat(flatId) {
   return async (dispatch) => {
     dispatch(flatDeleting(flatId))
-    let promise = fetch(FLATS_URL + flatId, {method: "DELETE"});
+    let promise = fetchDelete(FLATS_URL + flatId);
     promise.then(response => response.json())
         .then(() => dispatch(flatDeleting(-1)))
         .catch((error) => dispatch(flatDeletingError(error)))

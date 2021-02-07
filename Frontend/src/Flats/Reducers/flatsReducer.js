@@ -67,12 +67,14 @@ export default function flatListReducer(state = baseState, action)
       return {...state, loading: action.payload, error: null}
 
     case FLATS_LOADING_ERROR:
+      alert('Error: ' + action.payload);
       return {...state, loading: false, error: action.payload}
 
     case FLATS_DELETING:
       return {...state, loading: false, idDeleting: action.payload, error: null}
 
     case FLATS_DELETING_ERROR:
+      alert('Error: ' + action.payload);
       return {...state, loading: false, error: action.payload}
       
     default:

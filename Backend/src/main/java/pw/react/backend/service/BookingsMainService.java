@@ -41,8 +41,10 @@ class BookingsMainService implements BookingsService {
     @Override
     public Booking postBooking(Booking booking) {
         Booking result = new Booking();
+        Booking toSave = booking;
         try {
-            result = repository.save(booking);
+            toSave.setCustomerId(booking.getCustomer().getId());
+            result = repository.save(toSave);
         } catch (DataIntegrityViolationException e) {
             logger.error(String.format("Failed to save booking %s", e.getMessage()));
         }
