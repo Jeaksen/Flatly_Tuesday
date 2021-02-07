@@ -43,6 +43,21 @@
         "flatNumber": ""
       },
       "images": []
+    },
+    {
+      "id": "09fkm1o2oijs18hiujwj09d2bu",
+      "name": "U Grażyny",
+      "flatType": "Apartment",
+      "maxGuests": 6,
+      "pricePerDay": 35,
+      "address": {
+        "country": "Poland",
+        "city": "Zakopane",
+        "streetName": "Góralska",
+        "postCode": "00-100",
+        "buildingNumber": 25,
+        "flatNumber": 3
+      }
     }
   ],
   "bookings": [

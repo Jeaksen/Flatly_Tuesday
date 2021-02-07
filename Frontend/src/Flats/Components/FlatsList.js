@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
-import { deleteFlat, loadFlatListAsync } from '../Actions/flatsActions';
+import { deleteFlat, loadFlatListAsync, onFlatsLoadingWithParams } from '../Actions/flatsActions';
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
-import Pagination from './Pagination';
-import "../Layout/FlatsLayout.css"
+import Pagination from '../../AppComponents/Pagination';
+import "../Layout/FlatsLayout.css";
+import {DEBUGGING} from '../../AppConstants/AppConstants'
 
 const mapStateToProps = (state) => ({ 
   flats: state.flats.flats,
-  pageNumber: state.flats.pageable.pageNumber,
-  totalPages: state.flats.totalPages,
   loading: state.flats.loading,
   idDeleting: state.flats.idDeleting,
-  error: state.flats.error
+  error: state.flats.error,
+
+  //For Pagination
+  pageNumber: state.flats.pageable.pageNumber,
+  totalPages: state.flats.totalPages,
+  pageSize: state.flats.pageable.pageSize,
+  totalElements: state.flats.totalElements
 });
 
 const mapDispatchToProps = (dispatch) => ({
   loadFlatListAsync: () => dispatch(loadFlatListAsync()),
-  deleteFlat: (flatId) => dispatch(deleteFlat(flatId))
+  deleteFlat: (flatId) => dispatch(deleteFlat(flatId)),
+  
+  //For Pagination
+  onFlatsLoadingWithParams: (data) => dispatch(onFlatsLoadingWithParams(data))
 })
 
 function FlatsList(props) {
@@ -82,6 +90,10 @@ function FlatsList(props) {
         </tr>
       )
     )
+  }
+
+  const onChangingPage = (page) => {
+    props.onFlatsLoadingWithParams(DEBUGGING ? {pageNumber:page} : `?page=${page}`);
   }
 
   return (
@@ -153,7 +165,12 @@ function FlatsList(props) {
               </Row>
             </Form>
             <div className="d-flex flex-row py-4 align-items-center">
-              <Pagination />
+              <Pagination 
+                pageNumber = {props.pageNumber}
+                totalPages = {props.totalPages}
+                pageSize = {props.pageSize}
+                totalElements = {props.totalElements}
+                onChangingPage = {onChangingPage}/>
             </div>
           </div>
           : <div></div>}

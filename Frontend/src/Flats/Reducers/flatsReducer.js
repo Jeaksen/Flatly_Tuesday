@@ -23,7 +23,7 @@ const baseState = {
   totalPages: 7,
   totalElements: 7,
   last: false,
-  size: 1,
+  size: 10,
   number: 0,
   sort: {
     sorted: false,
