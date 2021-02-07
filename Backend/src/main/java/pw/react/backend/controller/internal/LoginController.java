@@ -47,7 +47,7 @@ public class LoginController
 
     @PostMapping(path = "/enc")
     public ResponseEntity<String> encode(@RequestHeader HttpHeaders headers,
-                                         String string)
+                                         @RequestParam(value = "string") String string)
     {
         logHeaders(headers);
         return ResponseEntity.ok(securityService.Encode(string));

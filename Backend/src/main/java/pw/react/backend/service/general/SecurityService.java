@@ -3,12 +3,16 @@ package pw.react.backend.service.general;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import pw.react.backend.dao.ApiKeyRepository;
 import pw.react.backend.dao.UserRepository;
 import pw.react.backend.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import pw.react.backend.service.AddressMainService;
+
 import java.util.Date;
 
 
@@ -22,6 +26,7 @@ class SecurityService implements SecurityProvider
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final ApiKeyRepository apiKeyRepository;
+    private final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
 
     public SecurityService(UserRepository userRepository, ApiKeyRepository apiKeyRepository)
@@ -40,6 +45,8 @@ class SecurityService implements SecurityProvider
         String token = headers.getFirst(SECURITY_HEADER);
         if (token == null || token.isEmpty())
             return false;
+        try {
+
 
         Claims claims = Jwts.parser().setSigningKey(TOKEN_SIGNING_KEY).parseClaimsJws(token).getBody();
         Integer uid = (Integer)claims.get("id");
@@ -48,6 +55,11 @@ class SecurityService implements SecurityProvider
 
         var savedUser = userRepository.findById(uid.longValue());
         return savedUser.isPresent() && savedUser.get().getUsername().equals(claims.getSubject());
+        } catch (Exception e)
+        {
+            logger.error(e.getMessage());
+            return false;
+        }
     }
 
     @Override
