@@ -51,6 +51,17 @@ function BookingsList(props)
     setShowConfirmation(false);
   }
 
+  const getOptionsStr = (pageNumber) =>
+  {
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+    if (name !== "") opt_str += `&name=${name}`;
+    if (country !== "") opt_str += `&country=${country}`;
+    if (city !== "") opt_str += `&city=${city}`;
+    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+    return opt_str;
+  }
+
   const renderTableData = () => {
     return props.bookings.map((booking) => (
         <tr key={booking.id} className='BookingsRow'>
@@ -90,18 +101,6 @@ function BookingsList(props)
       )
     )
   }
-
-  const getOptionsStr = (pageNumber) =>
-  {
-    let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
-    if (name !== "") opt_str += `&name=${name}`;
-    if (country !== "") opt_str += `&country=${country}`;
-    if (city !== "") opt_str += `&city=${city}`;
-    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
-    return opt_str;
-  }
-
 
     return (
         <div className="BookingsList">
