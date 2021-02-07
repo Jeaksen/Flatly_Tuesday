@@ -13,7 +13,7 @@ import pw.react.backend.service.general.SecurityProvider;
 import static java.util.stream.Collectors.joining;
 
 @RestController
-@RequestMapping("/private/login")
+@RequestMapping("/login")
 public class LoginController
 {
     private final Logger logger = LoggerFactory.getLogger(LoginController.class);
