@@ -32,19 +32,19 @@ public class MainConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        getCorsUrls();
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                final Set<String> mappings = getCorsMapings();
-                if (mappings.isEmpty()) {
+//                final Set<String> mappings = getCorsMapings();
+                registry.addMapping("/**");
+/*                if (mappings.isEmpty()) {
                     registry.addMapping("/**");
                 } else {
                     for (String mapping : mappings) {
                         registry.addMapping(mapping).allowedOrigins(getCorsUrls());
 
                     }
-                }
+                }*/
             }
         };
     }
