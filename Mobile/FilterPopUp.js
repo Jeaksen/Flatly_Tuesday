@@ -3,6 +3,7 @@ import { View, StyleSheet, TextInput, Dimensions, Animated, Text,Button,Keyboard
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Icon } from 'react-native-elements'
+import { ModalDatePicker } from "react-native-material-date-picker";
 import { debug } from 'react-native-reanimated';
 import { PixelRatio } from 'react-native';
 
@@ -19,6 +20,9 @@ const cities=[
 ]
 //For animation
 //animateView:
+const FPanelHeightOpen =0.45
+const FPanelHeightClose=0.38
+
 const initPos=-15
 const endiPos =10
 var currentPos=initPos
@@ -29,12 +33,23 @@ const initBRadious=0
 const endiBRadious=20
 var currentBRadious=initBRadious
 
+function GetFormatedDate({date,prefix}){
+    return(
+        <View style={styles.DateInput}>
+            <Text>{prefix}: {date.getFullYear()}-{date.getMonth()}-{date.getDate()}</Text>
+        </View>
+    );
+}
 export default class FilterPopUp extends Component{
 
+    /*
+    Props options:
+    DateActive = true/false 
+    */
     state={
             //This obj is allways on top need to be programatically switch active or not
             Active: false,
-            FPanelHeight: height*0.4,
+            FPanelHeight: height*FPanelHeightOpen,
             //view animation
             posAnimation: new Animated.Value(initPos),
             opaAnimation: new Animated.Value(initOpacity),
@@ -48,7 +63,19 @@ export default class FilterPopUp extends Component{
             selectedCountry: 'Poland',
             selectedCity: 'Płock',
 
+            //FilteringValues:
+            DateFrom: new Date(),
+            DateTo: new Date(),
+
+            //Calendar
+            CalendarMode: "From",
     }
+    constructor(props)
+    {
+        super(props);
+        this.CalendarRef = React.createRef();
+    }
+
     
     //Keyboard:
     componentDidMount() {
@@ -76,7 +103,7 @@ export default class FilterPopUp extends Component{
             currentOpacity=initOpacity;
             currentBRadious=initBRadious;
         }
-        this.setState({ FPanelHeight: height*0.4 })
+        this.setState({ FPanelHeight: height*FPanelHeightOpen })
         Animated.timing(this.state.posAnimation,{
             toValue:  currentPos,
             duration: 300,
@@ -103,21 +130,39 @@ export default class FilterPopUp extends Component{
         }).start();
     };
 
+    sumbitHandler =() =>{
+        this.animateView();
+    }
     onKeyboardShow =() =>{
         Animated.timing(this.state.hei1Animation,{toValue:  5,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.hei2Animation,{toValue:  5,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.opa2Animation,{toValue:  0,duration: 20,useNativeDriver: true}).start(
-            () =>{this.setState({ FPanelHeight: height*0.32 })}
+            () =>{this.setState({ FPanelHeight: height*FPanelHeightClose })}
         );
     }
 
     onKeyboardHide =() =>{
-        this.setState({ FPanelHeight: height*0.4 })
+        this.setState({ FPanelHeight: height*FPanelHeightOpen })
         Animated.timing(this.state.hei1Animation,{toValue:  10,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.hei2Animation,{toValue:  20,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.opa2Animation,{toValue:   1,duration: 200,useNativeDriver: true}).start();
     }
 
+    showCalendar=(mode) =>{
+        console.log("ustawiam mode: " + mode)
+        this.setState({ CalendarMode: mode })
+        this.CalendarRef.current.showModal()
+    }
+    setCalendarDate = (date)=>{
+        console.log("The mode: " + this.state.CalendarMode)
+        if(this.state.CalendarMode=="From")
+        {
+            this.setState({ DateFrom: date })
+        }
+        else{
+            this.setState({ DateTo: date })
+        }
+    }
     render(){
         const hei1Animation={transform: [{translateY: this.state.hei1Animation,}],};
         const hei2Animation={transform: [{translateY: this.state.hei2Animation,}],};
@@ -152,7 +197,7 @@ export default class FilterPopUp extends Component{
                     <Animated.View style={[styles.filterPanel, {height: this.state.FPanelHeight}, BorderAnimation]}>
                         <Animated.View style={[styles.SearchBar]}>
                             <Icon name='search' color='orange'/>
-                            <TextInput style={styles.textinput} placeholder="Search by flat name" />
+                            <TextInput style={styles.textinput} placeholder="Search by flat name" onSubmitEditing={this.sumbitHandler}/>
                         </Animated.View>
                         <View>
                             <DropDownPicker items={contries} placeholder="Country" searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCountry: item.value})}/>                        
@@ -160,18 +205,30 @@ export default class FilterPopUp extends Component{
                         <View>
                             <DropDownPicker items={cities}   placeholder="City"    searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCity: item.value})}/>                        
                         </View>
-                        <Animated.View style={[styles.priceBar,hei1Animation]}>
-                            <Text style={{fontSize: 20, marginRight:'auto'}} >Price: </Text>
-                            <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
-                            <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
-                        </Animated.View>
-                        <Animated.View style={[styles.guestsBar,hei2Animation]}>
-                            <Text style={{fontSize: 20, marginRight:'auto'}} >Max Guests: </Text>
-                            <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
-                            <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
-                        </Animated.View>
+                        {this.props.DateActive=="true" ?
+                        <View style={{height: 80}}>
+                                <Animated.View style={[styles.priceBar,hei1Animation]}>
+                                    <Text style={{fontSize: 20, marginRight:'auto'}} >Date: </Text>
+                                    <TouchableOpacity onPress={() => this.showCalendar("From")}><GetFormatedDate date={this.state.DateFrom} prefix="From"/></TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.showCalendar("To")}><GetFormatedDate date={this.state.DateTo}   prefix="To"  /></TouchableOpacity>
+                                    <ModalDatePicker ref={this.CalendarRef} button={<View/>} locale="en" onSelect={(date) => this.setCalendarDate(date)} initialDate={new Date()}/>   
+                                </Animated.View>
+                        </View>:
+                            <View>
+                                <Animated.View style={[styles.priceBar,hei1Animation]}>
+                                    <Text style={{fontSize: 20, marginRight:'auto'}} >Price: </Text>
+                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
+                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
+                                </Animated.View>
+                                <Animated.View style={[styles.guestsBar,hei2Animation]}>
+                                    <Text style={{fontSize: 20, marginRight:'auto'}} >Max Guests: </Text>
+                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
+                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
+                                </Animated.View>
+                            </View>
+                        }
                         <Animated.View style={[styles.SearchButton, Opa2Animation]}>
-                            <Button title="Search"  onPress={() => this.animateView()} color='#38373c'></Button>
+                            <Button title="Search"  onPress={() => this.sumbitHandler()} color='#38373c'></Button>
                         </Animated.View>
                      </Animated.View>
                 </Animated.View>: <View style={{backgroundColor: 'red'}}/>}
@@ -210,7 +267,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     SearchButton:{
-        marginTop: 10,
+        marginTop: 20,
     },
     textprice: {
         fontSize: 16,
@@ -260,5 +317,13 @@ const styles = StyleSheet.create({
         height: 2*height, 
         marginTop: -height, 
         opacity: 0.2,
+      },
+      DateInput:{
+          borderWidth: 1,
+          borderColor: 'gray',
+          borderRadius: 10,
+          opacity: 0.5,
+          margin: 2,
+          padding: 5,
       }
 });

@@ -15,11 +15,11 @@ const buttonW = width*0.3
 const centerMargin = (width - 3*buttonW)/4;
 const bigButtonW = 3*buttonW + 2*centerMargin
 
-function ListItem({ item, navigation }) {
+function ListItem({ item, navigation, token }) {
   return (
         <SafeAreaView style={styles.item}>
                 <View style={{flex: 1, flexDirection:'row'}}>
-                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item})}>
+                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item, token: token})}>
                         <View>
                             <Text style={styles.itemtitle}>{item.name}</Text>
                         </View>
@@ -47,6 +47,7 @@ export default function FlatsScreen({navigation}) {
     const [searchString, setSearchString] = useState('');
     const FilterRef = useRef(null);
 
+    const Token=navigation.getParam('token')
     const flagSize=150
     const infoBarSize=width*0.78
     const buttonW = width*0.3
@@ -60,7 +61,9 @@ export default function FlatsScreen({navigation}) {
     }
   
     const fetchData = () => {
-      const url = searchString.length >= 3 ? `https://restcountries.eu/rest/v2/name/${searchString}` : `https://restcountries.eu/rest/v2/all`;
+      console.log("token (Flats): "+Token)
+      //const url = searchString.length >= 3 ? `https://restcountries.eu/rest/v2/name/${searchString}` : `https://restcountries.eu/rest/v2/all`;
+      const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats";
       console.log(`Fetched from ${url}`);
       setLoading(true);
       fetch(url)
@@ -81,7 +84,7 @@ export default function FlatsScreen({navigation}) {
     
     return (
       <SafeAreaView style={styles.container}>
-        <HeaderNavBar page={"Flats"} navigation={navigation}/>
+        <HeaderNavBar page={"Flats"} navigation={navigation} token={Token}/>
         <View style={styles.naviFilter}>
                 <Button color="#dc8033" title="Filter" onPress={() =>FilterManager()}></Button>
         </View>     
@@ -92,13 +95,13 @@ export default function FlatsScreen({navigation}) {
             {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
             <FlatList style={{marginBottom: 80}}
               data={flats.length > 0 ? flats.slice(0, flats.length) : []}
-              renderItem={({ item }) => <ListItem item={item} navigation={navigation}/>}
+              renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={Token}/>}
               keyExtractor={(item) => item.name}
               refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
               />
           </View>}
           <View style={{position: 'absolute'}}>
-            <FilterPopUp ref={FilterRef}/>
+            <FilterPopUp ref={FilterRef} DateActive="false"/>
           </View>
         </View>
       </SafeAreaView>

@@ -15,10 +15,10 @@ const buttonW = width*0.3
 const centerMargin = (width - 3*buttonW)/4;
 const bigButtonW = 3*buttonW + 2*centerMargin
 
-function ListItem({ item, navigation }) {
+function ListItem({ item, navigation, token }) {
   return (
         <View style={styles.item}>
-          <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item})}>
+          <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item, token: token})}>
           <View  style={styles.itemrow}>
             <Text style={styles.itemOwner}>{item.alpha3Code}</Text>
             <Text style={styles.itemLocalization}>{item.name}</Text>
@@ -55,6 +55,7 @@ export default function BookingScreen({navigation}) {
   const [searchString, setSearchString] = useState('');
   const FilterRef = useRef(null);
 
+  const token = navigation.getParam('token');
   const flagSize=150
   const infoBarSize=width*0.78
   const buttonW = width*0.3
@@ -90,7 +91,7 @@ export default function BookingScreen({navigation}) {
   
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderNavBar page={"Bookings"} navigation={navigation}/>
+      <HeaderNavBar page={"Bookings"} navigation={navigation} token={token}/>
       <View style={styles.naviFilter}>
               <Button color="#dc8033" title="Filter" onPress={() =>FilterManager()}></Button>
       </View>     
@@ -101,13 +102,13 @@ export default function BookingScreen({navigation}) {
           {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
           <FlatList style={{marginBottom: 80}}
             data={flats.length > 0 ? flats.slice(0, flats.length) : []}
-            renderItem={({ item }) => <ListItem item={item} navigation={navigation}/>}
+            renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
             keyExtractor={(item) => item.name}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
             />
         </View>}
         <View style={{position: 'absolute'}}>
-          <FilterPopUp ref={FilterRef}/>
+          <FilterPopUp ref={FilterRef} DateActive="true"/>
         </View>
       </View>
     </SafeAreaView>
