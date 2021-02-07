@@ -7,7 +7,9 @@ import { useParams } from "react-router-dom";
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import Pagination from '../AppComponents/Pagination';
 import "./BookingsLayout.css";
-import "../BasicInputField.css"
+import "../BasicInputField.css";
+import { BACKEND_URL, BOOKINGS_URL } from '../AppConstants/AppConstants';
+import { fetchGet } from '../AppComponents/ServerApiService';
 
 const mapStateToProps = (state, ownProps) => ({ 
     bookings: state.bookingsList.list,
@@ -22,8 +24,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    loadBookingsListAsync: (URL, pageNumber) => dispatch(loadBookingsListAsync(URL, pageNumber)),
-    cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
+    loadBookingsListAsync: (URL) => dispatch(loadBookingsListAsync(URL)),
+    cancelBooking: (bookingId) => dispatch(cancelBooking(bookingId))
 })
 
 function BookingsList(props)
@@ -42,12 +44,12 @@ function BookingsList(props)
     });
     const { endDateWrap } = endDate;
 
-    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings${getOptionsStr(props.pageNumber)}${flatId ? `&flatId=${flatId}` : ""}`, props.pageNumber)}, [])
+    useEffect(() => {props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}${flatId ? `&flatId=${flatId}` : ""}`)}, [])
 
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.cancelBooking(props.mainURL, bookingId);
+    props.cancelBooking(bookingId);
     setShowConfirmation(false);
   }
 
@@ -122,11 +124,9 @@ function BookingsList(props)
                         isDisabled={city !== ""} isClearable={true} isRtl={false} isSearchable={true}
                         name="countrySelect"
                         placeholder="Select Country..."
-                        defaultOptions
                         loadOptions = {(inputValue, callback) => {
                             setTimeout(() => {
-                                //fetch(`${props.mainURL}/metadata/countries`)
-                                fetch(`${props.mainURL}/countryOptions`)
+                                fetchGet(`${BACKEND_URL}metadata/countries`)
                                     .then(promise => {return promise.status === 404 ? [] : promise.json()})
                                     .then(json => 
                                         {
@@ -145,11 +145,9 @@ function BookingsList(props)
                         isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
                         name="citySelect"
                         placeholder="Select City..."
-                        defaultOptions
                         loadOptions = {(inputValue, callback) => {
                             setTimeout(() => {
-                                //fetch(`${props.mainURL}/metadata/cities${country !== "" ? `?country=${country}` : ""}`)
-                                fetch(`${props.mainURL}/cityOptions`)
+                                fetchGet(`${BACKEND_URL}metadata/cities${country !== "" ? `?country=${country}` : ""}`)
                                     .then(promise => {return promise.status === 404 ? [] : promise.json()})
                                     .then(json => 
                                         {
@@ -173,8 +171,7 @@ function BookingsList(props)
                     <Col>
                     <button onClick={(e) => {
                         e.preventDefault();
-                        console.log(getOptionsStr(props.pageNumber));
-                        // props.loadBookingsListAsync(`${props.mainURL}/bookings${opt_str}`, props.pageNumber);
+                        props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}`);
                     }}>
                       Apply Filters
                     </button>
@@ -204,7 +201,7 @@ function BookingsList(props)
                     totalElements = {props.totalElements}
                     onChangingPage = {(pageNumber) => {
                         let optionsStr = getOptionsStr(pageNumber);
-                        props.loadBookingsListAsync(`${props.mainURL}/bookings${optionsStr}`, pageNumber);
+                        props.loadBookingsListAsync(`${BOOKINGS_URL}${optionsStr}`);
                       }}/>
                 </div>
               </div>

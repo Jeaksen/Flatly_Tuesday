@@ -1,4 +1,4 @@
-const baseState = {booking: null, loading: false, saving: false, error: null}
+const baseState = {booking: null, loading: false, error: null}
 
 export default function bookingDetailsReducer(state = baseState, action) 
 {
@@ -11,7 +11,7 @@ export default function bookingDetailsReducer(state = baseState, action)
             return {...state, loading: true}
         
         case "bookingDetailsLoadingError":
-            return {...state, loading: false, saving: false, error: action.payload}
+            return {...state, loading: false, error: action.payload}
 
         default:
             return state;

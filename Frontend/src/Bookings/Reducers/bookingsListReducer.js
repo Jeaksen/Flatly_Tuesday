@@ -1,5 +1,3 @@
-//const baseState = {list: [], loading: false, error: null}
-
 const baseState = {
     list: [],
     pageable: {
