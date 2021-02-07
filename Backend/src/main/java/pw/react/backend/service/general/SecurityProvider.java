@@ -9,4 +9,5 @@ public interface SecurityProvider
     boolean isAuthorized(HttpHeaders headers);
     String Authenticate(User user);
     String Encode(String string);
+    boolean isApiKeyValid(String apiKey);
 }

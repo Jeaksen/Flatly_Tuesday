@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import pw.react.backend.dao.ApiKeyRepository;
 import pw.react.backend.dao.UserRepository;
 import pw.react.backend.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,10 +21,13 @@ class SecurityService implements SecurityProvider
     private final String TOKEN_SIGNING_KEY = "G873Gg68g83g78";
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
+    private final ApiKeyRepository apiKeyRepository;
 
-    public SecurityService(UserRepository userRepository)
+
+    public SecurityService(UserRepository userRepository, ApiKeyRepository apiKeyRepository)
     {
         this.userRepository = userRepository;
+        this.apiKeyRepository = apiKeyRepository;
         encoder = new BCryptPasswordEncoder();
     }
 
@@ -74,5 +78,13 @@ class SecurityService implements SecurityProvider
     public String Encode(String string)
     {
         return encoder.encode(string);
+    }
+
+    @Override
+    public boolean isApiKeyValid(String apiKey)
+    {
+        if (apiKey == null || apiKey.isEmpty())
+            return false;
+        return apiKeyRepository.existsApiKeyByKey(apiKey);
     }
 }
