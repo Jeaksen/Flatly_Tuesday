@@ -9,8 +9,7 @@ import java.util.List;
 
 public interface BookingsService {
     Page<Booking> getBookings(Specification<Booking> bookingSpecification, Pageable pageable);
-    //boolean postBooking(Booking booking);
-    List<Booking> postBookings(List<Booking> bookings);
+    Booking postBooking(Booking booking);
     Booking getBooking(Long bookingId);
     boolean cancelBooking(Long bookingId);
 }
