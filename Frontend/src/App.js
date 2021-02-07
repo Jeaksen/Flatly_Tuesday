@@ -47,6 +47,9 @@ function App() {
           <Route path={`/bookings/details/:bookingId`} exact>
             <BookingDetails mainURL={mainURL} />
           </Route>
+          <Route path="/bookings/flatId=:flatId" exact>
+            <BookingsList mainURL={mainURL} />
+          </Route>
           <Route path="/bookings" exact>
             <BookingsList mainURL={mainURL} />
           </Route>
