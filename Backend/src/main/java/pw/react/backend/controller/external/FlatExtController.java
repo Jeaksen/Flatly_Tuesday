@@ -59,7 +59,7 @@ public class FlatExtController
                                                       FlatSpecification flatSpecification)
     {
         logHeaders(headers);
-        if(apiKey != null && !apiKey.isEmpty())
+        if(securityService.isApiKeyValid(apiKey))
         {
             long[] ids = flatsService.getBookedFlatsIndexes(bookingDatesSpecification);
             attributes.addAttribute("bookedIds", ids);
@@ -79,7 +79,7 @@ public class FlatExtController
     {
         var spec = (FlatSpecification)model.getAttribute("spec");
         var pageable = (Pageable)model.getAttribute("pageable");
-        if(apiKey != null && !apiKey.isEmpty() && model.containsAttribute("spec"))
+        if(model.containsAttribute("spec"))
         {
             return ResponseEntity.ok(flatsService.getFlats(Specification.where(spec).and(flatSpecification), pageable));
         } else
@@ -93,7 +93,7 @@ public class FlatExtController
                                                @PathVariable Long flatId)
     {
         logHeaders(headers);
-        if (securityService.isAuthorized(headers))
+        if (securityService.isApiKeyValid(apiKey))
         {
             return flatsService.getFlat(flatId).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Flat.Empty));
         }
