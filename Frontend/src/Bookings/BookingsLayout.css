@@ -64,3 +64,9 @@
     align-items: flex-end;
     justify-content: flex-end;
   }
+
+  .FlatRowRight {
+    display: flex; 
+    align-items: flex-end;
+    justify-content: flex-end;
+  }

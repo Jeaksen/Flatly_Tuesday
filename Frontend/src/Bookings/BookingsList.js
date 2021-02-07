@@ -4,7 +4,7 @@ import DateSelect from './DateSelect';
 import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
-import "./BookingsList.css";
+import "./BookingsLayout.css";
 import "../BasicInputField.css"
 
 const mapStateToProps = (state, ownProps) => ({ 
@@ -104,7 +104,7 @@ function BookingsList(props)
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.deleteBooking(bookingId);
+    props.cancelBooking(bookingId);
     setShowConfirmation(false);
   }
 
