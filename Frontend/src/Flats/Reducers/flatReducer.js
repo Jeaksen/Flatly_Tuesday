@@ -54,14 +54,23 @@ export default function flatReducer(state = baseState, action)
       return {...state, loading: false, saving: false,  error: action.payload}
 
     case FLAT_CHANGED:
-      return {...state, [action.payload.name]: action.payload.value}
+      return {
+        ...state, 
+        flat: {
+          ...state.flat,
+          [action.payload.name]: action.payload.value
+        }
+      }
 
       case FLAT_ADDRESS_CHANGED:
         return {
           ...state, 
           flat: {
             ...state.flat,
-            [action.payload.name]: action.payload.value
+            address: {
+              ...state.flat.address,
+              [action.payload.name]: action.payload.value
+            }
           }
         }
     default:
