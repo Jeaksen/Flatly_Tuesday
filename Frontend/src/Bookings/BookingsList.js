@@ -24,8 +24,6 @@ function BookingsList(props)
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [size, setSize] = useState(10);
     const [page, setPage] = useState(0);
-    const [sort, setSort] = useState("");
-    const [sortDir, setSortDir] = useState("desc");
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
     const [country, setCountry] = useState("");
@@ -37,6 +35,7 @@ function BookingsList(props)
         value: 'null',
     });
     const { endDateWrap } = endDate;
+    const [optionsStr , setOptionsStr] = useState(`?size=${size}&page=${page}`);
 
     useEffect(() => {props.loadBookingsListAsync()}, [])
     // return (
@@ -153,14 +152,14 @@ function BookingsList(props)
         {
           props.loading ? <Alert variant='primary'>Loading...</Alert> : 
             (props.error ? <Alert variant='danger'>Fetch error...</Alert> :
-            <ul>
+            <div>
               {props.bookings && props.bookings.length > 0 ? 
               <div>
                 <Form className='BookingsForm'>
                   <Row>
                     <Col>
                       <Form.Label>Search by Flat's name</Form.Label>
-                      <Form.Control classname="BasicInputField" placeholder="Flat's name" type="text" />
+                      <Form.Control className="BasicInputField" placeholder="Flat's name" type="text" onChange={(e) => setName(e.target.value)}/>
                     </Col>
                     <Col>
                       <Form.Label>Country</Form.Label>
@@ -195,7 +194,7 @@ function BookingsList(props)
                                       .then(json => callback(json.filter(i => i.label.toLowerCase().includes(inputValue.toLowerCase()))));
                               }, 1000)
                           }}
-                          onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
+                          onChange={(opt) => { opt != null ? setCity(opt.value) : setCity("")}}
                       />
                     </Col>
                     <Col>
@@ -205,6 +204,23 @@ function BookingsList(props)
                     <Col>
                       <Form.Label>Date To</Form.Label>
                       <DateSelect placeholder="Select End Date..." value={endDateWrap} onChange={value => setEndDate({ value })} />
+                    </Col>
+                    <Col>
+                    <button onClick={(e) => {
+                        e.preventDefault();
+                      let opt_str = `?size=${size}&page=${page}`;
+                      if (name !== "") opt_str += `&name=${name}`;
+                      if (country !== "") opt_str += `&country=${country}`;
+                      if (city !== "") opt_str += `&city=${city}`;
+                      if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+                      if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+                      setOptionsStr(opt_str);
+                      console.log(opt_str);
+                      // props.loadBookingsListAsync();
+                      // props.loadBookingsListAsync(opt_str);
+                    }}>
+                      Apply Filters
+                    </button>
                     </Col>
                   </Row>
                   <Row>
@@ -228,7 +244,7 @@ function BookingsList(props)
                 </div> */}
               </div>
               : <div></div>}
-            </ul>
+            </div>
           )
         }
         </div>
