@@ -104,35 +104,14 @@
     }
   ],
   "cityOptions": [
-    {
-      "value": "warsaw",
-      "label": "Warsaw"
-    },
-    {
-      "value": "moscow",
-      "label": "Moscow"
-    },
-    {
-      "value": "london",
-      "label": "London"
-    }
+    "Warsaw",
+    "Moscow",
+    "London"
   ],
   "countryOptions": [
-    {
-      "value": "poland",
-      "label": "Poland"
-    },
-    {
-      "value": "england",
-      "label": "England"
-    },
-    {
-      "value": "russia",
-      "label": "Russia"
-    },
-    {
-      "value": "arstotzka",
-      "label": "Arstotzka"
-    }
+    "Poland",
+    "England",
+    "Russia",
+    "Arstotzka"
   ]
 }
