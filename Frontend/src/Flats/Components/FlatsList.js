@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
-import { deleteFlat, loadFlatListAsync, onFlatsLoadingWithParams } from '../Actions/flatsActions';
+import AsyncSelect from 'react-select/async';
+import { deleteFlat, loadFlatListAsync } from '../Actions/flatsActions';
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import Pagination from '../../AppComponents/Pagination';
 import "../Layout/FlatsLayout.css";
@@ -20,33 +21,40 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  loadFlatListAsync: () => dispatch(loadFlatListAsync()),
-  deleteFlat: (flatId) => dispatch(deleteFlat(flatId)),
-  
-  //For Pagination
-  onFlatsLoadingWithParams: (data) => dispatch(onFlatsLoadingWithParams(data))
+  loadFlatListAsync: (URL, pageNumber) => dispatch(loadFlatListAsync(URL, pageNumber)),
+  deleteFlat: (URL, flatId) => dispatch(deleteFlat(URL, flatId)),
 })
 
 function FlatsList(props) {
-  const [filteredCountries, setFilteredCountries] = useState([{id: 1, name: 'Poland'}, {id: 2, name: 'Germany'}]);
-  const [filteredCities, setFilteredCities] = useState([{id: 1, name: 'Warsaw'}, {id: 2, name: 'Krakow'}, {id: 3, name: 'Munich'}]);
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+  const [MGLower, setMGLower] = useState("");
+  const [MGUpper, setMGUpper] = useState("");
+  const [priceLower, setPriceLower] = useState("");
+  const [priceUpper, setPriceUpper] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  useEffect(() => {props.loadFlatListAsync();}, []);
-  
-  const onCountryFilterChange = event => {} //countryFilter(event.target.value);
-  const onCityFilterChange = event => {} //cityFilter(event.target.value);
-  const onMGLowerFilterChange = event => {} //maxGuestsFilter({ number: event.target.value, comparator: Comparator.GE });
-  const onMGUpperFilterChange = event => {} //maxGuestsFilter({ number: event.target.value, comparator: Comparator.LE });
-  const onPriceLowerFilterChange = event => {} //priceFilter({ number: event.target.value, comparator: Comparator.GE });
-  const onPriceUpperFilterChange = event => {} //priceFilter({ number: event.target.value, comparator: Comparator.LE });
-  const onNameFilterChange = event => {} //nameFilter(event.target.value);
+  useEffect(() => {props.loadFlatListAsync(`${props.mainURL}/flats${getOptionsStr(props.pageNumber)}`, props.pageNumber)}, []);
   
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteFlat = (flatId) => {
-    props.deleteFlat(flatId);
+    props.deleteFlat(props.mainURL, flatId);
     setShowConfirmation(false);
+  }
+
+  const getOptionsStr = (pageNumber) =>
+  {
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+    if (name !== "") opt_str += `&name=${name}`;
+    if (country !== "") opt_str += `&country=${country}`;
+    if (city !== "") opt_str += `&city=${city}`;
+    if (MGLower !== "") opt_str += `&guestsFrom=${MGLower}`;
+    if (MGUpper !== "") opt_str += `&guestsTo=${MGUpper}`;
+    if (priceLower !== "") opt_str += `&priceFrom=${priceLower}`;
+    if (priceUpper !== "") opt_str += `&priceTo=${priceUpper}`;
+    return opt_str;
   }
 
   const renderTableData = () => {
@@ -92,10 +100,6 @@ function FlatsList(props) {
     )
   }
 
-  const onChangingPage = (page) => {
-    props.onFlatsLoadingWithParams(DEBUGGING ? {pageNumber:page} : `?page=${page}`);
-  }
-
   return (
     <div className="FlatsList">
     {
@@ -108,44 +112,79 @@ function FlatsList(props) {
               <Row>
                 <Col>
                   <Form.Label>Search by Flat's name</Form.Label>
-                  <Form.Control placeholder="Flat's name" type="text" onChange={onNameFilterChange} />
+                  <Form.Control className="BasicInputField" placeholder="Flat's name" type="text" onChange={(e) => setName(e.target.value)}/>
                 </Col>
                 <Col>
                   <Form.Label>Country</Form.Label>
-                  <Form.Control as="select" onChange={onCountryFilterChange}>
-                    <option disabled selected value> -- Select country -- </option>
-                    {filteredCountries.map(c => (
-                      <option key={c.id} value={c.name}>{c.name}</option>
-                    ))}
-                  </Form.Control>
+                  <AsyncSelect className="single-select" classNamePrefix="select" 
+                        isDisabled={city !== ""} isClearable={true} isRtl={false} isSearchable={true}
+                        name="countrySelect"
+                        placeholder="Select Country..."
+                        defaultOptions
+                        loadOptions = {(inputValue, callback) => {
+                          setTimeout(() => {
+                            //fetch(`${props.mainURL}/metadata/countries`)
+                            fetch(`${props.mainURL}/countryOptions`)
+                              .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                              .then(json => 
+                                {
+                                  let filtered = json.filter(i => i.toLowerCase().includes(inputValue.toLowerCase()));
+                                  callback(filtered.map((i) => {return {value: i, label: i}}));
+                                }
+                              );
+                          }, 1000)
+                        }}
+                        onChange={(opt) => { opt != null ? setCountry(opt.value) : setCountry("")}}
+                      />
                 </Col>
                 <Col>
                   <Form.Label>City</Form.Label>
-                  <Form.Control as="select" onChange={onCityFilterChange}>
-                    <option disabled selected value> -- Select city -- </option>
-                    {filteredCities.map(c => (
-                      <option key={c.id} value={c.name}>{c.name}</option>
-                    ))}
-                  </Form.Control>
+                  <AsyncSelect className="single-select" classNamePrefix="select" 
+                    isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
+                    name="citySelect"
+                    placeholder="Select City..."
+                    defaultOptions
+                    loadOptions = {(inputValue, callback) => {
+                      setTimeout(() => {
+                        //fetch(`${props.mainURL}/metadata/cities${country !== "" ? `?country=${country}` : ""}`)
+                        fetch(`${props.mainURL}/cityOptions`)
+                          .then(promise => {return promise.status === 404 ? [] : promise.json()})
+                          .then(json => 
+                            {
+                              let filtered = json.filter(i => i.toLowerCase().includes(inputValue.toLowerCase()));
+                              callback(filtered.map((i) => {return {value: i, label: i}}));
+                            }
+                          );
+                      }, 1000)
+                    }}
+                    onChange={(opt) => { opt != null ? setCity(opt.value) : setCity("")}}
+                  />
                 </Col>
                 <Col>
                   <Form.Label>Max guests</Form.Label>
-                  <Form.Control placeholder="Min" type="number" min={1} onChange={onMGLowerFilterChange} />
-                  <Form.Control placeholder="Max" type="number" min={1} onChange={onMGUpperFilterChange} />
+                  <Form.Control className="BasicInputField" placeholder="Min" type="number" min={1} onChange={(e) => setMGLower(e.target.value)}/>
+                  <Form.Control className="BasicInputField" placeholder="Max" type="number" min={1} onChange={(e) => setMGUpper(e.target.value)}/>
                 </Col>
                 <Col>
                   <Form.Label>Price</Form.Label>
-                  <Form.Control placeholder="Min" type="number" onChange={onPriceLowerFilterChange} />
-                  <Form.Control placeholder="Max" type="number" onChange={onPriceUpperFilterChange} />
+                  <Form.Control className="BasicInputField" placeholder="Min" type="number" min={1} onChange={(e) => setPriceLower(e.target.value)}/>
+                  <Form.Control className="BasicInputField" placeholder="Max" type="number" min={1} onChange={(e) => setPriceUpper(e.target.value)}/>
                 </Col>
                 <Col>
                   <Button variant='light' type="button" className='ButtonAddFlat'
-                      hidden={props.loading || props.saving}
-                      disabled={props.idDeleting !== -1}
-                      href={`/flats/add`}
-                      size="lg">
-                        Add new flat
+                    hidden={props.loading || props.saving}
+                    disabled={props.idDeleting !== -1}
+                    href={`/flats/add`}
+                    size="lg">
+                      Add new flat
                   </Button>
+                  <button onClick={(e) => {
+                    e.preventDefault();
+                    console.log(getOptionsStr(props.pageNumber));
+                    // props.loadFlatListAsync(`${props.mainURL}/bookings${opt_str}`, props.pageNumber);
+                  }}>
+                    Apply Filters
+                  </button>
                 </Col>
               </Row>
               <Row>
@@ -170,7 +209,10 @@ function FlatsList(props) {
                 totalPages = {props.totalPages}
                 pageSize = {props.pageSize}
                 totalElements = {props.totalElements}
-                onChangingPage = {onChangingPage}/>
+                onChangingPage = {(pageNumber) => {
+                  let optionsStr = getOptionsStr(pageNumber);
+                  props.loadFlatListAsync(`${props.mainURL}/flats${optionsStr}`, pageNumber);
+                }}/>
             </div>
           </div>
           : <div></div>}

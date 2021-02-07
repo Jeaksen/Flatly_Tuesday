@@ -29,11 +29,11 @@ export function flatDeletingError(error) {
   return ({type: FLATS_DELETING_ERROR, payload: error})
 }
 
-export function loadFlatListAsync() {
+export function loadFlatListAsync(URL, pageNumber) {
   if (DEBUGGING) {
     return async (dispatch) => {
       dispatch(flatListLoading(true));
-      let promise = fetch(FLATS_URL);
+      let promise = fetch(URL);
       promise.then(response => response.json())
           .then(json => dispatch(flatListLoaded({
             content: json,
@@ -44,7 +44,7 @@ export function loadFlatListAsync() {
                 empty: true
               },
               offset: 0,
-              pageNumber: 0,
+              pageNumber: pageNumber,
               pageSize: 10,
               unpaged: false,
               paged: true
@@ -69,7 +69,7 @@ export function loadFlatListAsync() {
   }
   return async (dispatch) => {
     dispatch(flatListLoading(true));
-    let promise = fetch(FLATS_URL);
+    let promise = fetch(URL);
     promise.then(response => response.json())
         .then(json => dispatch(flatListLoaded(json)))
         .then(() => dispatch(flatListLoading(false)))
@@ -85,53 +85,5 @@ export function deleteFlat(flatId) {
         .then(() => dispatch(flatDeleting(-1)))
         .catch((error) => dispatch(flatDeletingError(error)))
         .finally(() => window.location.href = "/flats");
-  }
-}
-
-export function onFlatsLoadingWithParams(params) {
-  if (DEBUGGING) {
-    return async (dispatch) => {
-      dispatch(flatListLoading(true))
-      let promise = fetch(FLATS_URL);
-      promise.then(response => response.json())
-          .then(json => dispatch(flatListLoaded({
-            content: json,
-            pageable: {
-              sort: {
-                sorted: false,
-                unsorted: true,
-                empty: true
-              },
-              offset: 0,
-              pageNumber: params.pageNumber,
-              pageSize: 10,
-              unpaged: false,
-              paged: true
-            },
-            totalPages: 10,
-            totalElements: 95,
-            last: false,
-            size: json.length,
-            number: 0,
-            sort: {
-              sorted: false,
-              unsorted: true,
-              empty: true
-            },
-            numberOfElements: json.length,
-            first: true,
-            empty: false
-          })))
-          .then(() => dispatch(flatListLoading(false)))
-          .catch((error) => dispatch(flatListLoadingError(error)));
-    }
-  }
-  return async (dispatch) => {
-    dispatch(flatListLoading(true));
-    let promise = fetch(FLATS_URL + params);
-    promise.then(response => response.json())
-        .then(json => dispatch(flatListLoaded(json)))
-        .then(() => dispatch(flatListLoading(false)))
-        .catch((error) => dispatch(flatListLoadingError(error)));
   }
 }
