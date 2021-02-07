@@ -15,6 +15,9 @@ import pw.react.backend.model.Booking;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.lang.Boolean.FALSE;
 
 @Service
 class BookingsMainService implements BookingsService {
@@ -35,27 +38,15 @@ class BookingsMainService implements BookingsService {
         return repository.findAll(bookingSpecification, pageable);
     }
 
-    /*@Override
-    public boolean postBooking(Booking booking) {
-        boolean result = false;
-        if (repository.existsById(booking.getId())) {
-            repository.save(booking);
-            logger.info("Booking with id {} posted.", booking.getId());
-            result = true;
-        }
-        else logger.info("Booking with id {} requested to be posted, but such id already exists.", booking.getId());
-        return result;
-    }*/
-
     @Override
-    public List<Booking> postBookings(List<Booking> bookings) {
-        List<Booking> results = new ArrayList<>();
+    public Booking postBooking(Booking booking) {
+        Booking result = new Booking();
         try {
-            results = repository.saveAll(bookings);
+            result = repository.save(booking);
         } catch (DataIntegrityViolationException e) {
-            logger.error(String.format("Failed to save bookings %s", e.getMessage()));
+            logger.error(String.format("Failed to save booking %s", e.getMessage()));
         }
-        return results;
+        return result;
     }
 
     @Override
@@ -73,7 +64,9 @@ class BookingsMainService implements BookingsService {
     public boolean cancelBooking(Long bookingId) {
         boolean result = false;
         if (repository.existsById(bookingId)) {
-            repository.deleteById(bookingId);
+            Booking booking = repository.getOne(bookingId);
+            booking.setActive(FALSE);
+            repository.save(booking);
             logger.info("Booking with id {} cancelled.", bookingId);
             result = true;
         }

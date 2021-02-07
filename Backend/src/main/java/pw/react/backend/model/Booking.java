@@ -10,6 +10,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import static java.lang.Boolean.TRUE;
+
 @Data
 @Entity
 @Table(name = "bookings")
@@ -33,14 +35,13 @@ public class Booking implements Serializable
     @NotNull
     private int noOfGuests;
 
+    private boolean isActive = TRUE;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private long customerId;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "flat_id")
     private Flat flat;
+
+    private transient Customer customer = new Customer();
 }
