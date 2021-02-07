@@ -36,6 +36,10 @@ function FlatsList(props) {
   
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
+  const onDeleteFlat = (flatId) => {
+    props.deleteFlat(flatId);
+    setShowConfirmation(false);
+  }
 
   const renderTableData = () => {
     return props.flats.map((flat, index) => (
@@ -72,7 +76,7 @@ function FlatsList(props) {
                 <Button variant="secondary" onClick={handleCloseConfirmation}>
                   Close
                 </Button>
-                <Button variant="primary" onClick={() => props.deleteFlat(flat.id)}>Delete</Button>
+                <Button variant="primary" onClick={() => onDeleteFlat(flat.id)}>Delete</Button>
               </Modal.Footer>
             </Modal>
         </tr>

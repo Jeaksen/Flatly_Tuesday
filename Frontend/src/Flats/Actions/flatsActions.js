@@ -84,7 +84,7 @@ export function deleteFlat(flatId) {
     promise.then(response => response.json())
         .then(() => dispatch(flatDeleting(-1)))
         .catch((error) => dispatch(flatDeletingError(error)))
-        .finally(() => dispatch(loadFlatListAsync()));
+        .finally(() => window.location.href = "/flats");
   }
 }
 

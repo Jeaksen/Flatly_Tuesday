@@ -26,7 +26,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 function FlatForm(props) {
   let { flatId } = useParams();
-  const isReadOnly = props.mode == 'view';
+  const isReadOnly = props.mode === 'view';
   const [files, setFiles] = useState([]);
   const [showedImg, setShowedImg] = useState(placeholder_img);
   const [clickedRow, setClickedRow] = useState(0);
@@ -95,12 +95,15 @@ function FlatForm(props) {
     const uploadedFiles = files.map(f => f.file);
     props.addNewFlat(props.flat, uploadedFiles);
     //files.forEach(file => URL.revokeObjectURL(file.preview));
-    window.location.href = "/flats";
   }
 
   const onCancel = () => window.location.href = "/flats";
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
+  const onDeleteFlat = (flatId) => {
+    props.deleteFlat(flatId);
+    setShowConfirmation(false);
+  }
   return (
     <div className='FlatForm' >
       { props.loading ? <Alert variant='primary'>Loading...</Alert> : 
@@ -188,7 +191,7 @@ function FlatForm(props) {
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleCloseConfirmation}>Close</Button>
-                <Button variant="primary" onClick={() => props.deleteFlat(props.flat.id)}>Delete</Button>
+                <Button variant="primary" onClick={() => onDeleteFlat(props.flat.id)}>Delete</Button>
               </Modal.Footer>
             </Modal>
           </div>

@@ -79,6 +79,20 @@ export function loadFlatAsync(flatId) {
 }
 
 export function addNewFlat(flat, uploadedFiles) {
+  if (DEBUGGING) {
+    return async (dispatch) => {
+      dispatch(flatSaving(true));
+      let promise = fetch(FLATS_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify(flat)
+      });
+      promise.then(response => response.json())
+        .then(() => dispatch(flatSaving(false)))
+        .catch((error) => dispatch(flatSavingError(error)))
+        .finally(() => window.location.href = "/flats");
+    }
+  }
   return async (dispatch) => {
     dispatch(flatSaving(true));
     const formData = new FormData();
@@ -95,7 +109,7 @@ export function addNewFlat(flat, uploadedFiles) {
     });
     promise.then(response => response.json())
       .then(() => dispatch(flatSaving(false)))
-      .catch((error) => dispatch(flatSavingError(error)));
-      //.finally(() => dispatch(loadFlatListAsync()));
+      .catch((error) => dispatch(flatSavingError(error)))
+      .finally(() => window.location.href = "/flats");
   }
 }
