@@ -5,18 +5,24 @@ import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
 import { useParams } from "react-router-dom";
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
+import Pagination from '../AppComponents/Pagination';
 import "./BookingsLayout.css";
 import "../BasicInputField.css"
 
 const mapStateToProps = (state, ownProps) => ({ 
     bookings: state.bookingsList.list,
     loading: state.bookingsList.loading,
-    saving: state.bookingsList.saving,
-    error: state.bookingsList.error
+    error: state.bookingsList.error,
+
+    //For Pagination
+    pageNumber: state.bookingsList.pageable.pageNumber,
+    totalPages: state.bookingsList.totalPages,
+    pageSize: state.bookingsList.pageable.pageSize,
+    totalElements: state.bookingsList.totalElements
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    loadBookingsListAsync: (URL) => dispatch(loadBookingsListAsync(URL)),
+    loadBookingsListAsync: (URL, pageNumber) => dispatch(loadBookingsListAsync(URL, pageNumber)),
     cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
 })
 
@@ -24,8 +30,6 @@ function BookingsList(props)
 {   
     let { flatId } = useParams();
     const [showConfirmation, setShowConfirmation] = useState(false);
-    const [size, setSize] = useState(10);
-    const [page, setPage] = useState(0);
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
     const [country, setCountry] = useState("");
@@ -37,9 +41,8 @@ function BookingsList(props)
         value: 'null',
     });
     const { endDateWrap } = endDate;
-    const [optionsStr , setOptionsStr] = useState(`?size=${size}&page=${page}`);
 
-    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings${optionsStr}${flatId ? `&flatId=${flatId}` : ""}`)}, [])
+    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings${getOptionsStr(props.pageNumber)}${flatId ? `&flatId=${flatId}` : ""}`, props.pageNumber)}, [])
 
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
@@ -87,6 +90,18 @@ function BookingsList(props)
       )
     )
   }
+
+  const getOptionsStr = (pageNumber) =>
+  {
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+    if (name !== "") opt_str += `&name=${name}`;
+    if (country !== "") opt_str += `&country=${country}`;
+    if (city !== "") opt_str += `&city=${city}`;
+    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+    return opt_str;
+  }
+
 
     return (
         <div className="BookingsList">
@@ -159,15 +174,8 @@ function BookingsList(props)
                     <Col>
                     <button onClick={(e) => {
                         e.preventDefault();
-                      let opt_str = `?size=${size}&page=${page}`;
-                      if (name !== "") opt_str += `&name=${name}`;
-                      if (country !== "") opt_str += `&country=${country}`;
-                      if (city !== "") opt_str += `&city=${city}`;
-                      if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-                      if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
-                      setOptionsStr(opt_str);
-                      console.log(opt_str);
-                      // props.loadBookingsListAsync(`${props.mainURL}/bookings${opt_str}`);
+                        console.log(getOptionsStr(props.pageNumber));
+                        // props.loadBookingsListAsync(`${props.mainURL}/bookings${opt_str}`, props.pageNumber);
                     }}>
                       Apply Filters
                     </button>
@@ -189,9 +197,17 @@ function BookingsList(props)
                     </Table>
                   </Row>
                 </Form>
-                {/* <div className="d-flex flex-row py-4 align-items-center">
-                  <Pagination />
-                </div> */}
+                <div className="d-flex flex-row py-4 align-items-center">
+                  <Pagination 
+                    pageNumber = {props.pageNumber}
+                    totalPages = {props.totalPages}
+                    pageSize = {props.pageSize}
+                    totalElements = {props.totalElements}
+                    onChangingPage = {(pageNumber) => {
+                        let optionsStr = getOptionsStr(pageNumber);
+                        props.loadBookingsListAsync(`${props.mainURL}/bookings${optionsStr}`, pageNumber);
+                      }}/>
+                </div>
               </div>
               : <div></div>}
             </div>
