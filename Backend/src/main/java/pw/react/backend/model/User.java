@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table
+@Table(name = "users")
 public class User
 {
     private static final long serialVersionUID = -6783504532088859179L;
