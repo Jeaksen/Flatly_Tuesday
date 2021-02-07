@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
 import { deleteFlat, loadFlatListAsync } from '../Actions/flatsActions';
-import { Button, Alert, Form, Row, Col, Table } from 'react-bootstrap';
+import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import Pagination from './Pagination';
 import "../Layout/FlatsLayout.css"
 
@@ -10,7 +10,6 @@ const mapStateToProps = (state) => ({
   pageNumber: state.flats.pageable.pageNumber,
   totalPages: state.flats.totalPages,
   loading: state.flats.loading,
-  saving: state.flats.saving,
   idDeleting: state.flats.idDeleting,
   error: state.flats.error
 });
@@ -23,7 +22,8 @@ const mapDispatchToProps = (dispatch) => ({
 function FlatsList(props) {
   const [filteredCountries, setFilteredCountries] = useState([{id: 1, name: 'Poland'}, {id: 2, name: 'Germany'}]);
   const [filteredCities, setFilteredCities] = useState([{id: 1, name: 'Warsaw'}, {id: 2, name: 'Krakow'}, {id: 3, name: 'Munich'}]);
-  
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   useEffect(() => {props.loadFlatListAsync();}, []);
   
   const onCountryFilterChange = event => {} //countryFilter(event.target.value);
@@ -33,6 +33,9 @@ function FlatsList(props) {
   const onPriceLowerFilterChange = event => {} //priceFilter({ number: event.target.value, comparator: Comparator.GE });
   const onPriceUpperFilterChange = event => {} //priceFilter({ number: event.target.value, comparator: Comparator.LE });
   const onNameFilterChange = event => {} //nameFilter(event.target.value);
+  
+  const handleCloseConfirmation = () => setShowConfirmation(false);
+  const handleShowConfirmation = () => setShowConfirmation(true);
 
   const renderTableData = () => {
     return props.flats.map((flat, index) => (
@@ -42,17 +45,36 @@ function FlatsList(props) {
           <td>{flat.address.city}</td>
           <td>{flat.maxGuests}</td>
           <td>{flat.price}</td>
-          <td disabled={props.idDeleting !== -1 || props.saving}>      
-            <Button className='ButtonDetail' type="button" 
-              onClick={() => props.deleteFlat(flat.id)}>Detail
+          <td disabled={props.idDeleting !== -1}>      
+            <Button className='GreenButton' type="button" 
+              href={`/flats/details/${flat.id}`}>Detail
             </Button>
-            <Button className='ButtonEdit' type="button" 
-              onClick={() => props.deleteFlat(flat.id)}>Edit
+            <Button className='BlueButton' type="button" 
+              href={`/flats/edit/${flat.id}`}>Edit
             </Button>
-            <Button className='ButtonDelete' type="button" 
-              onClick={() => props.deleteFlat(flat.id)}>Delete
+            <Button className='RedButton' type="button" 
+              onClick={handleShowConfirmation}>Delete
             </Button>
           </td>
+          <Modal
+              show={showConfirmation}
+              onHide={handleCloseConfirmation}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Confirmation</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                Are you sure to delete flat {flat.name}?
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseConfirmation}>
+                  Close
+                </Button>
+                <Button variant="primary" onClick={() => props.deleteFlat(flat.id)}>Delete</Button>
+              </Modal.Footer>
+            </Modal>
         </tr>
       )
     )

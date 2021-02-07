@@ -39,7 +39,7 @@ const img = {display: 'block',width: 'auto',height: '100%'};
 
 function FlatImageDropzone(props) {
   const {getRootProps, getInputProps, open, isDragActive, isDragAccept, isDragReject} = useDropzone({
-    accept: 'image/*', maxFiles: 20, noClick: true, noKeyboard: true,
+    accept: 'image/*', maxFiles: 20, noClick: true, noKeyboard: true, disabled: props.disabled,
     onDrop: (acceptedFiles) => { 
       props.onAddingFiles(acceptedFiles);
     }
@@ -88,7 +88,10 @@ function FlatImageDropzone(props) {
           <tbody>{renderTableData()}</tbody>
         </Table>
       </div>
-      <Button variant="primary" type="button" style={{position: 'absolute', bottom: 20}}
+      <Button variant="primary" 
+        type="button" 
+        style={{position: 'absolute', bottom: 20}}
+        hidden={props.disabled}
         onClick={open}>UPLOAD MORE IMAGES
       </Button>
     </div>
