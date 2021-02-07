@@ -1,6 +1,5 @@
 package pw.react.backend.model;
 
-import com.sun.istack.NotNull;
 import lombok.Data;
 
 import javax.persistence.*;

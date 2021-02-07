@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pw.react.backend.dao.BookingsRepository;
+import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
 
 import java.util.ArrayList;
@@ -78,5 +79,11 @@ class BookingsMainService implements BookingsService {
         }
         else logger.info("Booking with id {} requested to be cancelled, but no such booking was found.", bookingId);
         return result;
+    }
+
+    @Override
+    public List<Booking> getBookingsInDateRange(BookingDatesSpecification bookingDatesSpecification)
+    {
+        return repository.findAll(bookingDatesSpecification);
     }
 }
