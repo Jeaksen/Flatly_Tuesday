@@ -15,6 +15,7 @@ import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.specifications.BookingSpecification;
 import pw.react.backend.model.Booking;
 import pw.react.backend.service.BookingsService;
+import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.general.SecurityProvider;
 
 import static java.util.stream.Collectors.joining;
@@ -28,7 +29,7 @@ public class BookingsController
     private final BookingsService bookingsService;
 
     @Autowired
-    public BookingsController(SecurityProvider securityService, BookingsService bookingsService)
+    public BookingsController(SecurityProvider securityService, BookingsService bookingsService, FlatsService flatsService)
     {
         this.securityService = securityService;
         this.bookingsService = bookingsService;
@@ -59,7 +60,10 @@ public class BookingsController
                                               @PathVariable Long bookingId) {
         logHeaders(headers);
         if (securityService.isAuthorized(headers)) {
-            return ResponseEntity.ok(bookingsService.getBooking(bookingId));
+            Booking booking = bookingsService.getBooking(bookingId);
+            //Customer customer = tutaj wlepic request po customera do api bookly
+            //booking.setCustomer(customer);
+            return ResponseEntity.ok(booking);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Booking.EMPTY);
     }

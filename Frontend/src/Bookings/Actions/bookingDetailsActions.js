@@ -10,11 +10,11 @@ export function bookingDetailsLoadingError(error) {
     return ({type: "bookingDetailsLoadingError", payload: error})
 }
 
-export function loadBookingDetailsAsync(bookingId) {
+export function loadBookingDetailsAsync(URL, bookingId) {
     return async (dispatch) => {
         try {
             dispatch(bookingDetailsLoading());
-            const response = await fetch(`http://localhost:8080/bookings/${bookingId}`);
+            const response = await fetch(`${URL}/bookings/${bookingId}`);
             const json = await response.json();
             dispatch(bookingDetailsLoaded(json));
         } catch(error) {

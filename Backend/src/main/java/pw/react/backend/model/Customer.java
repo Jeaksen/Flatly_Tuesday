@@ -21,9 +21,9 @@ public class Customer implements Serializable
     private long id;
 
     @NotNull
-    private String name;
+    private String name = "Krzysztof";
     @NotNull
-    private String surname;
+    private String surname = "Jarzyna";
     @NotNull
-    private String phoneNo;
+    private String phoneNo = "555 555 555";
 }
