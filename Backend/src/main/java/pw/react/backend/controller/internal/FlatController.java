@@ -5,13 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.specifications.FlatSpecification;
 import pw.react.backend.model.Flat;
@@ -20,6 +20,7 @@ import pw.react.backend.service.ImageService;
 import pw.react.backend.service.general.SecurityProvider;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -68,15 +69,16 @@ public class FlatController
 
     @PostMapping(path = "")
     public ResponseEntity<String> createFlat(@RequestHeader HttpHeaders headers,
-                                             @RequestBody List<Flat> flats)
+                                             Flat flat,
+                                             @RequestParam("new_images") List<MultipartFile> newImages)
     {
         logHeaders(headers);
         if (securityService.isAuthorized(headers)) {
-            List<Flat> result = flatsService.saveFlats(flats);
+            Optional<Flat> result = flatsService.saveFlat(flat, newImages);
             if (result.isEmpty())
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the flats");
             else
-                return ResponseEntity.ok(result.stream().map(c -> String.valueOf(c.getId())).collect(joining(",")));
+                return ResponseEntity.ok(Long.toString(result.get().getId()));
         } else
             throw new UnauthorizedException("Unauthorized access to resources.");
     }
@@ -109,17 +111,46 @@ public class FlatController
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
-    @PutMapping(path = "/{flatId}", consumes={"application/json;charset=UTF-8"})
+    @PutMapping(path = "/{flatId}")
     public ResponseEntity<Flat> updateCompany(@RequestHeader HttpHeaders headers,
                                               @PathVariable Long flatId,
-                                              @RequestBody Flat updatedFlat) {
+                                              Flat updatedFlat,
+                                              @RequestParam("new_images") List<MultipartFile> newImages ) {
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
         {
-            Flat result = flatsService.updateFlat(flatId, updatedFlat);
+            Flat result = flatsService.updateFlat(flatId, updatedFlat, newImages);
             if (Flat.Empty.equals(result))
-                return ResponseEntity.badRequest().body(updatedFlat);
+                return ResponseEntity.badRequest().body(result);
             return ResponseEntity.ok(result);
+        } else
+            throw new UnauthorizedException("Unauthorized access to resources.");
+    }
+
+    @PostMapping(path = "/{flatId}/images")
+    public ResponseEntity<String> uploadImages(@RequestHeader HttpHeaders headers,
+                                              @PathVariable Long flatId,
+                                              @RequestParam("images") List<MultipartFile> images)
+    {
+        logHeaders(headers);
+        if (securityService.isAuthorized(headers))
+        {
+            var addedImages = imageService.storeImages(flatId, images);
+            return ResponseEntity.ok(String.format("Images uploaded: %s", addedImages.stream().map(c -> String.valueOf(c.getId())).collect(joining(","))));
+        } else
+            throw new UnauthorizedException("Unauthorized access to resources.");
+    }
+
+    @DeleteMapping(path = "/{flatId}/images/{imageId}")
+    public ResponseEntity<String> deleteImage(@RequestHeader HttpHeaders headers,
+                                              @PathVariable Long flatId,
+                                              @PathVariable String imageId)
+    {
+        logHeaders(headers);
+        if (securityService.isAuthorized(headers))
+        {
+            imageService.deleteFlatImage(flatId, imageId);
+            return ResponseEntity.ok(String.format("Deleted image with id %s", imageId));
         } else
             throw new UnauthorizedException("Unauthorized access to resources.");
     }

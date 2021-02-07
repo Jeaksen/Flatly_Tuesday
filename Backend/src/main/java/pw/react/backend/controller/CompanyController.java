@@ -136,12 +136,11 @@ public class CompanyController {
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
 
-//    @GetMapping(value = "/{companyId}/logo", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @GetMapping(value = "/{companyId}/logo", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{companyId}/logo", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getLog(@RequestHeader HttpHeaders headers, @PathVariable Long companyId) {
         logHeaders(headers);
         if (securityService.isAuthorized(headers)) {
-            MultiValueMap<String, Object> mpr = new LinkedMultiValueMap<String, Object>();
+            MultiValueMap<String, Object> mpr = new LinkedMultiValueMap<>();
             CompanyLogo companyLogo = companyLogoService.getCompanyLogo(companyId);
             List<CompanyLogo> list = new ArrayList<>();
             list.add(companyLogo);

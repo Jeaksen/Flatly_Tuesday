@@ -3,6 +3,7 @@ package pw.react.backend.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface BookingsService {
     Booking postBooking(Booking booking);
     Booking getBooking(Long bookingId);
     boolean cancelBooking(Long bookingId);
+    List<Booking> getBookingsInDateRange(BookingDatesSpecification bookingDatesSpecification);
 }

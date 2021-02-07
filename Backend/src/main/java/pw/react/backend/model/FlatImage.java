@@ -7,7 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "flat_pictures")
+@Table(name = "flat_images")
 @Data
 @NoArgsConstructor
 public class FlatImage
@@ -22,17 +22,14 @@ public class FlatImage
     private String fileType;
     @Column(nullable = false)
     private long flatId;
-    @Column(nullable = false)
-    private boolean isHeaderImage;
     @Column(nullable = false) @Lob
     private byte[] data;
 
-    public FlatImage(String fileName, String fileType, long flatId, boolean isHeaderImage, byte[] data)
+    public FlatImage(String fileName, String fileType, long flatId, byte[] data)
     {
         this.fileName = fileName;
         this.fileType = fileType;
         this.flatId = flatId;
-        this.isHeaderImage = isHeaderImage;
         this.data = data;
     }
 }

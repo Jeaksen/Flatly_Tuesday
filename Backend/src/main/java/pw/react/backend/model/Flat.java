@@ -1,11 +1,11 @@
 package pw.react.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sun.istack.NotNull;
 import lombok.Data;
-import java.util.List;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 
 @Data
@@ -25,8 +25,10 @@ public class Flat implements Serializable
     private int maxGuests;
     @Column(nullable = false)
     private int price;
-    @Column(nullable = false) @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private FlatType flatType;
     @NotNull @OneToOne(cascade = CascadeType.ALL)
     private Address address;
+    private transient List<FlatImage> images;
 }
