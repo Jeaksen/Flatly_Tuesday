@@ -85,6 +85,6 @@ class SecurityService implements SecurityProvider
     {
         if (apiKey == null || apiKey.isEmpty())
             return false;
-        return apiKeyRepository.existsApiKeyByKey(apiKey);
+        return apiKeyRepository.existsApiKeyByKeyValue(apiKey);
     }
 }
