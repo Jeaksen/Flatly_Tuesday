@@ -35,7 +35,7 @@ export default class FilterPopUp extends Component{
             //This obj is allways on top need to be programatically switch active or not
             Active: false,
             FPanelHeight: height*0.4,
-            //view aniamtion
+            //view animation
             posAnimation: new Animated.Value(initPos),
             opaAnimation: new Animated.Value(initOpacity),
             borAnimation: new Animated.Value(initBRadious),
