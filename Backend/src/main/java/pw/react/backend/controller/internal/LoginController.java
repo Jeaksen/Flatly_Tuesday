@@ -13,7 +13,7 @@ import pw.react.backend.service.general.SecurityProvider;
 import static java.util.stream.Collectors.joining;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/private/login")
 public class LoginController
 {
     private final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -43,5 +43,13 @@ public class LoginController
         if (token.isEmpty())
             throw new UnauthorizedException("Invalid user");
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping(path = "/enc")
+    public ResponseEntity<String> encode(@RequestHeader HttpHeaders headers,
+                                         String string)
+    {
+        logHeaders(headers);
+        return ResponseEntity.ok(securityService.Encode(string));
     }
 }

@@ -8,4 +8,5 @@ public interface SecurityProvider
     boolean isAuthenticated(HttpHeaders headers);
     boolean isAuthorized(HttpHeaders headers);
     String Authenticate(User user);
+    public String Encode(String string);
 }

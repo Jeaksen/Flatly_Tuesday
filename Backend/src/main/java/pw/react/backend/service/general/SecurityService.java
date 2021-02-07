@@ -7,7 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import pw.react.backend.dao.UserRepository;
 import pw.react.backend.model.User;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Date;
 
 
@@ -19,10 +19,12 @@ class SecurityService implements SecurityProvider
     private final String SECURITY_HEADER_VALUE = "secureMe";
     private final String TOKEN_SIGNING_KEY = "G873Gg68g83g78";
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
 
     public SecurityService(UserRepository userRepository)
     {
         this.userRepository = userRepository;
+        encoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -56,7 +58,7 @@ class SecurityService implements SecurityProvider
         var savedUser = userRepository.findByUsername(user.getUsername());
         String token = "";
 
-        if (savedUser.isPresent())
+        if (savedUser.isPresent() && encoder.matches(user.getPassword(), savedUser.get().getPassword()))
         {
             Long uid = savedUser.get().getId();
             token = Jwts.builder()
@@ -66,5 +68,11 @@ class SecurityService implements SecurityProvider
                     .signWith(SignatureAlgorithm.HS512, TOKEN_SIGNING_KEY).compact();
         }
         return token;
+    }
+
+    @Override
+    public String Encode(String string)
+    {
+        return encoder.encode(string);
     }
 }
