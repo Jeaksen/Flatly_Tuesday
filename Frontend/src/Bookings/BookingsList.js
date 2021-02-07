@@ -3,6 +3,7 @@ import AsyncSelect from 'react-select/async';
 import DateSelect from './DateSelect';
 import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
+import { useParams } from "react-router-dom";
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import "./BookingsLayout.css";
 import "../BasicInputField.css"
@@ -21,6 +22,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 function BookingsList(props)
 {   
+    let { flatId } = useParams();
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [size, setSize] = useState(10);
     const [page, setPage] = useState(0);
@@ -37,7 +39,7 @@ function BookingsList(props)
     const { endDateWrap } = endDate;
     const [optionsStr , setOptionsStr] = useState(`?size=${size}&page=${page}`);
 
-    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings`)}, [])
+    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings${optionsStr}${flatId ? `&flatId=${flatId}` : ""}`)}, [])
 
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
@@ -165,7 +167,6 @@ function BookingsList(props)
                       if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
                       setOptionsStr(opt_str);
                       console.log(opt_str);
-                      // props.loadBookingsListAsync(`${props.mainURL}/bookings`);
                       // props.loadBookingsListAsync(`${props.mainURL}/bookings${opt_str}`);
                     }}>
                       Apply Filters
