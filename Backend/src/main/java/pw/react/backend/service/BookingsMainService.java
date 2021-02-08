@@ -87,7 +87,7 @@ class BookingsMainService implements BookingsService {
     @Override
     public List<Long> cancelBookingsByFlatId(Long flatId) {
         List<Long> result = new ArrayList<>();
-        List<Booking> bookingsToCancel = repository.findAll().stream()
+        List<Booking> bookingsToCancel = repository.findByActive(true).stream()
                 .filter(booking -> booking.getFlat().getId() == flatId)
                 .collect(Collectors.toList());
         for (Booking toCancel : bookingsToCancel) {
