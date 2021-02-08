@@ -10,5 +10,4 @@ import java.util.List;
 
 public interface BookingsRepository extends JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking>
 {
-    List<Booking> findByActive(boolean active);
 }
