@@ -83,7 +83,12 @@ export function deleteFlat(flatId) {
   return async (dispatch) => {
     dispatch(flatDeleting(flatId))
     let promise = fetchDelete(FLATS_URL + flatId);
-    promise.then(response => response.json())
+    promise.then(response => {
+          if(!response.ok) {
+            throw new Error(response.message);
+          }
+          return response;
+        })
         .then(() => dispatch(flatDeleting(-1)))
         .catch((error) => dispatch(flatDeletingError(error)))
         .finally(() => window.location.href = "/flats");

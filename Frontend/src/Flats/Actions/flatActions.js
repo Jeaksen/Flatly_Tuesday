@@ -7,6 +7,8 @@ import {
   FLATS_URL,
   FLAT_CHANGED,
   FLAT_ADDRESS_CHANGED,
+  FLAT_NEW_IMAGES_CHANGED,
+  FLAT_SHOWED_IMG_CHANGED,
   DEBUGGING
 } from '../../AppConstants/AppConstants'
 import {fetchGet, fetchPut, fetchPost, fetchDelete, fetchPostWithFiles} from '../../AppComponents/ServerApiService'
@@ -38,6 +40,14 @@ export function onFlatChange(name, value) {
 
 export function onFlatAddressChange(name, value) {
   return ({type: FLAT_ADDRESS_CHANGED, payload: {name: name, value: value}})
+}
+
+export function onNewImagesChanged(new_images) {
+  return ({type: FLAT_NEW_IMAGES_CHANGED, payload: new_images})
+}
+
+export function onShowedImgChanged(imgPreview) {
+  return ({type: FLAT_SHOWED_IMG_CHANGED, payload: imgPreview})
 }
 
 export function loadFlatAsync(flatId) {
@@ -72,7 +82,12 @@ export function loadFlatAsync(flatId) {
   return async (dispatch) => {
     dispatch(flatLoading(true));
     let promise = fetchGet(FLATS_URL + `${flatId}`);
-    promise.then(response => response.json())
+    promise.then(response => {
+          if(!response.ok) {
+            throw new Error(response.message);
+          }
+          return response.json();
+        })
         .then(json => dispatch(flatLoaded(json)))
         .then(() => dispatch(flatLoading(false)))
         .catch((error) => dispatch(flatLoadingError(error)));
@@ -101,12 +116,17 @@ export function addNewFlat(flat, uploadedFiles) {
       formData.append("new_images", uploadedFiles[i]);
     }
     for (var key in flat) {
-      if (key == 'id') {
+      if (key !== 'id') {
         formData.append(key, flat[key]);
       }
     }
-    let promise = fetchPostWithFiles('/flats/', formData);
-    promise.then(response => response.json())
+    let promise = fetchPostWithFiles(FLATS_URL, formData);
+    promise.then(response => {
+        if(!response.ok) {
+          throw new Error(response.message);
+        }
+        return response;
+      })
       .then(() => dispatch(flatSaving(false)))
       .catch((error) => dispatch(flatSavingError(error)))
       .finally(() => window.location.href = "/flats");
