@@ -1,4 +1,5 @@
 import { BOOKINGS_URL } from '../../AppConstants/AppConstants';
+import { fetchGet } from '../../AppComponents/ServerApiService';
 
 export function bookingDetailsLoaded(booking) {
     return ({type: "bookingDetailsLoaded", payload: booking})
@@ -16,7 +17,7 @@ export function loadBookingDetailsAsync(bookingId) {
     return async (dispatch) => {
         try {
             dispatch(bookingDetailsLoading());
-            const response = await fetch(BOOKINGS_URL + bookingId);
+            const response = await fetchGet(BOOKINGS_URL + bookingId);
             const json = await response.json();
             dispatch(bookingDetailsLoaded(json));
         } catch(error) {

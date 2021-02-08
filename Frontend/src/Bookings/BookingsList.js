@@ -62,7 +62,7 @@ function BookingsList(props)
 
   const getOptionsStr = (pageNumber) =>
   {
-    let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}&include_inactive=false`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
@@ -87,7 +87,6 @@ function BookingsList(props)
   const renderTableData = () => {
     return props.bookings.map((booking) => (
         <tr key={booking.id} className='BookingsRow'>
-          <td>{booking.customer.name} {booking.customer.surname}</td>
           <td>{booking.flat.name}</td>
           <td>{booking.flat.address.country}</td>
           <td>{booking.flat.address.city}</td>
@@ -210,7 +209,6 @@ function BookingsList(props)
                     <Table className='BookingsTable'>
                       <thead>
                         <tr>
-                          <th>Name and Surname</th>
                           <th>Flat name</th>
                           <th>Country</th>
                           <th>City</th>
@@ -232,7 +230,7 @@ function BookingsList(props)
                       let optionsStr = getOptionsStr(pageNumber);
                       clearOptions();
                       let { name, country, city, startDate, endDate } = pagingOptions;
-                      let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+                      let opt_str = `?size=${props.pageSize}&page=${pageNumber}&include_inactive=false`;
                       if (name !== "") opt_str += `&name=${name}`;
                       if (country !== "") opt_str += `&country=${country}`;
                       if (city !== "") opt_str += `&city=${city}`;
