@@ -28,6 +28,8 @@ const mapDispatchToProps = (dispatch) => ({
 
 function FlatsList(props) {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [deleteId, setdeleteId] = useState("");
+  const [deleteName, setdeleteName] = useState("");
   const [sort, setSort] = useState("");
   const [sortDir, setSortDir] = useState("");
   const [name, setName] = useState("");
@@ -49,8 +51,6 @@ function FlatsList(props) {
 
   useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
   
-  const handleCloseConfirmation = () => setShowConfirmation(false);
-  const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteFlat = (flatId) => {
     props.deleteFlat(flatId);
     setShowConfirmation(false);
@@ -73,7 +73,7 @@ function FlatsList(props) {
       if(sortDir === "asc") 
       {
         setSortDir("desc");
-        if (sort !== "") opt_str += `&sort=${field},desc`;
+        opt_str += `&sort=${field},desc`;
       }
       else if(sortDir === "desc") 
       {
@@ -131,12 +131,16 @@ function FlatsList(props) {
               href={`/flats/edit/${flat.id}`}>Edit
             </Button>
             <Button className='RedButton' type="button" 
-              onClick={handleShowConfirmation}>Delete
+              onClick={() => {
+                setShowConfirmation(true);
+                setdeleteName(flat.name);
+                setdeleteId(flat.id);
+              }}>Delete
             </Button>
           </td>
           <Modal
               show={showConfirmation}
-              onHide={handleCloseConfirmation}
+              onHide={() => setShowConfirmation(false)}
               backdrop="static"
               keyboard={false}
             >
@@ -144,13 +148,13 @@ function FlatsList(props) {
                 <Modal.Title>Confirmation</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                Are you sure to delete flat {flat.name}?
+                Are you sure to delete flat {deleteName}?
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseConfirmation}>
+                <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
                   Close
                 </Button>
-                <Button variant="primary" onClick={() => onDeleteFlat(flat.id)}>Delete</Button>
+                <Button variant="primary" onClick={() => onDeleteFlat(deleteId)}>Delete</Button>
               </Modal.Footer>
             </Modal>
         </tr>
@@ -168,7 +172,7 @@ function FlatsList(props) {
             <Row>
               <Col>
                 <Form.Label>Search by Flat's name</Form.Label>
-                <Form.Control className="BasicInputField" placeholder="Flat's name" type="text" onChange={(e) => setName(e.target.value)}/>
+                <input className="BasicInputField" placeholder="Flat's name" type="text" onChange={(e) => setName(e.target.value)}/>
               </Col>
               <Col>
                 <Form.Label>Country</Form.Label>
@@ -216,29 +220,17 @@ function FlatsList(props) {
               </Col>
               <Col>
                 <Form.Label>Max guests</Form.Label>
-                <Form.Control className="BasicInputField" placeholder="Min" type="number" min={1} onChange={(e) => setMGLower(e.target.value)}/>
-                <Form.Control className="BasicInputField" placeholder="Max" type="number" min={1} onChange={(e) => setMGUpper(e.target.value)}/>
+                <input className="BasicInputField" placeholder="Min" type="number" min={1} onChange={(e) => setMGLower(e.target.value)}/>
+                <input className="BasicInputField" placeholder="Max" type="number" min={1} onChange={(e) => setMGUpper(e.target.value)}/>
               </Col>
               <Col>
                 <Form.Label>Price</Form.Label>
-                <Form.Control className="BasicInputField" placeholder="Min" type="number" min={1} onChange={(e) => setPriceLower(e.target.value)}/>
-                <Form.Control className="BasicInputField" placeholder="Max" type="number" min={1} onChange={(e) => setPriceUpper(e.target.value)}/>
-              </Col>
-              <Col>
-                <Button variant='light' type="button" className='ButtonAddFlat'
-                  hidden={props.loading || props.saving}
-                  disabled={props.idDeleting !== -1}
-                  href={`/flats/add`}
-                  size="lg">
-                    Add new flat
-                </Button>
+                <input className="BasicInputField" placeholder="Min" type="number" min={1} onChange={(e) => setPriceLower(e.target.value)}/>
+                <input className="BasicInputField" placeholder="Max" type="number" min={1} onChange={(e) => setPriceUpper(e.target.value)}/>
               </Col>
             </Row>
             <Row >
-              <Col />
-              <Col />
-              <Col>
-              <Button onClick={(e) => {
+             <Button style={{marginLeft: 'auto', marginRight: 8, marginTop: 9, fontSize: '1.25rem', borderStyle: 'none'}} onClick={(e) => {
                 e.preventDefault();
                 setPagingOptions({
                   name: name,
@@ -254,9 +246,13 @@ function FlatsList(props) {
               }}>
                 Apply Filters
               </Button>
-              </Col>
-              <Col />
-              <Col />
+              <Button type="button" style={{marginLeft: 8, marginRight: 'auto', marginTop: 9, fontSize: '1.25rem', backgroundColor: '#0f9b0f', borderStyle: 'none'}}
+                  hidden={props.loading || props.saving}
+                  disabled={props.idDeleting !== -1}
+                  href={`/flats/add`}
+                  size="lg">
+                    Add new flat
+                </Button>
             </Row>
             <Row>
               <Table className='FlatsTable'>
