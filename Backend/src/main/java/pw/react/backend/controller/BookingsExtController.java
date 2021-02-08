@@ -15,6 +15,7 @@ import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.specifications.BookingSpecification;
 import pw.react.backend.model.Booking;
 import pw.react.backend.service.BookingsService;
+import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.general.SecurityProvider;
 
 import static java.util.stream.Collectors.joining;
@@ -26,12 +27,14 @@ public class BookingsExtController
     private final Logger logger = LoggerFactory.getLogger(BookingsController.class);
     private final SecurityProvider securityService;
     private final BookingsService bookingsService;
+    private final FlatsService flatsService;
 
     @Autowired
-    public BookingsExtController(SecurityProvider securityService, BookingsService bookingsService)
+    public BookingsExtController(SecurityProvider securityService, BookingsService bookingsService, FlatsService flatsService)
     {
         this.securityService = securityService;
         this.bookingsService = bookingsService;
+        this.flatsService = flatsService;
     }
 
     private void logHeaders(@RequestHeader HttpHeaders headers) {
@@ -65,6 +68,8 @@ public class BookingsExtController
             if (result.getId() == 0) {
                 return ResponseEntity.badRequest().body(result);
             }
+            long id = result.getFlat().getId();
+            result.setFlat(flatsService.getFlat(id).get());
             return ResponseEntity.ok(result);
         }
         throw new UnauthorizedException("Unauthorized access to resources.");
@@ -77,6 +82,9 @@ public class BookingsExtController
         logHeaders(headers);
         if (securityService.isApiKeyValid(apiKey)) {
             Booking booking = bookingsService.getBooking(bookingId);
+            if (booking == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Booking.EMPTY);
+            }
             //Customer customer = tutaj wlepic request po customera do api bookly
             //booking.setCustomer(customer);
             return ResponseEntity.ok(booking);

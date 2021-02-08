@@ -61,6 +61,9 @@ public class BookingsController
         logHeaders(headers);
         if (securityService.isAuthorized(headers)) {
             Booking booking = bookingsService.getBooking(bookingId);
+            if (booking == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Booking.EMPTY);
+            }
             //Customer customer = tutaj wlepic request po customera do api bookly
             //booking.setCustomer(customer);
             return ResponseEntity.ok(booking);
