@@ -63,6 +63,7 @@ public class FlatMainService implements FlatsService
         boolean result = false;
         if (repository.existsById(flatId))
         {
+            bookingsService.cancelBookingsByFlatId(flatId);
             repository.deleteById(flatId);
             imageService.deleteImagesForFlat(flatId);
             logger.info("Flat with id {} deleted.", flatId);
