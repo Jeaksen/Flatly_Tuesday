@@ -28,24 +28,22 @@ export const fetchPost = (url) => {
 }
 
 export const fetchDelete = (url) => {
-  return fetch(url, {
-    method: 'DELETE', 
-    headers: {
-      'Content-Type': 'application/json', 
-      'security-header': TOKEN
-    }
-  });
+  let myHeaders = {"Content-Type": "application/json"};
+  if (TESTING) {
+    myHeaders["security-header"] = TOKEN;
+  } 
+  return fetch(url, {method: "DELETE", headers: myHeaders,});
 }
 
 
 export const fetchPostWithFiles = (url, formData) => {
-  let testHeaders = {
-    "Content-Type": "multipart/form-data", 
-    "security-header": TOKEN
-  };
+  let headers = {"Content-Type": "application/json"};
+  if (TESTING) {
+    headers["security-header"] = TOKEN;
+  } 
   return fetch(url, {
     method: 'POST', 
-    headers: testHeaders, 
+    headers, 
     body: formData
   });
 }

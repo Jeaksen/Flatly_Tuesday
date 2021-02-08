@@ -6,7 +6,11 @@ import {
   FLAT_SAVING_ERROR,
   FLAT_CHANGED,
   FLAT_ADDRESS_CHANGED,
-} from '../../AppConstants/AppConstants'
+  FLAT_NEW_IMAGES_CHANGED,
+  FLAT_SHOWED_IMG_CHANGED
+} from '../../AppConstants/AppConstants';
+
+import placeholder_img from '../../placeholder_img.png';
 
 const baseState = {
   flat: {
@@ -27,7 +31,9 @@ const baseState = {
   },
   loading: false, 
   saving: false,
-  error: null
+  error: null,
+  new_images: [],
+  showedImg: placeholder_img
 }
 export default function flatReducer(state = baseState, action) 
 {
@@ -38,7 +44,17 @@ export default function flatReducer(state = baseState, action)
         ...state, 
         flat: action.payload,
         loading: false, 
-        error: null
+        error: null,
+        new_images: action.payload.images.map(x => ({
+          file: {size: 0},
+          fileName: x.fileName,
+          fileType: x.fileType,
+          flatId: action.payload.id,
+          preview: `data:${x.fileType};base64,${x.data}`
+        })),
+        showedImg: action.payload.images.length > 0 
+        ? `data:${action.payload.images[0].fileType};base64,${action.payload.images[0].data}`
+        : placeholder_img
       }
 
     case FLAT_LOADING:
@@ -64,17 +80,30 @@ export default function flatReducer(state = baseState, action)
         }
       }
 
-      case FLAT_ADDRESS_CHANGED:
-        return {
-          ...state, 
-          flat: {
-            ...state.flat,
-            address: {
-              ...state.flat.address,
-              [action.payload.name]: action.payload.value
-            }
+    case FLAT_ADDRESS_CHANGED:
+      return {
+        ...state, 
+        flat: {
+          ...state.flat,
+          address: {
+            ...state.flat.address,
+            [action.payload.name]: action.payload.value
           }
         }
+      }
+
+    case FLAT_NEW_IMAGES_CHANGED:
+      return {
+        ...state, 
+        new_images: action.payload
+      }   
+
+    case FLAT_SHOWED_IMG_CHANGED:
+      return {
+        ...state, 
+        showedImg: action.payload
+      } 
+
     default:
       return state;
   }
