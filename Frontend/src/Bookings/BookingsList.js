@@ -32,6 +32,7 @@ function BookingsList(props)
 {   
     let { flatId } = useParams();
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [deleteId, setdeleteId] = useState("");
     const [sort, setSort] = useState("");
     const [sortDir, setSortDir] = useState("");
     const [name, setName] = useState("");
@@ -55,8 +56,6 @@ function BookingsList(props)
 
     useEffect(() => {props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}`)}, [])
 
-  const handleCloseConfirmation = () => setShowConfirmation(false);
-  const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
     props.cancelBooking(bookingId);
     setShowConfirmation(false);
@@ -152,12 +151,15 @@ function BookingsList(props)
             href={`/bookings/details/${booking.id}`}>Detail
           </Button>
           <Button className='RedButton' type="button" 
-            onClick={handleShowConfirmation}>Delete
+            onClick={() => {
+              setShowConfirmation(true);
+              setdeleteId(booking.id);
+            }}>Delete
           </Button>
         </td>
           <Modal
               show={showConfirmation}
-              onHide={handleCloseConfirmation}
+              onHide={() => setShowConfirmation(false)}
               backdrop="static"
               keyboard={false}
             >
@@ -168,10 +170,10 @@ function BookingsList(props)
                 Are you sure to delete the booking?
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseConfirmation}>
+                <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
                   Close
                 </Button>
-                <Button variant="primary" onClick={() => onDeleteBooking(booking.id)}>Delete</Button>
+                <Button variant="primary" onClick={() => onDeleteBooking(deleteId)}>Delete</Button>
               </Modal.Footer>
             </Modal>
         </tr>

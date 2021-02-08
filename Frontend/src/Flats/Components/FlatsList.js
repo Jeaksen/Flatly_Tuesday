@@ -28,6 +28,8 @@ const mapDispatchToProps = (dispatch) => ({
 
 function FlatsList(props) {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [deleteId, setdeleteId] = useState("");
+  const [deleteName, setdeleteName] = useState("");
   const [sort, setSort] = useState("");
   const [sortDir, setSortDir] = useState("");
   const [name, setName] = useState("");
@@ -49,8 +51,6 @@ function FlatsList(props) {
 
   useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
   
-  const handleCloseConfirmation = () => setShowConfirmation(false);
-  const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteFlat = (flatId) => {
     props.deleteFlat(flatId);
     setShowConfirmation(false);
@@ -131,12 +131,16 @@ function FlatsList(props) {
               href={`/flats/edit/${flat.id}`}>Edit
             </Button>
             <Button className='RedButton' type="button" 
-              onClick={handleShowConfirmation}>Delete
+              onClick={() => {
+                setShowConfirmation(true);
+                setdeleteName(flat.name);
+                setdeleteId(flat.id);
+              }}>Delete
             </Button>
           </td>
           <Modal
               show={showConfirmation}
-              onHide={handleCloseConfirmation}
+              onHide={() => setShowConfirmation(false)}
               backdrop="static"
               keyboard={false}
             >
@@ -144,13 +148,13 @@ function FlatsList(props) {
                 <Modal.Title>Confirmation</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                Are you sure to delete flat {flat.name}?
+                Are you sure to delete flat {deleteName}?
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseConfirmation}>
+                <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
                   Close
                 </Button>
-                <Button variant="primary" onClick={() => onDeleteFlat(flat.id)}>Delete</Button>
+                <Button variant="primary" onClick={() => onDeleteFlat(deleteId)}>Delete</Button>
               </Modal.Footer>
             </Modal>
         </tr>
