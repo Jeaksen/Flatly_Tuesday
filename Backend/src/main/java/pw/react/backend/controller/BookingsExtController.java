@@ -15,6 +15,7 @@ import pw.react.backend.appException.UnauthorizedException;
 import pw.react.backend.dao.specifications.BookingSpecification;
 import pw.react.backend.model.Booking;
 import pw.react.backend.model.Flat;
+import pw.react.backend.model.InboundBooking;
 import pw.react.backend.service.BookingsService;
 import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.general.SecurityProvider;
@@ -62,12 +63,15 @@ public class BookingsExtController
     @PostMapping(path = "")
     public ResponseEntity<Booking> postBookings(@RequestHeader HttpHeaders headers,
                                                 @RequestParam(value = "apiKey", required = false) String apiKey,
-                                                @RequestParam(value = "customerId", required = true) Long customerId,
-                                                @RequestParam(value = "flatId", required = true) Long flatId,
-                                                @RequestBody Booking booking) {
+                                                @RequestBody InboundBooking inboundBooking) {
         logHeaders(headers);
+        var booking = new Booking();
+        booking.setStartDate(inboundBooking.getStartDate());
+        booking.setEndDate(inboundBooking.getEndDate());
+        booking.setPrice(inboundBooking.getPrice());
+        booking.setNoOfGuests(inboundBooking.getNoOfGuests());
         if (securityService.isApiKeyValid(apiKey)) {
-            Booking result = bookingsService.postBooking(booking, customerId, flatId);
+            Booking result = bookingsService.postBooking(booking, inboundBooking.getCustomerId(), inboundBooking.getFlatId());
             if (result.getId() == 0) {
                 return ResponseEntity.badRequest().body(result);
             }
