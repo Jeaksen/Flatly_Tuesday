@@ -13,6 +13,7 @@ import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +74,23 @@ class BookingsMainService implements BookingsService {
             result = true;
         }
         else logger.info("Booking with id {} requested to be cancelled, but no such booking was found.", bookingId);
+        return result;
+    }
+
+    @Override
+    public List<Long> cancelBookingsByFlatId(Long flatId) {
+        List<Long> result = new ArrayList<>();
+        List<Booking> bookingsToCancel = repository.findAll().stream()
+                .filter(booking -> booking.getFlat().getId() == flatId)
+                .collect(Collectors.toList());
+        for (Booking toCancel : bookingsToCancel) {
+            toCancel.setActive(FALSE);
+            toCancel.setFlat(null);
+            repository.save(toCancel);
+            result.add(toCancel.getId());
+        }
+        logger.info("Bookings with id {} requested to be cancelled, but no such booking was found.",
+                result.stream().map(Object::toString).collect(Collectors.joining(",")));
         return result;
     }
 

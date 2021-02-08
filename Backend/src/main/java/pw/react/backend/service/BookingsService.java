@@ -13,5 +13,6 @@ public interface BookingsService {
     Booking postBooking(Booking booking);
     Booking getBooking(Long bookingId);
     boolean cancelBooking(Long bookingId);
+    List<Long> cancelBookingsByFlatId(Long flatId);
     List<Booking> getBookingsInDateRange(BookingDatesSpecification bookingDatesSpecification);
 }
