@@ -66,8 +66,8 @@ function BookingsList(props)
   {
     if (sort === field)
     {
-      if(sortDir === "desc") setSortDir("asc");
-      else if(sortDir === "asc") 
+      if(sortDir === "asc") setSortDir("desc");
+      else if(sortDir === "desc") 
       {
         setSort("");
         setSortDir("");
@@ -76,14 +76,14 @@ function BookingsList(props)
     else
     {
       setSort(field);
-      setSortDir("desc");
+      setSortDir("asc");
     }
   }
 
   const getOptionsStr = (pageNumber) =>
   {
     let opt_str = `?size=${props.pageSize}&page=${pageNumber}${flatId ? `&flatId=${flatId}` : ""}`;
-    if (sort !== "") opt_str += `&sort=${sort}&${sort}.dir=${sortDir}`;
+    if (sort !== "") opt_str += `&sort=${sort},${sortDir}`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
@@ -96,7 +96,7 @@ function BookingsList(props)
   {
     let { name, country, city, startDate, endDate } = pagingOptions;
     let opt_str = `?size=${props.pageSize}&page=${pageNumber}${flatId ? `&flatId=${flatId}` : ""}`;
-    if (sort !== "") opt_str += `&sort=${sort}&${sort}.dir=${sortDir}`;
+    if (sort !== "") opt_str += `&sort=${sort},${sortDir}`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
