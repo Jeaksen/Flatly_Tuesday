@@ -36,7 +36,7 @@ public class MainConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
 //                final Set<String> mappings = getCorsMapings();
-                registry.addMapping("/**");
+                registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST","PUT", "DELETE", "OPTIONS", "PATCH");
 /*                if (mappings.isEmpty()) {
                     registry.addMapping("/**");
                 } else {
