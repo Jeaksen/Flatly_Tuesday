@@ -26,7 +26,6 @@ export default class FilterPopUp extends Component{
 
     constructor(props){
         super(props);
-        console.debug("text");
         this.dot1Up()
         setTimeout(()=>this.dot2Up(),deltaspeed)
         setTimeout(()=>this.dot3Up(),2*deltaspeed)

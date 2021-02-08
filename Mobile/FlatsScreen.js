@@ -15,24 +15,26 @@ const buttonW = width*0.3
 const centerMargin = (width - 3*buttonW)/4;
 const bigButtonW = 3*buttonW + 2*centerMargin
 
-function ListItem({ item, navigation }) {
+function ListItem({ item, navigation, token }) {
+
+  var base=`data:image/png;base64,${item.images[0].data}`
+
   return (
         <SafeAreaView style={styles.item}>
                 <View style={{flex: 1, flexDirection:'row'}}>
-                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item})}>
+                <TouchableOpacity style={styles.itemBackground} onPress={() => navigation.navigate('FlatDetails',{flat: item, token: token})}>
                         <View>
                             <Text style={styles.itemtitle}>{item.name}</Text>
                         </View>
                         <View>
-                            <Text style={styles.itemtext}>  {`Location: ${item.region}, ${item.capital}`}</Text>
-                            <Text style={styles.itemtext}> {`Price: ${item.population} per night`} </Text>
+                            <Text style={styles.itemtext}>  {`Location: ${item.address.city}, ${item.address.country}`}</Text>
+                            <Text style={styles.itemtext}> {`Price: ${item.price} per night`} </Text>
                         </View>
                     </TouchableOpacity>
                     <View>
-                      <Image
+                       <Image
                           style={styles.itemFlag}
-                          source={{
-                          uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
+                          source={{uri: base}}/> 
                       <View/>
                     </View>
                 </View>
@@ -47,6 +49,7 @@ export default function FlatsScreen({navigation}) {
     const [searchString, setSearchString] = useState('');
     const FilterRef = useRef(null);
 
+    const token=navigation.getParam('token')
     const flagSize=150
     const infoBarSize=width*0.78
     const buttonW = width*0.3
@@ -60,12 +63,24 @@ export default function FlatsScreen({navigation}) {
     }
   
     const fetchData = () => {
-      const url = searchString.length >= 3 ? `https://restcountries.eu/rest/v2/name/${searchString}` : `https://restcountries.eu/rest/v2/all`;
-      console.log(`Fetched from ${url}`);
+      console.log("token (Flats): "+token)
+      const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats";
       setLoading(true);
-      fetch(url)
+
+      fetch(url, {
+        method: "GET",
+        headers: {
+            //'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'security-header': token
+            
+          },
+        })
         .then((response) => response.json())
-        .then((json) => setFlats(json))
+        //.then((response) => console.log("keys array = ", Object.keys(response.content[0].images[0])))
+        //.then((response) => console.log("keys array = ", Object.values(response.content[0].images[0])))
+        .then(response => response.content)
+        .then((response) => setFlats(response))
         .catch((error) => console.error(error))
         .finally(() => setTimeout(()=>setLoading(false),1000));
     }
@@ -81,7 +96,7 @@ export default function FlatsScreen({navigation}) {
     
     return (
       <SafeAreaView style={styles.container}>
-        <HeaderNavBar page={"Flats"} navigation={navigation}/>
+        <HeaderNavBar page={"Flats"} navigation={navigation} token={token}/>
         <View style={styles.naviFilter}>
                 <Button color="#dc8033" title="Filter" onPress={() =>FilterManager()}></Button>
         </View>     
@@ -90,15 +105,15 @@ export default function FlatsScreen({navigation}) {
         { isLoading ? <LoadingAnim/>:
           <View>
             {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
-            <FlatList style={{marginBottom: 80}}
+            <FlatList style={{marginBottom: 120}}
               data={flats.length > 0 ? flats.slice(0, flats.length) : []}
-              renderItem={({ item }) => <ListItem item={item} navigation={navigation}/>}
-              keyExtractor={(item) => item.name}
+              renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
+              keyExtractor={(item) => item.id}
               refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
               />
           </View>}
           <View style={{position: 'absolute'}}>
-            <FilterPopUp ref={FilterRef}/>
+            <FilterPopUp ref={FilterRef} DateActive="false"/>
           </View>
         </View>
       </SafeAreaView>
