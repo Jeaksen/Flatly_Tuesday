@@ -18,7 +18,7 @@ export default function FlatsDetailScreen({route, navigation}) {
     const [ImagesList,setImagesList] = useState([])
     const [currentImage,setCurrentImage] = useState(0)
 
-    useEffect(() => {fetchData();loadDefault();},[]);
+    useEffect(() => {loadDefault();fetchData();},[]);
 
     const fetchData = () => {
         let TmpImagesList=[]
@@ -35,7 +35,7 @@ export default function FlatsDetailScreen({route, navigation}) {
           .then((response) => response.json())
           .then(response => {TmpImagesList = response.images})
           .catch((error) => console.error(error))
-          .finally(() => {setImagesList(TmpImagesList)})
+          .finally(() => {setImagesList(TmpImagesList);setBase(`data:image/png;base64,${TmpImagesList[0].data}`);})
     }
     const loadDefault =()=>{
         if(item.images!=null)
@@ -77,7 +77,7 @@ export default function FlatsDetailScreen({route, navigation}) {
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.name}</Text>
                     <View style={styles.container}>
-                        {item.images!=null ?
+                        {item.images!=null || ImagesList!=null ?
                         <Image
                             style={styles.flag}
                             source={{uri: base}}/>:

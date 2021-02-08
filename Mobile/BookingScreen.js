@@ -20,7 +20,7 @@ function ListItem({ item, navigation, token }) {
         <View style={styles.item}>
           <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item, token: token})}>
           <View  style={styles.itemrow}>
-            <Text style={styles.itemOwner}>{`${item.customer.name} ${item.customer.surname}`}</Text>
+            <Text style={styles.itemOwner}>{`${item.customer.firstName} ${item.customer.lastName}`}</Text>
             <Text style={styles.itemLocalization}>{item.flat.address.city}</Text>
           </View>
           <View style={styles.itemrow}>
