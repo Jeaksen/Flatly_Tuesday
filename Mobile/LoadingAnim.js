@@ -10,6 +10,8 @@ const {width, height} = Dimensions.get("screen")
 const speed=300
 const deltaspeed=50
 const initMaxH=5
+let counter=0;
+const NoOfAnim=3;
 export default class FilterPopUp extends Component{
 
     state={
@@ -17,6 +19,8 @@ export default class FilterPopUp extends Component{
         dot2UpAnimation: new Animated.Value(-initMaxH),
         dot3UpAnimation: new Animated.Value(-initMaxH),
         dot4UpAnimation: new Animated.Value(-initMaxH),
+
+        opacityAnimation: new Animated.Value(1),
 
         maxH1: initMaxH,
         maxH2: initMaxH,
@@ -26,36 +30,46 @@ export default class FilterPopUp extends Component{
 
     constructor(props){
         super(props);
-        console.debug("text");
-        this.dot1Up()
-        setTimeout(()=>this.dot2Up(),deltaspeed)
-        setTimeout(()=>this.dot3Up(),2*deltaspeed)
-        setTimeout(()=>this.dot4Up(),3*deltaspeed)
     }
 
+    hide=() =>{
+        Animated.timing(this.state.opacityAnimation,{toValue: 0,duration: speed,useNativeDriver: true}).start()
+    }
+
+    show=()=>{
+        Animated.timing(this.state.opacityAnimation,{toValue: 1,duration: speed,useNativeDriver: true}).start(
+            ()=>{
+            this.dot1Up()
+            setTimeout(()=>this.dot2Up(),deltaspeed)
+            setTimeout(()=>this.dot3Up(),2*deltaspeed)
+            setTimeout(()=>this.dot4Up(),3*deltaspeed)
+
+            setTimeout(()=>this.dot1Up(),1*deltaspeed+speed)
+            setTimeout(()=>this.dot2Up(),2*deltaspeed+speed)
+            setTimeout(()=>this.dot3Up(),3*deltaspeed+speed)
+            setTimeout(()=>this.dot4Up(),4*deltaspeed+speed)}
+        )
+
+    }
     dot1Up =() =>{
+        this.setState({ maxH1: - this.state.maxH1 })
         Animated.timing(this.state.dot1UpAnimation,{toValue:  this.state.maxH1,duration: speed,useNativeDriver: true}).start(
-        ()=>Animated.timing(this.state.dot1UpAnimation,{toValue:  -this.state.maxH1,duration: speed,useNativeDriver: true}).start(
-        ()=>{this.setState({ maxH1: - this.state.maxH1 }); 
-        try{this.dot1Up()}catch{}}))
+        ()=>Animated.timing(this.state.dot1UpAnimation,{toValue:  -this.state.maxH1,duration: speed,useNativeDriver: true}).start());
     }
     dot2Up =() =>{
+        this.setState({ maxH2: - this.state.maxH2 })
         Animated.timing(this.state.dot2UpAnimation,{toValue:  this.state.maxH2,duration: speed,useNativeDriver: true}).start(
-        ()=>Animated.timing(this.state.dot2UpAnimation,{toValue:  -this.state.maxH2,duration: speed,useNativeDriver: true}).start(
-        ()=>{this.setState({ maxH2: - this.state.maxH2 });
-        try{this.dot2Up()}catch{};}))
+        ()=>Animated.timing(this.state.dot2UpAnimation,{toValue:  -this.state.maxH2,duration: speed,useNativeDriver: true}).start());
     }
     dot3Up =() =>{
+        this.setState({ maxH3: - this.state.maxH3 })
         Animated.timing(this.state.dot3UpAnimation,{toValue:   this.state.maxH3,duration: speed,useNativeDriver: true}).start(
-        ()=>Animated.timing(this.state.dot3UpAnimation,{toValue:  -this.state.maxH3,duration: speed,useNativeDriver: true}).start(
-        ()=>{this.setState({ maxH3: - this.state.maxH3 });
-        try{this.dot3Up()}catch{};}))
+        ()=>Animated.timing(this.state.dot3UpAnimation,{toValue:  -this.state.maxH3,duration: speed,useNativeDriver: true}).start());
     }
     dot4Up =() =>{
+        this.setState({ maxH4: - this.state.maxH4 })
         Animated.timing(this.state.dot4UpAnimation,{toValue:   this.state.maxH4,duration: speed,useNativeDriver: true}).start(
-        ()=>Animated.timing(this.state.dot4UpAnimation,{toValue:  -this.state.maxH4,duration: speed,useNativeDriver: true}).start(
-        ()=>{this.setState({ maxH4: - this.state.maxH4 });
-        try{this.dot4Up()}catch{};}))
+        ()=>Animated.timing(this.state.dot4UpAnimation,{toValue:  -this.state.maxH4,duration: speed,useNativeDriver: true}).start());
     }
     render(){
         const dot1Animation={transform: [{translateY: this.state.dot1UpAnimation,}],};
@@ -63,10 +77,11 @@ export default class FilterPopUp extends Component{
         const dot3Animation={transform: [{translateY: this.state.dot3UpAnimation,}],};
         const dot4Animation={transform: [{translateY: this.state.dot4UpAnimation,}],};
 
+        const ViewAnimation={opacity: this.state.opacityAnimation,};        
         return(
             
             <View style={styles.container}>
-                <Animated.View style={{flexDirection:'row'}}>
+                <Animated.View style={[{flexDirection:'row'},ViewAnimation]}>
                     <Animated.View style={[styles.dot, dot1Animation]}></Animated.View>
                     <Animated.View style={[styles.dot, dot2Animation]}></Animated.View>
                     <Animated.View style={[styles.dot, dot3Animation]}></Animated.View>
@@ -83,10 +98,10 @@ const styles = StyleSheet.create({
     container:{
         height: 3*initMaxH,
         marginVertical: 3*initMaxH,
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        marginLeft: width/2-50,
         marginTop: height*0.4,
         marginBottom: 'auto',
+        position: 'absolute',
     },
 
     dot:{

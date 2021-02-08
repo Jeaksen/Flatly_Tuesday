@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRef, forwardRef } from 'react';
-import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button, Dimensions } from 'react-native';
+import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button, Dimensions, Alert ,Animated  } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { debug } from 'react-native-reanimated';
@@ -8,23 +8,40 @@ import { debug } from 'react-native-reanimated';
 const {width,height} = Dimensions.get("screen")
 const loginTextH=20;
 
+
 export default function LoginScreen({navigation}) {
-    const [token, setToken] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
 
+    //animation:
+    
+    const opacity = new Animated.Value(0);
+    const anim=()=>{
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    }
+
+    
     function loginHandler(e) {
+      console.log("usr: "+username + " , pass:" + password)
         //e.preventDefault();
         setError(false);
+        let formdata = new FormData();
+        formdata.append("username", username)
+        formdata.append("password", password)
         fetch('http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/login', {
             method: 'POST', 
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Content-Type': 'multipart/form-data;',
+                'Accept': '*/*',
+                //'security-header' : 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiaWQiOjEsImlhdCI6MTYxMjcxODM3OH0.ctlB10GVA9pMvzNuRRBzKn3ktOuU9R3kYHgwYYPI31Mm31FPs1wusfXkTKj0YLOBruU5Wr5VIZEdRBVOwt022Q',    
             },
-            body: JSON.stringify({username: username, password: password})
-           
+            //body: JSON.stringify({username: username, password: password})
+            body: formdata
         })
         .then(response => {
         if (response.status == 404 || response.status == 401) {
@@ -39,7 +56,8 @@ export default function LoginScreen({navigation}) {
             return null;
         }
         else if (response.status == 200) {
-            return response.json();
+            anim();
+            return response.text()
           }
         else{
           Alert.alert(
@@ -55,38 +73,48 @@ export default function LoginScreen({navigation}) {
         })
         .then(responseData => {
           if (responseData != null) {
-            setToken(responseData.jwt);
+            setTimeout(()=>
             navigation.dispatch(StackActions.reset({
               index: 0,
               actions: [
                 NavigationActions.navigate({
                   routeName: 'Flats',
-                  params: {token: token}
+                  params: {token: responseData}
                 }),
               ],
-            }))
+            })),1000);
           } 
         })
     }
 
     return (
-      <View style={styles.container}>
-          <Text style={styles.title}>Flatly</Text>
-          <View style={styles.inputcontainer}>
-              <Text style={styles.inputlogintext}>Login</Text>
-              <View style={styles.inputadjustcontainer}>
-                <TextInput style={styles.inputtext} placeholder="Username" onChange={(val) => setUsername(val)}/>
-                <TextInput style={styles.inputtext} placeholder="Password" onChange={(val) => setPassword(val)}/>
-              </View>
-          </View>
-          <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Flats')}>
-            <Text style={styles.logintext}>Login</Text>
-          </TouchableOpacity>
-      </View>
+        <View style={styles.container}>
+            <Animated.View style={[styles.circle, {opacity: opacity}]}></Animated.View>
+            <Text style={styles.title}>Flatly</Text>
+            <View style={styles.inputcontainer}>
+                <Text style={styles.inputlogintext}>Login</Text>
+                <View style={styles.inputadjustcontainer}>
+                  <TextInput style={styles.inputtext} placeholder="Username" onChangeText={(val) => setUsername(val)}/>
+                  <TextInput style={styles.inputtext} placeholder="Password" onChangeText={(val) => setPassword(val)}/>
+                </View>
+            </View>
+            <TouchableOpacity style={styles.loginButton} onPress={() => loginHandler()}>
+              <Text style={styles.logintext}>Login</Text>
+            </TouchableOpacity>
+        </View>
     );
   }
-  
+
+  const circlesize=50;
   const styles = StyleSheet.create({
+    circle:{
+      width: circlesize,
+      height: circlesize,
+      backgroundColor: '#dc8033',
+      borderWidth: 0,
+      borderRadius: circlesize/2,
+      opacity: 0.9,
+  },
     container: {
         marginTop: 'auto',
         marginBottom: 'auto',
@@ -112,6 +140,7 @@ export default function LoginScreen({navigation}) {
     },
     inputlogintext:{
         fontSize: 16,
+        backgroundColor: '#f2f2f2',
         marginTop: -loginTextH/2,
         height: loginTextH,
         textAlign: 'center',
@@ -136,7 +165,7 @@ export default function LoginScreen({navigation}) {
         textAlign: 'center',
         borderBottomColor: 'orange',
         borderBottomWidth: 2,
-        width: 90,
+        width: 120,
     },
     loginButton:{
         marginTop: 20,

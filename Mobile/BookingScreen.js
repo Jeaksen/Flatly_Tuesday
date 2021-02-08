@@ -15,46 +15,33 @@ const buttonW = width*0.3
 const centerMargin = (width - 3*buttonW)/4;
 const bigButtonW = 3*buttonW + 2*centerMargin
 
-function ListItem({ item, navigation }) {
+function ListItem({ item, navigation, token }) {
   return (
         <View style={styles.item}>
-          <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item})}>
+          <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item, token: token})}>
           <View  style={styles.itemrow}>
-            <Text style={styles.itemOwner}>{item.alpha3Code}</Text>
-            <Text style={styles.itemLocalization}>{item.name}</Text>
+            <Text style={styles.itemOwner}>{`${item.customer.firstName} ${item.customer.lastName}`}</Text>
+            <Text style={styles.itemLocalization}>{item.flat.address.city}</Text>
           </View>
-          <Text style={styles.itemName}>{item.capital}</Text>
-          <Text style={styles.itemData}>20.03.2020 - 20.03.2020</Text>
+          <View style={styles.itemrow}>
+            <Text style={styles.itemLocalization}>{item.flat.address.country}</Text>
+          </View>
+          <Text style={styles.itemName}>{item.flat.name}</Text>
+          <Text style={styles.itemData}>{`${item.startDate}-${item.endDate}`}</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.itembuttoncancel} onPress={() => createAlert()}>
-              <Text style={styles.itemcancel}>Cancel</Text>
-          </TouchableOpacity> */}
         </View>
     );
 }
 
-function createAlert() {
-  Alert.alert(
-    "Warning",
-    "Are you sure you want to cancel this booking?",
-    [
-      {
-        text: "NO",
-        onPress: () => console.log("NO Pressed"),
-        style: "cancel"
-      },
-      { text: "YES", onPress: () => console.log("YES Pressed") }
-    ],
-    { cancelable: false }
-  );
-}
 
 export default function BookingScreen({navigation}) {
   const [isLoading, setLoading] = useState(true);
   const [flats, setFlats] = useState([]);
   const [searchString, setSearchString] = useState('');
   const FilterRef = useRef(null);
+  const LoadingRef = useRef(null);
 
+  const token = navigation.getParam('token');
   const flagSize=150
   const infoBarSize=width*0.78
   const buttonW = width*0.3
@@ -62,21 +49,61 @@ export default function BookingScreen({navigation}) {
   const bigButtonW = 3*buttonW + 2*centerMargin
   //const [searchLength, setSearchLength] = useState({last: 111, newest: 0})
 
-  const onRefresh = () => {
-    console.log(isLoading);
-    fetchData(false);
+  const ustawLoading =(mode) =>
+  {
+    setLoading(mode);
+    if(mode==true)
+    {
+      LoadingRef.current.show()
+    }
+    else{
+      LoadingRef.current.hide()
+    }
   }
 
-  // Odkomentowac jak będzie backend
-  const fetchData = () => {
-    const url = searchString.length >= 3 ? `https://restcountries.eu/rest/v2/name/${searchString}` : `https://restcountries.eu/rest/v2/all`;
-    console.log(`Fetched from ${url}`);
-    setLoading(true);
-    fetch(url)
+  const filterData = (data) => {
+    let url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings?`;
+    if(data.flatName!="")  url +=`&name=${data.flatName}`;
+    if(data.Country!="")   url +=`&country=${data.Country}`;
+    if(data.City!="")      url +=`&city=${data.City}`;
+    if(data.dateFrom!="")  url +=`&dateFrom=${data.dateFrom}`;
+    if(data.dateTo!="")    url +=`&dateTo=${data.dateTo}`;
+    ustawLoading(true);
+    fetch(url, {
+      method: "GET",
+      headers: {
+          'Accept': '*/*',
+          'security-header': token       
+        },
+      })
       .then((response) => response.json())
-      .then((json) => setFlats(json))
+      .then(response => response.content)
+      .then((response) => setFlats(response))
       .catch((error) => console.error(error))
-      .finally(() => setTimeout(()=>setLoading(false),1000));
+      .finally(() => setTimeout(()=>ustawLoading(false),1000));
+
+  }
+
+  const fetchData = () => {
+    //.log("token (Flats): "+token)
+    const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings";
+    ustawLoading(true);
+
+    let bookings=[]
+    fetch(url, {
+      method: "GET",
+      headers: {
+          //'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'security-header': token
+          
+        },
+      })
+      .then((response) => response.json())
+      .then(response => bookings = response.content)
+      .then(() => setFlats(bookings))
+      .catch((error) => console.error(error))
+      .finally(() => setTimeout(()=>ustawLoading(false),1000));
   }
 
   useEffect(() => {
@@ -84,30 +111,32 @@ export default function BookingScreen({navigation}) {
   }, []);
 
   const FilterManager =() =>{
-    console.log("filter manager")
+    //console.log("filter manager")
     FilterRef.current.animateView()
+    FilterRef.current.setToken(token);
   }
   
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderNavBar page={"Bookings"} navigation={navigation}/>
+      <HeaderNavBar page={"Bookings"} navigation={navigation} token={token}/>
       <View style={styles.naviFilter}>
               <Button color="#dc8033" title="Filter" onPress={() =>FilterManager()}></Button>
       </View>     
 
       <View>
-      { isLoading ? <LoadingAnim/>:
+      <LoadingAnim ref={LoadingRef}/>
+      { isLoading ? <View/>:
         <View>
           {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
-          <FlatList style={{marginBottom: 80}}
+          <FlatList style={{marginBottom: 140}}
             data={flats.length > 0 ? flats.slice(0, flats.length) : []}
-            renderItem={({ item }) => <ListItem item={item} navigation={navigation}/>}
-            keyExtractor={(item) => item.name}
+            renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
+            keyExtractor={(item) => item.id.toString()}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
             />
         </View>}
         <View style={{position: 'absolute'}}>
-          <FilterPopUp ref={FilterRef}/>
+          <FilterPopUp ref={FilterRef} DateActive="true"  token={token} handleSearch={filterData}/>
         </View>
       </View>
     </SafeAreaView>

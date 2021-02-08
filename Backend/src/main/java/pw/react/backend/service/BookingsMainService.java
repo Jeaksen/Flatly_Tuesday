@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
 import pw.react.backend.dao.BookingsRepository;
 import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
+import pw.react.backend.model.Flat;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,11 +42,16 @@ class BookingsMainService implements BookingsService {
     }
 
     @Override
-    public Booking postBooking(Booking booking) {
+    public Booking postBooking(Booking booking, long customerId, long flatId) {
         Booking result = new Booking();
         Booking toSave = booking;
+
+        toSave.setCustomerId(customerId);
+        Flat flat = new Flat();
+        flat.setId(flatId);
+        toSave.setFlat(flat);
+        toSave.setPrice(2423);
         try {
-            toSave.setCustomerId(booking.getCustomer().getId());
             result = repository.save(toSave);
         } catch (DataIntegrityViolationException e) {
             logger.error(String.format("Failed to save booking %s", e.getMessage()));
@@ -73,6 +81,23 @@ class BookingsMainService implements BookingsService {
             result = true;
         }
         else logger.info("Booking with id {} requested to be cancelled, but no such booking was found.", bookingId);
+        return result;
+    }
+
+    @Override
+    public List<Long> cancelBookingsByFlatId(Long flatId) {
+        List<Long> result = new ArrayList<>();
+        List<Booking> bookingsToCancel = repository.findAll().stream()
+                .filter(booking -> booking.getFlat().getId() == flatId)
+                .collect(Collectors.toList());
+        for (Booking toCancel : bookingsToCancel) {
+            toCancel.setActive(FALSE);
+            toCancel.setFlat(null);
+            repository.save(toCancel);
+            result.add(toCancel.getId());
+        }
+        logger.info("Bookings with id {} cancelled",
+                result.stream().map(Object::toString).collect(Collectors.joining(",")));
         return result;
     }
 

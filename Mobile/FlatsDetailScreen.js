@@ -4,6 +4,7 @@ import { HeaderBackButton } from 'react-navigation-stack';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements'
 import HeaderNavBar from './HeaderNavBar';
+import home from './assets/home.png'
 
 const {width, height} = Dimensions.get("screen")
 const butColor = '#38373c';
@@ -11,36 +12,96 @@ const butsize=50;
 
 export default function FlatsDetailScreen({route, navigation}) {
     const item = navigation.getParam('flat');
+    const token=navigation.getParam('token');
+
+    const [base ,setBase] = useState(`./assets/home.png`);
+    const [ImagesList,setImagesList] = useState([])
+    const [currentImage,setCurrentImage] = useState(0)
+
+    useEffect(() => {loadDefault();fetchData();},[]);
+
+    const fetchData = () => {
+        let TmpImagesList=[]
+        const url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/${item.id}`;
+        console.log("Fetchuje !!!")
+        fetch(url, {
+          method: "GET",
+          headers: {
+              //'Content-Type': 'application/json',
+              'Accept': '*/*',
+              'security-header': token
+            },
+          })
+          .then((response) => response.json())
+          .then(response => {TmpImagesList = response.images})
+          .catch((error) => console.error(error))
+          .finally(() => {setImagesList(TmpImagesList);setBase(`data:image/png;base64,${TmpImagesList[0].data}`);})
+    }
+    const loadDefault =()=>{
+        if(item.images!=null)
+        {
+            setBase(`data:image/png;base64,${item.images[0].data}`);
+        }
+    }
+    let buttonEnable=true
+    const moveRight = () =>{
+          console.log("right")
+          move(1)
+    }
+    const moveLeft = () =>{
+        console.log("left")
+        move(-1)
+    }
+    const move = (direction) =>{
+        if(!buttonEnable || item.images==null) return
+        let tmp = currentImage + direction;
+        console.log("ImagesListLength: "+ImagesList.length + " currentImage: "+currentImage)
+        if (tmp<0)
+        {
+            tmp =ImagesList.length-1;
+        }
+        if(tmp > ImagesList.length-1)
+        {
+            tmp=0;
+        }
+        setCurrentImage(tmp);
+        console.log("tmp: "+tmp)
+        setBase(`data:image/png;base64,${ImagesList[tmp].data}`);
+        buttonEnable=true;
+    }
 
     return (
         <SafeAreaView >
             <View style={styles.circle}></View>
-            <HeaderNavBar page={"Flats"} navigation={navigation}/>
+            <HeaderNavBar page={"Flats"} navigation={navigation}  token={token}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.name}</Text>
                     <View style={styles.container}>
+                        {item.images!=null || ImagesList!=null ?
                         <Image
                             style={styles.flag}
-                            source={{
-                                uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
+                            source={{uri: base}}/>:
+                        <Image
+                            style={styles.flag}
+                            source={home}/> }
                     </View>
             </View>
             <View style={styles.midPanel}>
-                <TouchableOpacity style={styles.roundButton}>
+                <TouchableOpacity onPress={() => moveLeft()} style={styles.roundButton}>
                     <Icon name="arrow-left" color='white' size={butsize}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.roundButtonLeft}>
+                <TouchableOpacity onPress={() => moveRight()} style={styles.roundButtonLeft}>
                     <Icon name="arrow-right" color='white' size={butsize}/>
                 </TouchableOpacity>
             </View>
             <View style={styles.bottomPanel}>
                 <View style={styles.row}>
-                    <Text style={styles.infoBold}> {`Max guests:  ${item.population}` } </Text>
-                    <Text style={styles.infoBoldLeft}> {`${item.alpha2Code} PLN`} </Text>
+                    <Text style={styles.infoBold}> {`Max guests:  ${item.maxGuests}` } </Text>
+                    <Text style={styles.infoBoldLeft}> {`${item.price} PLN/Night`} </Text>
                 </View>
-                <Text style={styles.info}> {`Location:  ${item.region}, ${item.subregion}`} </Text>
-                <Text style={styles.info}> {`Address:  ${item.capital}`} </Text>
-                <Text style={styles.info}> {`Availability:  ${item.alpha3Code}`} </Text>
+                <Text style={styles.info}> {`Location:  ${item.address.city}, ${item.address.country}`} </Text>
+                <Text style={styles.info}> {`Address:  ${item.address.streetName} ${item.address.buildingNumber}${item.address.flatNumber!=null &&item.address.flatNumber!='null' ? "/"+item.address.flatNumber : ""}, ${item.address.postCode}`} </Text>
+                <Text style={styles.info}> {`Flat type:  ${item.flatType}`} </Text>
                 <View  style={styles.button}>
                     <Button title="Back" color='black' onPress={() => navigation.navigate('Flats')}></Button>
                 </View>

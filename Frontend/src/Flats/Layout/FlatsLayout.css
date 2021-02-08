@@ -16,6 +16,13 @@
   border-top: none;
 }
 
+.FlatsTable > thead > tr >  th > button {
+  background: none;
+  font: inherit;
+  color: white;
+  border: none;
+}
+
 .FlatsRow {
   background: #eacda3;  
   background: -webkit-linear-gradient(to right, #d6ae7b, #eacda3); 

@@ -10,7 +10,7 @@ const centerMargin = (width - 3*buttonW)/4;
 const bigButtonW = 3*buttonW + 2*centerMargin
 
 
-export default function HeaderNavBar({navigation,page}) {
+export default function HeaderNavBar({navigation,page,token}) {
 
   const getStyle =(buttonPage) =>{
     if(buttonPage==page)
@@ -27,13 +27,13 @@ export default function HeaderNavBar({navigation,page}) {
       <View style={{flexDirection:'column', justifyContent: 'center', alignItems: 'center'}}>
         <View style={styles.naviPanel}>
             <View style={getStyle("Flats")}>
-                <Button color = '#38373c' title="Flats"  onPress={() => navigation.navigate('Flats')}></Button>
+                <Button color = '#38373c' title="Flats"  onPress={() => navigation.navigate('Flats', {token: token})}></Button>
             </View>
             <View style={getStyle("Bookings")}>
-                <Button color = '#38373c' title="Bookings" onPress={() =>navigation.navigate('Bookings')}></Button>
+                <Button color = '#38373c' title="Bookings" onPress={() =>navigation.navigate('Bookings', {token: token})}></Button>
             </View>
             <View style={getStyle("logout")}>
-                <Button color = '#38373c' title="Log out" onPress={() =>navigation.navigate('Home')}></Button>
+                <Button color = '#38373c' title="Log out" onPress={() =>navigation.navigate('Home', {token: token})}></Button>
             </View>
         </View>
       </View>

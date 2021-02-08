@@ -50,7 +50,6 @@ types:
     properties:
       id:
         type: integer
-        required: false
   post_booking:
     properties:
       startDate:
@@ -143,15 +142,16 @@ types:
         description: filter for bookings ending at most on <value>
         required: false 
         example: 2020-05-02
-      includeInactive:
+      omit_inactive:
         type: boolean
         description: flag indicating to include inactive bookings in the search
-        required: false  
+        required: false
+        default: true
     responses:
       200:
+        description: list of bookings in content array, paging in pageable object
         body:
           json/application:
-            description: list of bookings in content array, paging ingo in pageable object
             type: booking[]
             example: {
               "content": [
@@ -180,7 +180,8 @@ types:
                               "flatNumber": "13",
                               "flat": null
                           }
-                      }
+                      },
+                      "active": false
                   },
                   {
                       "id": 2,
@@ -206,7 +207,8 @@ types:
                               "buildingNumber": "13",
                               "flatNumber": "13",
                               "flat": null
-                          }
+                          },
+                        "active": false
                       }
                   },
                   {
@@ -234,7 +236,8 @@ types:
                               "flatNumber": "13",
                               "flat": null
                           }
-                      }
+                      },
+                      "active": false
                   },
                   {
                       "id": 4,
@@ -261,7 +264,8 @@ types:
                               "flatNumber": "13",
                               "flat": null
                           }
-                      }
+                      },
+                      "active": false
                   }
               ],
               "pageable": {
@@ -301,8 +305,7 @@ types:
       json/application:
         description: list of bookings
         type: post_booking
-        example: [
-          {
+        example: {
               "startDate": "2020-03-07",
               "endDate": "2020-03-15",
               "price": 50,
@@ -314,13 +317,12 @@ types:
                   "id": 1
               }
           }
-      ]
     responses:
       200:
+        description: saved booking details
         body:
           json/application:
             type: booking
-            description: saved booking details
             example: {
             "id": 1,
             "startDate": "2020-01-18",
@@ -345,14 +347,15 @@ types:
                     "buildingNumber": "13",
                     "flatNumber": "13",
                     "flat": null
-                }
+                },
+            "active": false
             }
         }
       405:
+        description: empty booking object
         body:
           json/application:
-            description: empty booking object
-            type: booking
+            type: object
             example: {
               "id": 0,
               "startDate": null,
@@ -367,7 +370,7 @@ types:
                   "surname": "Jarzyna",
                   "phoneNo": "555 555 555"
               },
-              "active": true
+              "active": false
           }
 
 
@@ -395,6 +398,41 @@ types:
         apikey:
           type: string
           description: authentication key
+      responses:
+        200:
+          body:
+            json/application:
+              type: booking
+              example: {
+                "id": 54,
+                "startDate": "2020-03-07",
+                "endDate": "2020-03-15",
+                "price": 50,
+                "noOfGuests": 5,
+                "customerId": 2,
+                "flat": {
+                    "id": 1,
+                    "name": "My flat",
+                    "maxGuests": 4,
+                    "price": 600,
+                    "flatType": "Apartment",
+                    "address": {
+                        "id": 40,
+                        "country": "Poland",
+                        "city": "Gdynia",
+                        "streetName": "Miodowa",
+                        "postCode": "80-260",
+                        "buildingNumber": "4",
+                        "flatNumber": "3",
+                        "flat": null
+                    },
+                    "images": null
+                },
+                "customer": {
+                    "id": 0
+                },
+                "active": true
+            }
 
 /flats:
   get:

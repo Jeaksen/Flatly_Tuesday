@@ -10,8 +10,9 @@ import java.util.List;
 
 public interface BookingsService {
     Page<Booking> getBookings(Specification<Booking> bookingSpecification, Pageable pageable);
-    Booking postBooking(Booking booking);
+    Booking postBooking(Booking booking, long customerId, long flatId);
     Booking getBooking(Long bookingId);
     boolean cancelBooking(Long bookingId);
+    List<Long> cancelBookingsByFlatId(Long flatId);
     List<Booking> getBookingsInDateRange(BookingDatesSpecification bookingDatesSpecification);
 }
