@@ -197,23 +197,31 @@ function FlatsList(props) {
                     size="lg">
                       Add new flat
                   </Button>
-                  <button onClick={(e) => {
-                    e.preventDefault();
-                    setPagingOptions({
-                      name: name,
-                      city: city,
-                      country: country,
-                      MGLower: MGLower,
-                      MGUpper: MGUpper,
-                      priceLower: priceLower,
-                      priceUpper: priceUpper,
-                    });
-                    props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`);
-                    clearOptions();
-                  }}>
-                    Apply Filters
-                  </button>
                 </Col>
+              </Row>
+              <Row >
+                <Col />
+                <Col />
+                <Col>
+                <Button onClick={(e) => {
+                  e.preventDefault();
+                  setPagingOptions({
+                    name: name,
+                    city: city,
+                    country: country,
+                    MGLower: MGLower,
+                    MGUpper: MGUpper,
+                    priceLower: priceLower,
+                    priceUpper: priceUpper,
+                  });
+                  props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`);
+                  clearOptions();
+                }}>
+                  Apply Filters
+                </Button>
+                </Col>
+                <Col />
+                <Col />
               </Row>
               <Row>
                 <Table className='FlatsTable'>

@@ -189,7 +189,7 @@ function BookingsList(props)
                       <DateSelect placeholder="Select End Date..." value={endDateWrap} onChange={value => setEndDate({ value })} />
                     </Col>
                     <Col>
-                    <button onClick={(e) => {
+                    <Button onClick={(e) => {
                         e.preventDefault();
                         setPagingOptions({
                           name: name,
@@ -202,7 +202,7 @@ function BookingsList(props)
                         clearOptions();
                     }}>
                       Apply Filters
-                    </button>
+                    </Button>
                     </Col>
                   </Row>
                   <Row>

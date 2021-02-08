@@ -4,14 +4,14 @@ import {
   FLAT_LOADING_ERROR,
   FLAT_SAVING,
   FLAT_SAVING_ERROR,
-  FLATS_URL,BACKEND_URL,
+  FLATS_URL,
   FLAT_CHANGED,
   FLAT_ADDRESS_CHANGED,
   FLAT_NEW_IMAGES_CHANGED,
   FLAT_SHOWED_IMG_CHANGED,
-  DEBUGGING
-} from '../../AppConstants/AppConstants'
-import {fetchGet, fetchPut, fetchPost, fetchDelete, fetchPostWithFiles} from '../../AppComponents/ServerApiService'
+  FLAT_REMOVE_IMAGES
+} from '../../AppConstants/AppConstants';
+import {fetchGet, fetchPutWithFiles, fetchPostWithFiles, getFormData} from '../../AppComponents/ServerApiService';
 
 export function flatLoaded(flatsResponse){
   return ({ type: FLAT_LOADED, payload: flatsResponse })
@@ -50,35 +50,11 @@ export function onShowedImgChanged(imgPreview) {
   return ({type: FLAT_SHOWED_IMG_CHANGED, payload: imgPreview})
 }
 
+export function onRemoveOldImg(imgName) {
+  return ({type: FLAT_REMOVE_IMAGES, payload: imgName})
+}
+
 export function loadFlatAsync(flatId) {
-  // if (DEBUGGING) {
-  //   return async (dispatch) => {
-  //     dispatch(flatLoading(true));
-  //     let promise = fetch(FLATS_URL + `${flatId}`);
-  //     promise.then(response => response.json())
-  //         .then(json => dispatch(flatLoaded({
-  //           ...json,
-  //           images: [
-  //             {
-  //               id: "52d389b7-38f1-43b5-91d6-be9167940f16",
-  //               fileName: "00017.jpg",
-  //               fileType: "image/jpeg",
-  //               flatId: 1,
-  //               data: []
-  //             },
-  //             {
-  //               id: "5752662f-bb11-4bd3-8f92-a4599398ad55",
-  //               fileName: "00014.jpg",
-  //               fileType: "image/jpeg",
-  //               flatId: 1,
-  //               data: []
-  //             }
-  //           ]
-  //         })))
-  //         .then(() => dispatch(flatLoading(false)))
-  //         .catch((error) => dispatch(flatLoadingError(error)));
-  //   }
-  // }
   return async (dispatch) => {
     dispatch(flatLoading(true));
     let promise = fetchGet(FLATS_URL + `${flatId}`);
@@ -97,30 +73,8 @@ export function loadFlatAsync(flatId) {
 export function addNewFlat(flat, uploadedFiles) {
   return async (dispatch) => {
     dispatch(flatSaving(true));
-    const formData = new FormData();
-    for (let i = 0 ; i < uploadedFiles.length ; i++) {
-      formData.append("new_images", uploadedFiles[i].file);
-    }
-    for (var key in flat) {
-      if (key != 'id' && key != 'images') {
-        if (key == 'address') {
-          formData.append('address.country',flat.address.country);
-          formData.append('address.city',flat.address.city);
-          formData.append('address.postCode',flat.address.postCode);
-          formData.append('address.buildingNumber',flat.address.buildingNumber);
-          formData.append('address.flatNumber',flat.address.flatNumber);
-        }
-        else {
-          formData.append(key, flat[key]);
-        }
-      }
-    }
-
-    // Display the key/value pairs
-    for (var pair of formData.entries()) {
-      console.log(pair[0]+ ': ' + pair[1]); 
-    }
-    let promise = fetchPostWithFiles('http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats', formData);
+    const formData = getFormData(flat, uploadedFiles);
+    let promise = fetchPostWithFiles(FLATS_URL, formData);
     promise.then(response => {
         if(!response.ok) {
           throw new Error(response.message);
@@ -128,7 +82,24 @@ export function addNewFlat(flat, uploadedFiles) {
         return response;
       })
       .then(() => dispatch(flatSaving(false)))
+      .then(() => window.location.href = "/flats")
       .catch((error) => dispatch(flatSavingError(error)));
-      //.finally(() => window.location.href = "/flats");
+  }
+}
+
+export function updateFlat(flat, uploadedFiles) {
+  return async (dispatch) => {
+    dispatch(flatSaving(true));
+    const formData = getFormData(flat, uploadedFiles);
+    let promise = fetchPutWithFiles(FLATS_URL + flat.id, formData);
+    promise.then(response => {
+        if(!response.ok) {
+          throw new Error(response.message);
+        }
+        return response;
+      })
+      .then(() => dispatch(flatSaving(false)))
+      .then(() => window.location.href = "/flats")
+      .catch((error) => dispatch(flatSavingError(error)));
   }
 }
