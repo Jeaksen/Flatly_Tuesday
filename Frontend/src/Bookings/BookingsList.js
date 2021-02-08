@@ -65,19 +65,19 @@ function BookingsList(props)
   const setSortingHooks = (field) =>
   {
     let { name, country, city, startDate, endDate } = pagingOptions;
-    let opt_str = `?size=${props.pageSize}&page=${props.pageNumber}${flatId ? `&flatId=${flatId}` : ""}`;
+    let opt_str = `?size=${props.pageSize}&page=${props.pageNumber}&omit_inactive=true${flatId ? `&flatId=${flatId}` : ""}`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
-    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+    if (startDate.value != 'null') opt_str += `&dateFrom=${getFormattedDate(startDate.value.value)}`;
+    if (endDate.value != 'null') opt_str += `&dateTo=${getFormattedDate(endDate.value.value)}`;
 
     if (sort === field)
     {
       if(sortDir === "asc") 
       {
         setSortDir("desc");
-        if (sort !== "") opt_str += `&sort=${field},desc`;
+        opt_str += `&sort=${field},desc`;
       }
       else if(sortDir === "desc") 
       {
@@ -96,26 +96,26 @@ function BookingsList(props)
 
   const getOptionsStr = (pageNumber) =>
   {
-    let opt_str = `?size=${props.pageSize}&page=${pageNumber}${flatId ? `&flatId=${flatId}` : ""}`;
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}&omit_inactive=true${flatId ? `&flatId=${flatId}` : ""}`;
     if (sort !== "") opt_str += `&sort=${sort},${sortDir}`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
-    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+    if (startDate.value != 'null') opt_str += `&dateFrom=${getFormattedDate(startDate.value.value)}`;
+    if (endDate.value != 'null') opt_str += `&dateTo=${getFormattedDate(endDate.value.value)}`;
     return opt_str;
   }
 
   const getOptionsPagingStr = (pageNumber) =>
   {
     let { name, country, city, startDate, endDate } = pagingOptions;
-    let opt_str = `?size=${props.pageSize}&page=${pageNumber}${flatId ? `&flatId=${flatId}` : ""}`;
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}&omit_inactive=true${flatId ? `&flatId=${flatId}` : ""}`;
     if (sort !== "") opt_str += `&sort=${sort},${sortDir}`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
-    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+    if (startDate.value != 'null') opt_str += `&dateFrom=${getFormattedDate(startDate.value.value)}`;
+    if (endDate.value != 'null') opt_str += `&dateTo=${getFormattedDate(endDate.value.value)}`;
     return opt_str;
   }
 
@@ -130,6 +130,14 @@ function BookingsList(props)
     setEndDate({
       value: 'null',
     });
+  }
+
+  const getFormattedDate = (date) =>
+  {
+    const year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date);
+    const month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date);
+    const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
+    return `${year}-${month}-${day}`;
   }
 
   const renderTableData = () => {
@@ -181,7 +189,7 @@ function BookingsList(props)
                 <Row>
                   <Col>
                     <Form.Label>Search by Flat's name</Form.Label>
-                    <Form.Control className="BasicInputField" placeholder="Flat's name" type="text" onChange={(e) => setName(e.target.value)}/>
+                    <input className="BasicInputField" placeholder="Flat's name" type="text" onChange={(e) => setName(e.target.value)}/>
                   </Col>
                   <Col>
                     <Form.Label>Country</Form.Label>
@@ -235,22 +243,22 @@ function BookingsList(props)
                     <Form.Label>Date To</Form.Label>
                     <DateSelect placeholder="Select End Date..." value={endDateWrap} onChange={value => setEndDate({ value })} />
                   </Col>
-                  <Col>
-                    <Button onClick={(e) => {
-                      e.preventDefault();
-                      setPagingOptions({
-                        name: name,
-                        city: city,
-                        country: country,
-                        startDate: startDate,
-                        endDate: endDate
-                      });
-                      props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}`);
-                      clearOptions();
-                    }}>
-                      Apply Filters
-                    </Button>
-                  </Col>
+                </Row>
+                <Row>
+                  <Button style={{margin: 'auto', marginTop: 7, fontSize: '1.25rem', borderStyle: 'none'}} onClick={(e) => {
+                    e.preventDefault();
+                    setPagingOptions({
+                      name: name,
+                      city: city,
+                      country: country,
+                      startDate: startDate,
+                      endDate: endDate
+                    });
+                    props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}`);
+                    clearOptions();
+                  }}>
+                    Apply Filters
+                  </Button>
                 </Row>
                 <Row>
                   <Table className='BookingsTable'>
