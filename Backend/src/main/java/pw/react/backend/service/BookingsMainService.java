@@ -13,6 +13,7 @@ import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
 import pw.react.backend.model.Flat;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,6 +50,7 @@ class BookingsMainService implements BookingsService {
         Flat flat = new Flat();
         flat.setId(flatId);
         toSave.setFlat(flat);
+        toSave.setPrice(2423);
         try {
             result = repository.save(toSave);
         } catch (DataIntegrityViolationException e) {
