@@ -18,34 +18,22 @@ export default function BookingDetailScreen({route, navigation}) {
             <View style={styles.circle}></View>
             <HeaderNavBar page={"Bookings"} navigation={navigation}/>
             <View style={styles.topPanel}>
-                    <Text style={styles.title}>{item.name}</Text>
-                    {/* <View style={styles.container}>
-                        <Image
-                            style={styles.flag}
-                            source={{
-                                uri: `https://www.countryflags.io/${item.alpha2Code}/flat/64.png`,}}/>
-                    </View> */}
+                    <Text style={styles.title}>{item.flat.name}</Text>
             </View>
-            {/* <View style={styles.midPanel}>
-                <TouchableOpacity style={styles.roundButton}>
-                    <Icon name="arrow-left" color='white' size={butsize}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.roundButtonLeft}>
-                    <Icon name="arrow-right" color='white' size={butsize}/>
-                </TouchableOpacity>
-            </View> */}
             <View style={styles.bottomPanel}>
                 <View style={styles.row}>
-                    <Text style={styles.infoBold}> {`Person renting:  ${item.population}` } </Text>
-                    <Text style={styles.infoBoldLeft}> {`${item.alpha2Code} PLN`} </Text>
+                    <Text style={styles.infoBold}> {`Person renting:  ${item.customer.name} ${item.customer.surname}` } </Text>
                 </View>
-                <Text style={styles.info}> {`Date:  ${item.region}, ${item.subregion}`} </Text>
-                <Text style={styles.info}> {`Booking Price:  ${item.capital}`} </Text>
-                <Text style={styles.info}> {`Number of Guests:  ${item.alpha3Code}`} </Text>
-                <Text style={styles.info}> {`Flat Name:  ${item.alpha3Code}`} </Text>
+                <Text style={styles.info}> {`Date:  ${item.startDate}-${item.endDate}`} </Text>
+                <Text style={styles.info}> {`Customer number:  ${item.customer.phoneNo}`} </Text>
+                <Text style={styles.info}> {`Booking Price:  ${item.price} PLN`} </Text>
+                <Text style={styles.info}> {`Number of Guests:  ${item.noOfGuests}`} </Text>
+                <Text style={styles.info}> {`Flat Type:  ${item.flat.flatType}`} </Text>
+                <Text style={styles.info}> {`Location:  ${item.flat.address.city}, ${item.flat.address.country}`} </Text>
+
                 <View style={styles.row}>
                     <View style={styles.button1}> 
-                        <Button title="Go to Flat Details" color='black' onPress={() => navigation.navigate('Bookings')}></Button>
+                        <Button title="Go to Flat Details" color='black' onPress={() => navigation.navigate('FlatDetails', {flat: item.flat})}></Button>
                     </View>
                     <View  style={styles.button}>
                         <Button title="Back" color='black' onPress={() => navigation.navigate('Bookings')}></Button>
@@ -94,11 +82,11 @@ const styles = StyleSheet.create({
         width: 200
     },
     info: {
-        marginTop: 8,
+        marginVertical: 10,
         fontSize: 20,
     },
     infoBold: {
-        marginTop: 8,
+        marginVertical: 10,
         fontSize: 20,
         fontWeight: 'bold',
     },

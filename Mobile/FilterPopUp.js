@@ -9,15 +9,6 @@ import { PixelRatio } from 'react-native';
 
 const {width, height} = Dimensions.get("screen")
 
-//For Dropdowns
-const contries=[
-    {label: 'Poland', value: 'Poland'},
-    {label: 'German', value: 'German'},
-]
-const cities=[
-    {label: 'Płock', value: 'Płock'},
-    {label: 'Warszawa', value: 'Warszawa'},
-]
 //For animation
 //animateView:
 const FPanelHeightOpen =0.45
@@ -59,24 +50,101 @@ export default class FilterPopUp extends Component{
             hei1Animation: new Animated.Value(10),
             hei2Animation: new Animated.Value(20),
             opa2Animation: new Animated.Value(1),
-            //DropDowns
-            selectedCountry: 'Poland',
-            selectedCity: 'Płock',
+
 
             //FilteringValues:
+            FlatName: "",
+            selectedCountry: "",
+            selectedCity: "",
+            PriceFrom: "",
+            PriceTo: "",
+            GuestsFrom: "",
+            GuestsTo: "",
+            DateFromFilter: "",
+            DataToFilter: "",
+            
+            //FilteringValues helpers:
             DateFrom: new Date(),
             DateTo: new Date(),
 
             //Calendar
             CalendarMode: "From",
+
+            //For Dropdowns
+            countries: [],
+            cities: [],
     }
     constructor(props)
     {
         super(props);
         this.CalendarRef = React.createRef();
+
     }
 
-    
+
+    setToken(token)
+    {
+        //console.log("popupem jestem :"+token);
+        this.setState({FlatName: ""});
+        this.setState({selectedCountry: ""});
+        this.setState({selectedCity: ""});
+        this.setState({PriceFrom: ""});
+        this.setState({PriceTo: ""});
+        this.setState({GuestsFrom: ""});
+        this.setState({GuestsTo: ""});
+        this.setState({DateFromFilter: ""});
+        this.setState({DataToFilter: ""});
+        this.fetchData(token)
+    }
+    fetchData(token){
+        //console.log("token (FilterPopUp): "+token)
+        const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/metadata/countries"; 
+        
+        let tmpCountries=[]
+        let tmpCities=[]
+        fetch(url, {
+          method: "GET",
+          headers: {
+              'Accept': '*/*',
+              'security-header': token
+            },
+          })
+          .then((response) => response.json())
+          .then((response) => tmpCountries=response)
+          .catch((error) => console.error(error))
+          .finally(() => this.setState({countries: tmpCountries}));
+
+          const url1 ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/metadata/cities";  
+          fetch(url1, {
+            method: "GET",
+            headers: {
+                'Accept': '*/*',
+                'security-header': token
+              },
+            })
+            .then((response) => response.json())
+            .then((response) => tmpCities=response)
+            .catch((error) => console.error(error))
+            .finally(() => this.setState({cities: tmpCities}));
+      }
+
+    sumbitHandler =() =>{
+        this.animateView();
+        const data = {
+            'flatName':   this.state.FlatName,
+            'Country':    this.state.selectedCountry,
+            'City':       this.state.selectedCity,
+            'priceFrom':  this.state.PriceFrom,
+            'priceTo':    this.state.PriceTo,
+            'guestsFrom': this.state.GuestsFrom,
+            'guestsTo':   this.state.GuestsTo,
+            'DateFrom' :  this.state.DateFromFilter,
+            'DateTo':     this.state.DataToFilter,
+        }
+        console.log("running handle search"+ this.state.FlatName +"|")
+        this.props.handleSearch(data);
+    }
+
     //Keyboard:
     componentDidMount() {
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.onKeyboardShow);
@@ -130,9 +198,7 @@ export default class FilterPopUp extends Component{
         }).start();
     };
 
-    sumbitHandler =() =>{
-        this.animateView();
-    }
+
     onKeyboardShow =() =>{
         Animated.timing(this.state.hei1Animation,{toValue:  5,duration: 200,useNativeDriver: true}).start();
         Animated.timing(this.state.hei2Animation,{toValue:  5,duration: 200,useNativeDriver: true}).start();
@@ -149,19 +215,31 @@ export default class FilterPopUp extends Component{
     }
 
     showCalendar=(mode) =>{
-        console.log("ustawiam mode: " + mode)
+        //console.log("ustawiam mode: " + mode)
         this.setState({ CalendarMode: mode })
         this.CalendarRef.current.showModal()
     }
     setCalendarDate = (date)=>{
-        console.log("The mode: " + this.state.CalendarMode)
+        //console.log("The mode: " + this.state.CalendarMode)
         if(this.state.CalendarMode=="From")
         {
             this.setState({ DateFrom: date })
+            this.setState({DateFromFilter : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`})
         }
         else{
             this.setState({ DateTo: date })
+            this.setState({DataToFilter : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`})
         }
+    }
+
+    changeto2D = (data)=>{
+        let newData=[];
+
+        data.forEach(element => {
+            newData.push({ label: element, value: element })
+        });
+        console.log("newdata: " + newData)
+        return (newData);
     }
     render(){
         const hei1Animation={transform: [{translateY: this.state.hei1Animation,}],};
@@ -197,13 +275,13 @@ export default class FilterPopUp extends Component{
                     <Animated.View style={[styles.filterPanel, {height: this.state.FPanelHeight}, BorderAnimation]}>
                         <Animated.View style={[styles.SearchBar]}>
                             <Icon name='search' color='orange'/>
-                            <TextInput style={styles.textinput} placeholder="Search by flat name" onSubmitEditing={this.sumbitHandler}/>
+                            <TextInput style={styles.textinput} placeholder="Search by flat name" onChangeText={(e)=>this.setState({FlatName: e})} onSubmitEditing={this.sumbitHandler}/>
                         </Animated.View>
                         <View>
-                            <DropDownPicker items={contries} placeholder="Country" searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCountry: item.value})}/>                        
+                            <DropDownPicker items={this.changeto2D(this.state.countries)} placeholder="Country" searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCountry: item.value})}/>                        
                         </View>
                         <View>
-                            <DropDownPicker items={cities}   placeholder="City"    searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCity: item.value})}/>                        
+                            <DropDownPicker items={this.changeto2D(this.state.cities)}   placeholder="City"    searchable={true} labelStyle={{color: '#000000'}} containerStyle={{height: 40, width: 300,marginVertical: 3}} onChangeItem={item => this.setState({selectedCity: item.value})}/>                        
                         </View>
                         {this.props.DateActive=="true" ?
                         <View style={{height: 80}}>
@@ -217,13 +295,13 @@ export default class FilterPopUp extends Component{
                             <View>
                                 <Animated.View style={[styles.priceBar,hei1Animation]}>
                                     <Text style={{fontSize: 20, marginRight:'auto'}} >Price: </Text>
-                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
-                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
+                                    <TextInput onChangeText={(e)=>this.setState({PriceFrom: e})} keyboardType='numeric' style={styles.textprice} placeholder="From"/>
+                                    <TextInput onChangeText={(e)=>this.setState({PriceTo: e})}  keyboardType='numeric' style={styles.textprice} placeholder="To"/>
                                 </Animated.View>
                                 <Animated.View style={[styles.guestsBar,hei2Animation]}>
                                     <Text style={{fontSize: 20, marginRight:'auto'}} >Max Guests: </Text>
-                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="From"/>
-                                    <TextInput keyboardType='numeric' style={styles.textprice} placeholder="To"/>
+                                    <TextInput onChangeText={(e)=>this.setState({GuestsFrom: e})} keyboardType='numeric' style={styles.textprice} placeholder="From"/>
+                                    <TextInput onChangeText={(e)=>this.setState({GuestsTo: e})} keyboardType='numeric' style={styles.textprice} placeholder="To"/>
                                 </Animated.View>
                             </View>
                         }

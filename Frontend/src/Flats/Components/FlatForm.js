@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
-import { addNewFlat, loadFlatAsync, onFlatChange, onFlatAddressChange, onNewImagesChanged, onShowedImgChanged } from '../Actions/flatActions';
+import { addNewFlat, loadFlatAsync, onFlatChange, onFlatAddressChange, onNewImagesChanged, onShowedImgChanged, onRemoveOldImg, updateFlat } from '../Actions/flatActions';
 import { deleteFlat } from '../Actions/flatsActions';
 import {Form, Row, Col, Button, Card, CardDeck, Alert, Modal } from 'react-bootstrap';
 import AddressForm from "./AddressForm";
@@ -25,13 +25,14 @@ const mapDispatchToProps = (dispatch) => ({
   onFlatAddressChange: (name,value) => dispatch(onFlatAddressChange(name,value)),
   deleteFlat: (flatId) => dispatch(deleteFlat(flatId)),
   onNewImagesChanged: (newImgs) => dispatch(onNewImagesChanged(newImgs)),
-  onShowedImgChanged: (imgPreview) =>  dispatch(onShowedImgChanged(imgPreview))
+  onShowedImgChanged: (imgPreview) =>  dispatch(onShowedImgChanged(imgPreview)),
+  onRemoveOldImg: (imgName) =>  dispatch(onRemoveOldImg(imgName)),
+  updateFlat: (flat, uploadedFiles) => dispatch(updateFlat(flat, uploadedFiles))
 })
 
 function FlatForm(props) {
   let { flatId } = useParams();
   const isReadOnly = props.mode === 'view';
-  //const [showedImg, setShowedImg] = useState(placeholder_img);
   const [clickedRow, setClickedRow] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -52,7 +53,8 @@ function FlatForm(props) {
           fileName: file.name,
           fileType: file.type,
           flatId: props.flat.id,
-          preview: URL.createObjectURL(file)
+          preview: URL.createObjectURL(file),
+          isOld: false
         }))
     ]
     props.onNewImagesChanged(newFiles);
@@ -63,9 +65,10 @@ function FlatForm(props) {
     e.stopPropagation();
     URL.revokeObjectURL(preview);
     const newFiles = [...props.new_images];
+    const nameOfRemovedImg = newFiles[index].fileName;
     newFiles.splice(index, 1);
     props.onNewImagesChanged(newFiles);
-
+    props.onRemoveOldImg(nameOfRemovedImg);
     let newIndex = index;
     let newImgPreview = placeholder_img;
     if (index == newFiles.length && newFiles.length != 0) {
@@ -95,7 +98,13 @@ function FlatForm(props) {
   }
 
   const onSubmit = async () => {
-    props.addNewFlat(props.flat, props.new_images);
+    if (props.mode == 'edit') {
+      const currentNewImgs = props.new_images;
+      props.updateFlat(props.flat, currentNewImgs.filter(x => x.isOld == false));
+    }
+    else {
+      props.addNewFlat(props.flat, props.new_images);
+    }
   }
 
   const onCancel = () => window.location.href = "/flats";
