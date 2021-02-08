@@ -12,20 +12,21 @@ const butsize=50;
 
 export default function BookingDetailScreen({route, navigation}) {
     const item = navigation.getParam('booking');
-
+    const token = navigation.getParam('token');
+    
     return (
         <SafeAreaView >
             <View style={styles.circle}></View>
-            <HeaderNavBar page={"Bookings"} navigation={navigation}/>
+            <HeaderNavBar page={"Bookings"} navigation={navigation}  token={token}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.flat.name}</Text>
             </View>
             <View style={styles.bottomPanel}>
                 <View style={styles.row}>
-                    <Text style={styles.infoBold}> {`Person renting:  ${item.customer.name} ${item.customer.surname}` } </Text>
+                    <Text style={styles.infoBold}> {`Person renting:  ${item.customer.firstName} ${item.customer.lastName}` } </Text>
                 </View>
-                <Text style={styles.info}> {`Date:  ${item.startDate}-${item.endDate}`} </Text>
-                <Text style={styles.info}> {`Customer number:  ${item.customer.phoneNo}`} </Text>
+                <Text style={styles.info}> {`Date:  (${item.startDate}) - (${item.endDate})`} </Text>
+                <Text style={styles.info}> {`Customer number:  ${item.customer.phoneNumber}`} </Text>
                 <Text style={styles.info}> {`Booking Price:  ${item.price} PLN`} </Text>
                 <Text style={styles.info}> {`Number of Guests:  ${item.noOfGuests}`} </Text>
                 <Text style={styles.info}> {`Flat Type:  ${item.flat.flatType}`} </Text>
@@ -33,7 +34,7 @@ export default function BookingDetailScreen({route, navigation}) {
 
                 <View style={styles.row}>
                     <View style={styles.button1}> 
-                        <Button title="Go to Flat Details" color='black' onPress={() => navigation.navigate('FlatDetails', {flat: item.flat})}></Button>
+                        <Button title="Go to Flat Details" color='black' onPress={() => navigation.navigate('FlatDetails', {flat: item.flat, token: token})}></Button>
                     </View>
                     <View  style={styles.button}>
                         <Button title="Back" color='black' onPress={() => navigation.navigate('Bookings')}></Button>

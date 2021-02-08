@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRef, forwardRef } from 'react';
-import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button, Dimensions, Alert  } from 'react-native';
+import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, RefreshControl, Button, Dimensions, Alert ,Animated  } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { debug } from 'react-native-reanimated';
@@ -14,6 +14,18 @@ export default function LoginScreen({navigation}) {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
 
+    //animation:
+    
+    const opacity = new Animated.Value(0);
+    const anim=()=>{
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    }
+
+    
     function loginHandler(e) {
       console.log("usr: "+username + " , pass:" + password)
         //e.preventDefault();
@@ -44,6 +56,7 @@ export default function LoginScreen({navigation}) {
             return null;
         }
         else if (response.status == 200) {
+            anim();
             return response.text()
           }
         else{
@@ -60,6 +73,7 @@ export default function LoginScreen({navigation}) {
         })
         .then(responseData => {
           if (responseData != null) {
+            setTimeout(()=>
             navigation.dispatch(StackActions.reset({
               index: 0,
               actions: [
@@ -68,29 +82,39 @@ export default function LoginScreen({navigation}) {
                   params: {token: responseData}
                 }),
               ],
-            }))
+            })),1000);
           } 
         })
     }
 
     return (
-      <View style={styles.container}>
-          <Text style={styles.title}>Flatly</Text>
-          <View style={styles.inputcontainer}>
-              <Text style={styles.inputlogintext}>Login</Text>
-              <View style={styles.inputadjustcontainer}>
-                <TextInput style={styles.inputtext} placeholder="Username" onChangeText={(val) => setUsername(val)}/>
-                <TextInput style={styles.inputtext} placeholder="Password" onChangeText={(val) => setPassword(val)}/>
-              </View>
-          </View>
-          <TouchableOpacity style={styles.loginButton} onPress={() => loginHandler()}>
-            <Text style={styles.logintext}>Login</Text>
-          </TouchableOpacity>
-      </View>
+        <View style={styles.container}>
+            <Animated.View style={[styles.circle, {opacity: opacity}]}></Animated.View>
+            <Text style={styles.title}>Flatly</Text>
+            <View style={styles.inputcontainer}>
+                <Text style={styles.inputlogintext}>Login</Text>
+                <View style={styles.inputadjustcontainer}>
+                  <TextInput style={styles.inputtext} placeholder="Username" onChangeText={(val) => setUsername(val)}/>
+                  <TextInput style={styles.inputtext} placeholder="Password" onChangeText={(val) => setPassword(val)}/>
+                </View>
+            </View>
+            <TouchableOpacity style={styles.loginButton} onPress={() => loginHandler()}>
+              <Text style={styles.logintext}>Login</Text>
+            </TouchableOpacity>
+        </View>
     );
   }
-  
+
+  const circlesize=50;
   const styles = StyleSheet.create({
+    circle:{
+      width: circlesize,
+      height: circlesize,
+      backgroundColor: '#dc8033',
+      borderWidth: 0,
+      borderRadius: circlesize/2,
+      opacity: 0.9,
+  },
     container: {
         marginTop: 'auto',
         marginBottom: 'auto',
@@ -141,7 +165,7 @@ export default function LoginScreen({navigation}) {
         textAlign: 'center',
         borderBottomColor: 'orange',
         borderBottomWidth: 2,
-        width: 90,
+        width: 120,
     },
     loginButton:{
         marginTop: 20,

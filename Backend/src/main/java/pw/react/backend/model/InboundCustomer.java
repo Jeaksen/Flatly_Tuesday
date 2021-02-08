@@ -12,18 +12,16 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-@Entity
-@Table(name = "customers")
-public class Customer implements Serializable
+public class InboundCustomer implements Serializable
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
-    @NotNull
-    private String firstName = "Krzysztof";
-    @NotNull
-    private String lastName = "Jarzyna";
-    @NotNull
-    private String phoneNumber = "791 623 690";
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String email;
+    private String country;
+    private String address;
+    private String login;
+    private String password;
+    private String securityToken;
 }
