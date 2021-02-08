@@ -20,15 +20,12 @@ function ListItem({ item, navigation, token }) {
         <View style={styles.item}>
           <TouchableOpacity onPress={() => navigation.navigate('BookingDetails',{booking: item, token: token})}>
           <View  style={styles.itemrow}>
-            <Text style={styles.itemOwner}>{item.alpha3Code}</Text>
-            <Text style={styles.itemLocalization}>{item.name}</Text>
+            <Text style={styles.itemOwner}>{`${item.customer.name} ${item.customer.surname}`}</Text>
+            <Text style={styles.itemLocalization}>{item.flat.address.city}</Text>
           </View>
-          <Text style={styles.itemName}>{item.capital}</Text>
-          <Text style={styles.itemData}>20.03.2020 - 20.03.2020</Text>
+          <Text style={styles.itemName}>{item.flat.name}</Text>
+          <Text style={styles.itemData}>{`${item.startDate}-${item.endDate}`}</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.itembuttoncancel} onPress={() => createAlert()}>
-              <Text style={styles.itemcancel}>Cancel</Text>
-          </TouchableOpacity> */}
         </View>
     );
 }
@@ -68,14 +65,47 @@ export default function BookingScreen({navigation}) {
     fetchData(false);
   }
 
-  // Odkomentowac jak będzie backend
-  const fetchData = () => {
-    const url = searchString.length >= 3 ? `https://restcountries.eu/rest/v2/name/${searchString}` : `https://restcountries.eu/rest/v2/all`;
-    console.log(`Fetched from ${url}`);
+  const filterData = (data) => {
+    let url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings?`;
+    console.log("data.flatName:"+ data.flatName)
+    if(data.flatName!="")  url +=`&name=${data.flatName}`;
+    if(data.Country!="")   url +=`&country=${data.Country}`;
+    if(data.City!="")      url +=`&city=${data.City}`;
+    if(data.dateFrom!="")  url +=`&dateFrom=${data.dateFrom}`;
+    if(data.dateTo!="")    url +=`&dateTo=${data.dateTo}`;
     setLoading(true);
-    fetch(url)
+    fetch(url, {
+      method: "GET",
+      headers: {
+          'Accept': '*/*',
+          'security-header': token       
+        },
+      })
       .then((response) => response.json())
-      .then((json) => setFlats(json))
+      .then(response => response.content)
+      .then((response) => setFlats(response))
+      .catch((error) => console.error(error))
+      .finally(() => setTimeout(()=>setLoading(false),1000));
+  }
+
+  const fetchData = () => {
+    //.log("token (Flats): "+token)
+    const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings";
+    setLoading(true);
+
+    let bookings=[]
+    fetch(url, {
+      method: "GET",
+      headers: {
+          //'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'security-header': token
+          
+        },
+      })
+      .then((response) => response.json())
+      .then(response => bookings = response.content)
+      .then(() => setFlats(bookings))
       .catch((error) => console.error(error))
       .finally(() => setTimeout(()=>setLoading(false),1000));
   }
@@ -103,12 +133,12 @@ export default function BookingScreen({navigation}) {
           <FlatList style={{marginBottom: 80}}
             data={flats.length > 0 ? flats.slice(0, flats.length) : []}
             renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
-            keyExtractor={(item) => item.name}
+            keyExtractor={(item) => item.id}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
             />
         </View>}
         <View style={{position: 'absolute'}}>
-          <FilterPopUp ref={FilterRef} DateActive="true"/>
+          <FilterPopUp ref={FilterRef} DateActive="true"  token={token} handleSearch={filterData}/>
         </View>
       </View>
     </SafeAreaView>

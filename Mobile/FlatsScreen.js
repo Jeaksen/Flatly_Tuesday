@@ -16,9 +16,6 @@ const centerMargin = (width - 3*buttonW)/4;
 const bigButtonW = 3*buttonW + 2*centerMargin
 
 function ListItem({ item, navigation, token }) {
-
-  var base=`data:image/png;base64,${item.images[0].data}`
-
   return (
         <SafeAreaView style={styles.item}>
                 <View style={{flex: 1, flexDirection:'row'}}>
@@ -32,9 +29,11 @@ function ListItem({ item, navigation, token }) {
                         </View>
                     </TouchableOpacity>
                     <View>
+                      {item.images!=null ?
                        <Image
                           style={styles.itemFlag}
-                          source={{uri: base}}/> 
+                          source={{uri: `data:image/png;base64,${item.images[0].data}`}}/> :
+                          <View/>}
                       <View/>
                     </View>
                 </View>
@@ -57,13 +56,33 @@ export default function FlatsScreen({navigation}) {
     const bigButtonW = 3*buttonW + 2*centerMargin
     //const [searchLength, setSearchLength] = useState({last: 111, newest: 0})
   
-    const onRefresh = () => {
-      console.log(isLoading);
-      fetchData(false);
+    const filterData = (data) => {
+      let url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats?`;
+      console.log("data.flatName:"+ data.flatName)
+      if(data.flatName!="")  url +=`&name=${data.flatName}`;
+      if(data.Country!="")   url +=`&country=${data.Country}`;
+      if(data.City!="")      url +=`&city=${data.City}`;
+      if(data.priceFrom!="") url +=`&priceFrom=${data.priceFrom}`;
+      if(data.priceTo!="")   url +=`&priceTo=${data.priceTo}`;
+      if(data.guestsFrom!="")url +=`&guestsFrom=${data.guestsFrom}`;
+      if(data.guestsTo!="")  url +=`&guestsTo=${data.guestsTo}`;
+      setLoading(true);
+      fetch(url, {
+        method: "GET",
+        headers: {
+            'Accept': '*/*',
+            'security-header': token       
+          },
+        })
+        .then((response) => response.json())
+        .then(response => response.content)
+        .then((response) => setFlats(response))
+        .catch((error) => console.error(error))
+        .finally(() => setTimeout(()=>setLoading(false),1000));
     }
   
     const fetchData = () => {
-      console.log("token (Flats): "+token)
+      //.log("token (Flats): "+token)
       const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats";
       setLoading(true);
 
@@ -77,8 +96,6 @@ export default function FlatsScreen({navigation}) {
           },
         })
         .then((response) => response.json())
-        //.then((response) => console.log("keys array = ", Object.keys(response.content[0].images[0])))
-        //.then((response) => console.log("keys array = ", Object.values(response.content[0].images[0])))
         .then(response => response.content)
         .then((response) => setFlats(response))
         .catch((error) => console.error(error))
@@ -90,8 +107,9 @@ export default function FlatsScreen({navigation}) {
     }, []);
 
     const FilterManager =() =>{
-      console.log("filter manager")
-      FilterRef.current.animateView()
+      //console.log("filter manager")
+      FilterRef.current.animateView();
+      FilterRef.current.setToken(token);
     }
     
     return (
@@ -113,7 +131,7 @@ export default function FlatsScreen({navigation}) {
               />
           </View>}
           <View style={{position: 'absolute'}}>
-            <FilterPopUp ref={FilterRef} DateActive="false"/>
+            <FilterPopUp ref={FilterRef} DateActive="false" token={token} handleSearch={filterData}/>
           </View>
         </View>
       </SafeAreaView>
