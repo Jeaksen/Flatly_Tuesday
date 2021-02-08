@@ -18,7 +18,7 @@ const baseState = {
     name: "",       
     maxGuests: 1,
     price: 0,
-    flatType: "",
+    flatType: "Apartment",
     address: {
       country: "", 
       city: "", 

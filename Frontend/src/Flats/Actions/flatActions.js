@@ -4,7 +4,7 @@ import {
   FLAT_LOADING_ERROR,
   FLAT_SAVING,
   FLAT_SAVING_ERROR,
-  FLATS_URL,
+  FLATS_URL,BACKEND_URL,
   FLAT_CHANGED,
   FLAT_ADDRESS_CHANGED,
   FLAT_NEW_IMAGES_CHANGED,
@@ -95,32 +95,32 @@ export function loadFlatAsync(flatId) {
 }
 
 export function addNewFlat(flat, uploadedFiles) {
-  // if (DEBUGGING) {
-  //   return async (dispatch) => {
-  //     dispatch(flatSaving(true));
-  //     let promise = fetch(FLATS_URL, {
-  //         method: 'POST',
-  //         headers: {'Content-Type': 'application/json',},
-  //         body: JSON.stringify(flat)
-  //     });
-  //     promise.then(response => response.json())
-  //       .then(() => dispatch(flatSaving(false)))
-  //       .catch((error) => dispatch(flatSavingError(error)))
-  //       .finally(() => window.location.href = "/flats");
-  //   }
-  // }
   return async (dispatch) => {
     dispatch(flatSaving(true));
     const formData = new FormData();
     for (let i = 0 ; i < uploadedFiles.length ; i++) {
-      formData.append("new_images", uploadedFiles[i]);
+      formData.append("new_images", uploadedFiles[i].file);
     }
     for (var key in flat) {
-      if (key !== 'id') {
-        formData.append(key, flat[key]);
+      if (key != 'id' && key != 'images') {
+        if (key == 'address') {
+          formData.append('address.country',flat.address.country);
+          formData.append('address.city',flat.address.city);
+          formData.append('address.postCode',flat.address.postCode);
+          formData.append('address.buildingNumber',flat.address.buildingNumber);
+          formData.append('address.flatNumber',flat.address.flatNumber);
+        }
+        else {
+          formData.append(key, flat[key]);
+        }
       }
     }
-    let promise = fetchPostWithFiles(FLATS_URL, formData);
+
+    // Display the key/value pairs
+    for (var pair of formData.entries()) {
+      console.log(pair[0]+ ': ' + pair[1]); 
+    }
+    let promise = fetchPostWithFiles('http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats', formData);
     promise.then(response => {
         if(!response.ok) {
           throw new Error(response.message);
@@ -128,7 +128,7 @@ export function addNewFlat(flat, uploadedFiles) {
         return response;
       })
       .then(() => dispatch(flatSaving(false)))
-      .catch((error) => dispatch(flatSavingError(error)))
-      .finally(() => window.location.href = "/flats");
+      .catch((error) => dispatch(flatSavingError(error)));
+      //.finally(() => window.location.href = "/flats");
   }
 }
