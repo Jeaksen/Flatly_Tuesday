@@ -142,10 +142,11 @@ types:
         description: filter for bookings ending at most on <value>
         required: false 
         example: 2020-05-02
-      include_inactive:
+      omit_inactive:
         type: boolean
         description: flag indicating to include inactive bookings in the search
         required: false
+        default: true
     responses:
       200:
         description: list of bookings in content array, paging in pageable object
