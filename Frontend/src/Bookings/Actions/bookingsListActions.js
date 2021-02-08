@@ -1,3 +1,6 @@
+import { BOOKINGS_URL } from '../../AppConstants/AppConstants';
+import {fetchGet, fetchDelete} from '../../AppComponents/ServerApiService'
+
 export function bookingsListLoaded(list) {
     return ({type: "bookingsListLoaded", payload: list})
 }
@@ -10,40 +13,13 @@ export function bookingsListLoadingError(error) {
     return ({type: "bookingsListLoadingError", payload: error})
 }
 
-export function loadBookingsListAsync(URL, pageNumber) {
+export function loadBookingsListAsync(URL) {
     return async (dispatch) => {
         try {
             dispatch(bookingsListLoading());
-            const response = await fetch(URL);
+            const response = await fetchGet(URL);
             const json = await response.json();
-            dispatch(bookingsListLoaded({
-                content: json,
-                pageable: {
-                  sort: {
-                    sorted: false,
-                    unsorted: true,
-                    empty: true
-                  },
-                  offset: 0,
-                  pageNumber: pageNumber,
-                  pageSize: 10,
-                  unpaged: false,
-                  paged: true
-                },
-                totalPages: 10,
-                totalElements: 95,
-                last: false,
-                size: json.length,
-                number: 0,
-                sort: {
-                  sorted: false,
-                  unsorted: true,
-                  empty: true
-                },
-                numberOfElements: json.length,
-                first: true,
-                empty: false
-              }));
+            dispatch(bookingsListLoaded(json));
         } catch(error) {
             console.error(error);
             dispatch(bookingsListLoadingError(error));
@@ -59,11 +35,11 @@ export function bookingCancelingError(error) {
     return ({type: "bookingCancelingError", payload: error})
 }
 
-export function cancelBooking(URL, bookingId) {
+export function cancelBooking(bookingId) {
     return async (dispatch) => {
         try {
             dispatch(bookingCanceling(bookingId))
-            await fetch(`${URL}/bookings/` + bookingId, {method: 'DELETE'});
+            await fetchDelete(BOOKINGS_URL + bookingId, {method: 'DELETE'});
             dispatch(loadBookingsListAsync());
         } catch(error) {
             console.error(error);

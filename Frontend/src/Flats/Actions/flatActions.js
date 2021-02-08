@@ -4,9 +4,11 @@ import {
   FLAT_LOADING_ERROR,
   FLAT_SAVING,
   FLAT_SAVING_ERROR,
-  FLATS_URL,
+  FLATS_URL,BACKEND_URL,
   FLAT_CHANGED,
   FLAT_ADDRESS_CHANGED,
+  FLAT_NEW_IMAGES_CHANGED,
+  FLAT_SHOWED_IMG_CHANGED,
   DEBUGGING
 } from '../../AppConstants/AppConstants'
 import {fetchGet, fetchPut, fetchPost, fetchDelete, fetchPostWithFiles} from '../../AppComponents/ServerApiService'
@@ -38,6 +40,14 @@ export function onFlatChange(name, value) {
 
 export function onFlatAddressChange(name, value) {
   return ({type: FLAT_ADDRESS_CHANGED, payload: {name: name, value: value}})
+}
+
+export function onNewImagesChanged(new_images) {
+  return ({type: FLAT_NEW_IMAGES_CHANGED, payload: new_images})
+}
+
+export function onShowedImgChanged(imgPreview) {
+  return ({type: FLAT_SHOWED_IMG_CHANGED, payload: imgPreview})
 }
 
 export function loadFlatAsync(flatId) {
@@ -72,7 +82,12 @@ export function loadFlatAsync(flatId) {
   return async (dispatch) => {
     dispatch(flatLoading(true));
     let promise = fetchGet(FLATS_URL + `${flatId}`);
-    promise.then(response => response.json())
+    promise.then(response => {
+          if(!response.ok) {
+            throw new Error(response.message);
+          }
+          return response.json();
+        })
         .then(json => dispatch(flatLoaded(json)))
         .then(() => dispatch(flatLoading(false)))
         .catch((error) => dispatch(flatLoadingError(error)));
@@ -80,35 +95,40 @@ export function loadFlatAsync(flatId) {
 }
 
 export function addNewFlat(flat, uploadedFiles) {
-  // if (DEBUGGING) {
-  //   return async (dispatch) => {
-  //     dispatch(flatSaving(true));
-  //     let promise = fetch(FLATS_URL, {
-  //         method: 'POST',
-  //         headers: {'Content-Type': 'application/json',},
-  //         body: JSON.stringify(flat)
-  //     });
-  //     promise.then(response => response.json())
-  //       .then(() => dispatch(flatSaving(false)))
-  //       .catch((error) => dispatch(flatSavingError(error)))
-  //       .finally(() => window.location.href = "/flats");
-  //   }
-  // }
   return async (dispatch) => {
     dispatch(flatSaving(true));
     const formData = new FormData();
     for (let i = 0 ; i < uploadedFiles.length ; i++) {
-      formData.append("new_images", uploadedFiles[i]);
+      formData.append("new_images", uploadedFiles[i].file);
     }
     for (var key in flat) {
-      if (key == 'id') {
-        formData.append(key, flat[key]);
+      if (key != 'id' && key != 'images') {
+        if (key == 'address') {
+          formData.append('address.country',flat.address.country);
+          formData.append('address.city',flat.address.city);
+          formData.append('address.postCode',flat.address.postCode);
+          formData.append('address.buildingNumber',flat.address.buildingNumber);
+          formData.append('address.flatNumber',flat.address.flatNumber);
+        }
+        else {
+          formData.append(key, flat[key]);
+        }
       }
     }
-    let promise = fetchPostWithFiles('/flats/', formData);
-    promise.then(response => response.json())
+
+    // Display the key/value pairs
+    for (var pair of formData.entries()) {
+      console.log(pair[0]+ ': ' + pair[1]); 
+    }
+    let promise = fetchPostWithFiles('http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats', formData);
+    promise.then(response => {
+        if(!response.ok) {
+          throw new Error(response.message);
+        }
+        return response;
+      })
       .then(() => dispatch(flatSaving(false)))
-      .catch((error) => dispatch(flatSavingError(error)))
-      .finally(() => window.location.href = "/flats");
+      .catch((error) => dispatch(flatSavingError(error)));
+      //.finally(() => window.location.href = "/flats");
   }
 }

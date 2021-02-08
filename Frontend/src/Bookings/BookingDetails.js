@@ -14,8 +14,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  loadBookingDetailsAsync: (URL, bookingId) => dispatch(loadBookingDetailsAsync(URL, bookingId)),
-  cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
+  loadBookingDetailsAsync: (bookingId) => dispatch(loadBookingDetailsAsync(bookingId)),
+  cancelBooking: (bookingId) => dispatch(cancelBooking(bookingId))
 })
 
 function BookingDetails(props) {
@@ -26,11 +26,11 @@ function BookingDetails(props) {
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.cancelBooking(props.mainURL, bookingId);
+    props.cancelBooking(bookingId);
     setShowConfirmation(false);
   }
     
-  useEffect(() => {props.loadBookingDetailsAsync(props.mainURL, bookingId)}, [])
+  useEffect(() => {props.loadBookingDetailsAsync(bookingId)}, [])
 
   if (props.loading) {
     return (<label>Loading...</label>)
@@ -49,7 +49,7 @@ function BookingDetails(props) {
                   <Form.Label column sm="2">Person renting</Form.Label>
                   <Col sm="10">
                     <Form.Control type="text" name="name" value={`${props.booking.customer.name} ${props.booking.customer.surname}`} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
                   </Col>
                 </Form.Group>
 
@@ -57,7 +57,7 @@ function BookingDetails(props) {
                   <Form.Label column sm="2">Date</Form.Label>
                   <Col sm="10">
                     <Form.Control type="text" name="name" value={`${props.booking.startDate} - ${props.booking.endDate}`} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
                   </Col>
                 </Form.Group>
 
@@ -65,15 +65,15 @@ function BookingDetails(props) {
                   <Form.Label column sm="2">Contact number</Form.Label>
                   <Col sm="10">
                     <Form.Control type="text" name="name" value={props.booking.customer.phoneNo} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
                   </Col>
                 </Form.Group>
 
                <Form.Group as={Row} controlId="name">
                   <Form.Label column sm="2">Booking price</Form.Label>
                   <Col sm="10">
-                    <Form.Control type="text" name="name" value={props.booking.bookingPrice} 
-                    plaintext={true} />
+                    <Form.Control type="text" name="name" value={props.booking.price} 
+                    plaintext={true} readOnly={true} readOnly={true} />
                   </Col>
                 </Form.Group>
 
@@ -81,7 +81,7 @@ function BookingDetails(props) {
                   <Form.Label column sm="2">Number of Guests</Form.Label>
                   <Col sm="10">
                     <Form.Control type="text" name="name" value={props.booking.noOfGuests} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
                   </Col>
                 </Form.Group>
 
@@ -89,7 +89,7 @@ function BookingDetails(props) {
                   <Form.Label column sm="2">Flat name</Form.Label>
                   <Col sm="10">
                     <Form.Control type="text" name="name" value={props.booking.flat.name} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
                   </Col>
                 </Form.Group>
 
@@ -97,11 +97,12 @@ function BookingDetails(props) {
                   <Form.Label column sm="2">Localization</Form.Label>
                   <Col sm="10">
                     <Form.Control type="text" name="name" value={props.booking.flat.address.country} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
                     <Form.Control type="text" name="name" value={`${props.booking.flat.address.city} ${props.booking.flat.address.postCode}`} 
-                    plaintext={true} />
-                    <Form.Control type="text" name="name" value={`${props.booking.flat.address.streetName} ${props.booking.flat.address.buildingNumber}/${props.booking.flat.address.flatNumber}`} 
-                    plaintext={true} />
+                    plaintext={true} readOnly={true} />
+                    <Form.Control type="text" name="name" 
+                      value={`${props.booking.flat.address.streetName} ${props.booking.flat.address.buildingNumber}${props.booking.flat.address.flatNumber ? `/${props.booking.flat.address.flatNumber}` : ""}`} 
+                    plaintext={true} readOnly={true} />
                   </Col>
                 </Form.Group>
               </Form>

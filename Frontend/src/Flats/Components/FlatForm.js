@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
-import { addNewFlat, loadFlatAsync, onFlatChange, onFlatAddressChange } from '../Actions/flatActions';
+import { addNewFlat, loadFlatAsync, onFlatChange, onFlatAddressChange, onNewImagesChanged, onShowedImgChanged } from '../Actions/flatActions';
 import { deleteFlat } from '../Actions/flatsActions';
 import {Form, Row, Col, Button, Card, CardDeck, Alert, Modal } from 'react-bootstrap';
 import AddressForm from "./AddressForm";
@@ -14,21 +14,24 @@ const mapStateToProps = (state) => ({
   flat: state.flat.flat,
   loading: state.flat.loading,
   saving: state.flat.saving,
-  error: state.flat.error
+  error: state.flat.error,
+  new_images: state.flat.new_images,
+  showedImg: state.flat.showedImg
 })
 const mapDispatchToProps = (dispatch) => ({
   loadFlatAsync: (flatId) => dispatch(loadFlatAsync(flatId)),
   addNewFlat: (flat, uploadedFiles) => dispatch(addNewFlat(flat, uploadedFiles)),
   onFlatChange: (name,value) => dispatch(onFlatChange(name,value)),
   onFlatAddressChange: (name,value) => dispatch(onFlatAddressChange(name,value)),
-  deleteFlat: (flatId) => dispatch(deleteFlat(flatId))
+  deleteFlat: (flatId) => dispatch(deleteFlat(flatId)),
+  onNewImagesChanged: (newImgs) => dispatch(onNewImagesChanged(newImgs)),
+  onShowedImgChanged: (imgPreview) =>  dispatch(onShowedImgChanged(imgPreview))
 })
 
 function FlatForm(props) {
   let { flatId } = useParams();
   const isReadOnly = props.mode === 'view';
-  const [files, setFiles] = useState([]);
-  const [showedImg, setShowedImg] = useState(placeholder_img);
+  //const [showedImg, setShowedImg] = useState(placeholder_img);
   const [clickedRow, setClickedRow] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -39,10 +42,10 @@ function FlatForm(props) {
   }, []);
 
   const onAddingFiles = (acceptedFiles) => {
-    const currentFileNames = files.map(f => f.name);
+    const currentFileNames = props.new_images.map(f => f.name);
     const filteredAddedFiles = acceptedFiles.filter(file => currentFileNames.indexOf(file.name) === -1);
     const newFiles = [
-      ...files,
+      ...props.new_images,
       ...filteredAddedFiles.map(file => (
         {
           file: file, 
@@ -52,16 +55,16 @@ function FlatForm(props) {
           preview: URL.createObjectURL(file)
         }))
     ]
-    setFiles(newFiles);
+    props.onNewImagesChanged(newFiles);
     onRowClick(0, newFiles[0].preview);
   }
 
   const onRemovingFile = (e, index, preview) =>  {
     e.stopPropagation();
     URL.revokeObjectURL(preview);
-    const newFiles = [...files];
-    newFiles.splice(index, 1);  
-    setFiles(newFiles);
+    const newFiles = [...props.new_images];
+    newFiles.splice(index, 1);
+    props.onNewImagesChanged(newFiles);
 
     let newIndex = index;
     let newImgPreview = placeholder_img;
@@ -76,7 +79,7 @@ function FlatForm(props) {
 
   const onRowClick = (rowIndex, preview) => {
     setClickedRow(rowIndex);
-    setShowedImg(preview ?? placeholder_img);
+    props.onShowedImgChanged(preview ?? placeholder_img);
   }
 
   const onflatChange = event => {
@@ -92,9 +95,7 @@ function FlatForm(props) {
   }
 
   const onSubmit = async () => {
-    const uploadedFiles = files.map(f => f.file);
-    props.addNewFlat(props.flat, uploadedFiles);
-    //files.forEach(file => URL.revokeObjectURL(file.preview));
+    props.addNewFlat(props.flat, props.new_images);
   }
 
   const onCancel = () => window.location.href = "/flats";
@@ -147,14 +148,14 @@ function FlatForm(props) {
           </Card>
 
           <Card style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
-            <Card.Img  src={showedImg}/>
+            <Card.Img  src={props.showedImg}/>
           </Card>
 
           <Card bg="light" border="info">
             <Card.Header style={{textAlign:'center'}}>UPLOADED PICTURES</Card.Header>
             <Card.Body>
             <FlatImageDropzone 
-              files = {files}
+              files = {props.new_images}
               clickedRow = {clickedRow}
               onAddingFiles = {onAddingFiles} 
               onRemovingFile = {onRemovingFile}
@@ -167,7 +168,7 @@ function FlatForm(props) {
         <div hidden={!isReadOnly}>
           <Button className='LargeBlueButton' 
               type="button" 
-              href={`/bookings`}>SHOW ASSOCIATED BOOKINGS</Button>
+              href={`/bookings/flatId=${props.flat.id}`}>SHOW ASSOCIATED BOOKINGS</Button>
           <div className='FlatRowRight' >
             <Button className='BlueButton' 
               type="button" 

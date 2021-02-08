@@ -1,5 +1,3 @@
-//const baseState = {list: [], loading: false, error: null}
-
 const baseState = {
     list: [],
     pageable: {
@@ -10,7 +8,7 @@ const baseState = {
       },
       offset: 0,
       pageNumber: 0,
-      pageSize: 1,
+      pageSize: 10,
       unpaged: false,
       paged: true
     },

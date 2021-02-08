@@ -63,7 +63,7 @@ function App() {
             <FlatForm mode='edit'/>
           </Route>
           <Route path="/flats" exact>
-            <FlatsList />
+            <FlatsList mainURL={mainURL} />
           </Route>
           <Route path="/" exact>
             <LoginPage />
