@@ -27,6 +27,9 @@ const mapDispatchToProps = (dispatch) => ({
 })
 
 function FlatsList(props) {
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [sort, setSort] = useState("");
+  const [sortDir, setSortDir] = useState("");
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
@@ -34,7 +37,6 @@ function FlatsList(props) {
   const [MGUpper, setMGUpper] = useState("");
   const [priceLower, setPriceLower] = useState("");
   const [priceUpper, setPriceUpper] = useState("");
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [pagingOptions, setPagingOptions] = useState({
     name: "",
     city: "",
@@ -45,7 +47,7 @@ function FlatsList(props) {
     priceUpper: "",
   });
 
-  useEffect(() => {console.log(getOptionsStr(props.pageNumber)); props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
+  useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
   
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
@@ -54,9 +56,28 @@ function FlatsList(props) {
     setShowConfirmation(false);
   }
 
+  const setSortingHooks = (field) =>
+  {
+    if (sort === field)
+    {
+      if(sortDir === "desc") setSortDir("asc");
+      else if(sortDir === "asc") 
+      {
+        setSort("");
+        setSortDir("");
+      }
+    }
+    else
+    {
+      setSort(field);
+      setSortDir("desc");
+    }
+  }
+
   const getOptionsStr = (pageNumber) =>
   {
     let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+    if (sort !== "") opt_str += `&sort=${sort}&${sort}.dir=${sortDir}`;
     if (name !== "") opt_str += `&name=${name}`;
     if (country !== "") opt_str += `&country=${country}`;
     if (city !== "") opt_str += `&city=${city}`;
@@ -227,11 +248,11 @@ function FlatsList(props) {
                 <Table className='FlatsTable'>
                   <thead>
                     <tr>
-                      <th>Flat name</th>
-                      <th>Country</th>
-                      <th>City</th>
-                      <th>Max guests</th>
-                      <th>Price</th>
+                      <th><button onClick={(e) => {e.preventDefault(); setSortingHooks("name")}}>Flat name{sort === "name" ? ` - ${sortDir}` : ""}</button></th>
+                      <th><button onClick={(e) => {e.preventDefault(); setSortingHooks("address.country")}}>Country{sort === "address.country" ? ` - ${sortDir}` : ""}</button></th>
+                      <th><button onClick={(e) => {e.preventDefault(); setSortingHooks("address.city")}}>City{sort === "address.city" ? ` - ${sortDir}` : ""}</button></th>
+                      <th><button onClick={(e) => {e.preventDefault(); setSortingHooks("maxGuests")}}>Max guests{sort === "maxGuests" ? ` - ${sortDir}` : ""}</button></th>
+                      <th><button onClick={(e) => {e.preventDefault(); setSortingHooks("price")}}>Price{sort === "price" ? ` - ${sortDir}` : ""}</button></th>
                       <th>Options</th>
                     </tr>
                   </thead>
