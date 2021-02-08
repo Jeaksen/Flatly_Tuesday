@@ -43,7 +43,7 @@ public class FlatMainService implements FlatsService
         {
             updatedFlat.setId(flatId);
             result = repository.save(updatedFlat);
-            imageService.deleteRemovedImages(updatedFlat.getImages());
+            imageService.deleteRemovedImages(updatedFlat.getImages(), result.getId());
             if (!newImages.isEmpty())
             {
                 var addedImages = imageService.storeImages(flatId, newImages);

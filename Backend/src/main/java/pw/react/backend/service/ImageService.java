@@ -13,5 +13,5 @@ public interface ImageService
     Optional<FlatImage> getFirstImage(long flatId);
     void deleteFlatImage(long flatId, String imageId);
     void deleteImagesForFlat(long flatId);
-    void deleteRemovedImages(List<FlatImage> updatedImages);
+    void deleteRemovedImages(List<FlatImage> updatedImages, long flatId);
 }
