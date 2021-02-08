@@ -59,7 +59,6 @@ export default function FlatsScreen({navigation}) {
       fetchData(false);
     }
   
-    // Odkomentowac jak będzie backend
     const fetchData = () => {
       const url = searchString.length >= 3 ? `https://restcountries.eu/rest/v2/name/${searchString}` : `https://restcountries.eu/rest/v2/all`;
       console.log(`Fetched from ${url}`);
@@ -68,9 +67,7 @@ export default function FlatsScreen({navigation}) {
         .then((response) => response.json())
         .then((json) => setFlats(json))
         .catch((error) => console.error(error))
-        .finally(() => setTimeout(()=>setLoading(false),2000));
-
-
+        .finally(() => setTimeout(()=>setLoading(false),1000));
     }
   
     useEffect(() => {

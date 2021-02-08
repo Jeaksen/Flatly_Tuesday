@@ -51,18 +51,6 @@ types:
       id:
         type: integer
         required: false
-      name:
-        type: string
-        required: false
-      maxGuests:
-        type: integer
-        required: false
-      price:
-        type: integer
-        required: false
-      address:
-        type: address
-        required: false
   post_booking:
     properties:
       startDate:
@@ -97,11 +85,14 @@ types:
         type: customer
       flat:
         type: flat
+      isActive:
+        type: boolean
+        description: flag incicating whether the booking is active
 
 
 /bookings:
   get:
-    description: get all flat bookings
+    description: get all flat bookings, by default without inactive bookings
     queryParameters:
       apikey:
         type: string
@@ -151,7 +142,11 @@ types:
         type: date-only
         description: filter for bookings ending at most on <value>
         required: false 
-        example: 2020-05-02    
+        example: 2020-05-02
+      includeInactive:
+        type: boolean
+        description: flag indicating to include inactive bookings in the search
+        required: false  
     responses:
       200:
         body:
@@ -324,9 +319,58 @@ types:
       200:
         body:
           json/application:
-            type: string
-            description: id of the bookings or error message
-            example: "[32]"
+            type: booking
+            description: saved booking details
+            example: {
+            "id": 1,
+            "startDate": "2020-01-18",
+            "endDate": "2020-01-22",
+            "price": 4,
+            "noOfGuests": 5,
+            "customer": {
+                "id": 1
+            },
+            "flat": {
+                "id": 1,
+                "name": "chatka",
+                "maxGuests": 20,
+                "price": 1,
+                "flatType": "chatkapuchatka",
+                "address": {
+                    "id": 1,
+                    "country": "Poland",
+                    "city": "Szczecin",
+                    "streetName": "mojastara",
+                    "postCode": "13-420",
+                    "buildingNumber": "13",
+                    "flatNumber": "13",
+                    "flat": null
+                }
+            }
+        }
+      405:
+        body:
+          json/application:
+            description: empty booking object
+            type: booking
+            example: {
+              "id": 0,
+              "startDate": null,
+              "endDate": null,
+              "price": 0,
+              "noOfGuests": 0,
+              "customerId": 0,
+              "flat": null,
+              "customer": {
+                  "id": 0,
+                  "name": "Krzysztof",
+                  "surname": "Jarzyna",
+                  "phoneNo": "555 555 555"
+              },
+              "active": true
+          }
+
+
   /{bookingId}:
     delete:
       description: cancel a booking
@@ -345,6 +389,12 @@ types:
             json/application:
               type: string
               example: Cannot cancel booking 234 - it has already started
+    get:
+      description: get bookings details
+      queryParameters:
+        apikey:
+          type: string
+          description: authentication key
 
 /flats:
   get:

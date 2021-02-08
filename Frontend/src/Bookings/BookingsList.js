@@ -3,27 +3,35 @@ import AsyncSelect from 'react-select/async';
 import DateSelect from './DateSelect';
 import { connect } from 'react-redux';
 import { loadBookingsListAsync, cancelBooking } from './Actions/bookingsListActions';
+import { useParams } from "react-router-dom";
 import { Button, Alert, Form, Row, Col, Table, Modal } from 'react-bootstrap';
+import Pagination from '../AppComponents/Pagination';
 import "./BookingsLayout.css";
-import "../BasicInputField.css"
+import "../BasicInputField.css";
+import { BACKEND_URL, BOOKINGS_URL } from '../AppConstants/AppConstants';
+import { fetchGet } from '../AppComponents/ServerApiService';
 
 const mapStateToProps = (state, ownProps) => ({ 
     bookings: state.bookingsList.list,
     loading: state.bookingsList.loading,
-    saving: state.bookingsList.saving,
-    error: state.bookingsList.error
+    error: state.bookingsList.error,
+
+    //For Pagination
+    pageNumber: state.bookingsList.pageable.pageNumber,
+    totalPages: state.bookingsList.totalPages,
+    pageSize: state.bookingsList.pageable.pageSize,
+    totalElements: state.bookingsList.totalElements
 });
 
 const mapDispatchToProps = (dispatch) => ({
     loadBookingsListAsync: (URL) => dispatch(loadBookingsListAsync(URL)),
-    cancelBooking: (URL, bookingId) => dispatch(cancelBooking(URL, bookingId))
+    cancelBooking: (bookingId) => dispatch(cancelBooking(bookingId))
 })
 
 function BookingsList(props)
 {   
+    let { flatId } = useParams();
     const [showConfirmation, setShowConfirmation] = useState(false);
-    const [size, setSize] = useState(10);
-    const [page, setPage] = useState(0);
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
     const [country, setCountry] = useState("");
@@ -35,21 +43,50 @@ function BookingsList(props)
         value: 'null',
     });
     const { endDateWrap } = endDate;
-    const [optionsStr , setOptionsStr] = useState(`?size=${size}&page=${page}`);
+    const [pagingOptions, setPagingOptions] = useState({
+      name: "",
+      city: "",
+      country: "",
+      startDate: {value: 'null'},
+      endDate: {value: 'null'}
+    });
 
-    useEffect(() => {props.loadBookingsListAsync(`${props.mainURL}/bookings`)}, [])
+    useEffect(() => {console.log(getOptionsStr(props.pageNumber)); props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}${flatId ? `&flatId=${flatId}` : ""}`)}, [])
 
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
   const onDeleteBooking = (bookingId) => {
-    props.cancelBooking(props.mainURL, bookingId);
+    props.cancelBooking(bookingId);
     setShowConfirmation(false);
+  }
+
+  const getOptionsStr = (pageNumber) =>
+  {
+    let opt_str = `?size=${props.pageSize}&page=${pageNumber}&include_inactive=false`;
+    if (name !== "") opt_str += `&name=${name}`;
+    if (country !== "") opt_str += `&country=${country}`;
+    if (city !== "") opt_str += `&city=${city}`;
+    if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+    if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+    return opt_str;
+  }
+
+  const clearOptions = () => 
+  {
+    setName("");
+    setCountry("");
+    setCity("");
+    setStartDate({
+      value: 'null',
+    });
+    setEndDate({
+      value: 'null',
+    });
   }
 
   const renderTableData = () => {
     return props.bookings.map((booking) => (
         <tr key={booking.id} className='BookingsRow'>
-          <td>{booking.customer.name} {booking.customer.surname}</td>
           <td>{booking.flat.name}</td>
           <td>{booking.flat.address.country}</td>
           <td>{booking.flat.address.city}</td>
@@ -106,11 +143,9 @@ function BookingsList(props)
                         isDisabled={city !== ""} isClearable={true} isRtl={false} isSearchable={true}
                         name="countrySelect"
                         placeholder="Select Country..."
-                        defaultOptions
                         loadOptions = {(inputValue, callback) => {
                             setTimeout(() => {
-                                //fetch(`${props.mainURL}/metadata/countries`)
-                                fetch(`${props.mainURL}/countryOptions`)
+                                fetchGet(`${BACKEND_URL}metadata/countries`)
                                     .then(promise => {return promise.status === 404 ? [] : promise.json()})
                                     .then(json => 
                                         {
@@ -132,8 +167,7 @@ function BookingsList(props)
                         defaultOptions
                         loadOptions = {(inputValue, callback) => {
                             setTimeout(() => {
-                                //fetch(`${props.mainURL}/metadata/cities${country !== "" ? `?country=${country}` : ""}`)
-                                fetch(`${props.mainURL}/cityOptions`)
+                                fetchGet(`${BACKEND_URL}metadata/cities${country !== "" ? `?country=${country}` : ""}`)
                                     .then(promise => {return promise.status === 404 ? [] : promise.json()})
                                     .then(json => 
                                         {
@@ -157,16 +191,15 @@ function BookingsList(props)
                     <Col>
                     <button onClick={(e) => {
                         e.preventDefault();
-                      let opt_str = `?size=${size}&page=${page}`;
-                      if (name !== "") opt_str += `&name=${name}`;
-                      if (country !== "") opt_str += `&country=${country}`;
-                      if (city !== "") opt_str += `&city=${city}`;
-                      if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
-                      if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
-                      setOptionsStr(opt_str);
-                      console.log(opt_str);
-                      // props.loadBookingsListAsync(`${props.mainURL}/bookings`);
-                      // props.loadBookingsListAsync(`${props.mainURL}/bookings${opt_str}`);
+                        setPagingOptions({
+                          name: name,
+                          city: city,
+                          country: country,
+                          startDate: startDate,
+                          endDate: endDate
+                        });
+                        props.loadBookingsListAsync(`${BOOKINGS_URL}${getOptionsStr(props.pageNumber)}`);
+                        clearOptions();
                     }}>
                       Apply Filters
                     </button>
@@ -176,7 +209,6 @@ function BookingsList(props)
                     <Table className='BookingsTable'>
                       <thead>
                         <tr>
-                          <th>Name and Surname</th>
                           <th>Flat name</th>
                           <th>Country</th>
                           <th>City</th>
@@ -188,9 +220,25 @@ function BookingsList(props)
                     </Table>
                   </Row>
                 </Form>
-                {/* <div className="d-flex flex-row py-4 align-items-center">
-                  <Pagination />
-                </div> */}
+                <div className="d-flex flex-row py-4 align-items-center">
+                  <Pagination 
+                    pageNumber = {props.pageNumber}
+                    totalPages = {props.totalPages}
+                    pageSize = {props.pageSize}
+                    totalElements = {props.totalElements}
+                    onChangingPage = {(pageNumber) => {
+                      let optionsStr = getOptionsStr(pageNumber);
+                      clearOptions();
+                      let { name, country, city, startDate, endDate } = pagingOptions;
+                      let opt_str = `?size=${props.pageSize}&page=${pageNumber}&include_inactive=false`;
+                      if (name !== "") opt_str += `&name=${name}`;
+                      if (country !== "") opt_str += `&country=${country}`;
+                      if (city !== "") opt_str += `&city=${city}`;
+                      if (startDate.value != 'null') opt_str += `&dateFrom=${startDate.value.value.getFullYear()}-${startDate.value.value.getMonth()}-${startDate.value.value.getDate()}`;
+                      if (endDate.value != 'null') opt_str += `&dateTo=${endDate.value.value.getFullYear()}-${endDate.value.value.getMonth()}-${endDate.value.value.getDate()}`;
+                      props.loadBookingsListAsync(`${BOOKINGS_URL}${opt_str}`);
+                    }}/>
+                </div>
               </div>
               : <div></div>}
             </div>

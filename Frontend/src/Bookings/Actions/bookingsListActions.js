@@ -1,3 +1,6 @@
+import { BOOKINGS_URL } from '../../AppConstants/AppConstants';
+import {fetchGet, fetchDelete} from '../../AppComponents/ServerApiService'
+
 export function bookingsListLoaded(list) {
     return ({type: "bookingsListLoaded", payload: list})
 }
@@ -14,7 +17,7 @@ export function loadBookingsListAsync(URL) {
     return async (dispatch) => {
         try {
             dispatch(bookingsListLoading());
-            const response = await fetch(URL);
+            const response = await fetchGet(URL);
             const json = await response.json();
             dispatch(bookingsListLoaded(json));
         } catch(error) {
@@ -22,18 +25,6 @@ export function loadBookingsListAsync(URL) {
             dispatch(bookingsListLoadingError(error));
         }
     }
-}
-
-export function bookingsListSaved(list) {
-    return ({type: "bookingsListSaved", payload: list})
-}
-
-export function bookingsListSaving() {
-    return ({type: "bookingsListSaving"})
-}
-
-export function bookingsListSavingError(error) {
-    return ({type: "bookingsListSavingError", payload: error})
 }
 
 export function bookingCanceling(bookingId) {
@@ -44,11 +35,11 @@ export function bookingCancelingError(error) {
     return ({type: "bookingCancelingError", payload: error})
 }
 
-export function cancelBooking(URL, bookingId) {
+export function cancelBooking(bookingId) {
     return async (dispatch) => {
         try {
             dispatch(bookingCanceling(bookingId))
-            await fetch(`${URL}/bookings/` + bookingId, {method: 'DELETE'});
+            await fetchDelete(BOOKINGS_URL + bookingId, {method: 'DELETE'});
             dispatch(loadBookingsListAsync());
         } catch(error) {
             console.error(error);

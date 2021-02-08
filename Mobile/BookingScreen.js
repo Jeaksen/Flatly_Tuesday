@@ -26,9 +26,9 @@ function ListItem({ item, navigation }) {
           <Text style={styles.itemName}>{item.capital}</Text>
           <Text style={styles.itemData}>20.03.2020 - 20.03.2020</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.itembuttoncancel} onPress={() => createAlert()}>
+          {/* <TouchableOpacity style={styles.itembuttoncancel} onPress={() => createAlert()}>
               <Text style={styles.itemcancel}>Cancel</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
     );
 }
@@ -76,7 +76,7 @@ export default function BookingScreen({navigation}) {
       .then((response) => response.json())
       .then((json) => setFlats(json))
       .catch((error) => console.error(error))
-      .finally(() => setTimeout(()=>setLoading(false),2000));
+      .finally(() => setTimeout(()=>setLoading(false),1000));
   }
 
   useEffect(() => {

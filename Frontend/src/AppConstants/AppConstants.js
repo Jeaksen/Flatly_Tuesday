@@ -1,5 +1,6 @@
 export const BACKEND_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/';
 export const FLATS_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/';
+export const BOOKINGS_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings/';
 export const DEBUGGING = false;
 export const TESTING = true;
 export const TOKEN = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiaWQiOjEsImlhdCI6MTYxMjcxODM3OH0.ctlB10GVA9pMvzNuRRBzKn3ktOuU9R3kYHgwYYPI31Mm31FPs1wusfXkTKj0YLOBruU5Wr5VIZEdRBVOwt022Q';

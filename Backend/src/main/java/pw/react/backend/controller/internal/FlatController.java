@@ -19,6 +19,7 @@ import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.ImageService;
 import pw.react.backend.service.general.SecurityProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,6 +120,8 @@ public class FlatController
         logHeaders(headers);
         if (securityService.isAuthorized(headers))
         {
+            if (updatedFlat.getImages() == null)
+                updatedFlat.setImages(new ArrayList<>());
             Flat result = flatsService.updateFlat(flatId, updatedFlat, newImages);
             if (Flat.Empty.equals(result))
                 return ResponseEntity.badRequest().body(result);

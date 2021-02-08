@@ -168,7 +168,7 @@ function FlatForm(props) {
         <div hidden={!isReadOnly}>
           <Button className='LargeBlueButton' 
               type="button" 
-              href={`/bookings`}>SHOW ASSOCIATED BOOKINGS</Button>
+              href={`/bookings/flatId=${props.flat.id}`}>SHOW ASSOCIATED BOOKINGS</Button>
           <div className='FlatRowRight' >
             <Button className='BlueButton' 
               type="button" 
