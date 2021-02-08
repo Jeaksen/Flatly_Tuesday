@@ -89,6 +89,7 @@ public class BookingsExtController
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Booking.EMPTY);
             }
             //Customer customer = tutaj wlepic request po customera do api bookly
+            // NIE trzeba bo bookly ma dane o customerze
             //booking.setCustomer(customer);
             return ResponseEntity.ok(booking);
         }
