@@ -16,7 +16,7 @@ const baseState = {
     },
     offset: 0,
     pageNumber: 0,
-    pageSize: 1,
+    pageSize: 3,
     unpaged: false,
     paged: true
   },
