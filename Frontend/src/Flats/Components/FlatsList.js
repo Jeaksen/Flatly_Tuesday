@@ -35,8 +35,17 @@ function FlatsList(props) {
   const [priceLower, setPriceLower] = useState("");
   const [priceUpper, setPriceUpper] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pagingOptions, setPagingOptions] = useState({
+    name: "",
+    city: "",
+    country: "",
+    MGLower: "",
+    MGUpper: "",
+    priceLower: "",
+    priceUpper: "",
+  });
 
-  useEffect(() => {props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
+  useEffect(() => {console.log(getOptionsStr(props.pageNumber)); props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`)}, []);
   
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
@@ -56,6 +65,17 @@ function FlatsList(props) {
     if (priceLower !== "") opt_str += `&priceFrom=${priceLower}`;
     if (priceUpper !== "") opt_str += `&priceTo=${priceUpper}`;
     return opt_str;
+  }
+
+  const clearOptions = () => 
+  {
+    setName("");
+    setCountry("");
+    setCity("");
+    setMGLower("");
+    setMGUpper("");
+    setPriceLower("");
+    setPriceUpper("");
   }
 
   const renderTableData = () => {
@@ -121,6 +141,7 @@ function FlatsList(props) {
                         isDisabled={city !== ""} isClearable={true} isRtl={false} isSearchable={true}
                         name="countrySelect"
                         placeholder="Select Country..."
+                        defaultOptions
                         loadOptions = {(inputValue, callback) => {
                           setTimeout(() => {
                             fetchGet(`${BACKEND_URL}metadata/countries`)
@@ -142,6 +163,7 @@ function FlatsList(props) {
                     isDisabled={false} isClearable={true} isRtl={false} isSearchable={true}
                     name="citySelect"
                     placeholder="Select City..."
+                    defaultOptions
                     loadOptions = {(inputValue, callback) => {
                       setTimeout(() => {
                         fetchGet(`${BACKEND_URL}metadata/cities${country !== "" ? `?country=${country}` : ""}`)
@@ -177,7 +199,17 @@ function FlatsList(props) {
                   </Button>
                   <button onClick={(e) => {
                     e.preventDefault();
+                    setPagingOptions({
+                      name: name,
+                      city: city,
+                      country: country,
+                      MGLower: MGLower,
+                      MGUpper: MGUpper,
+                      priceLower: priceLower,
+                      priceUpper: priceUpper,
+                    });
                     props.loadFlatListAsync(`${FLATS_URL}${getOptionsStr(props.pageNumber)}`);
+                    clearOptions();
                   }}>
                     Apply Filters
                   </button>
@@ -206,8 +238,17 @@ function FlatsList(props) {
                 pageSize = {props.pageSize}
                 totalElements = {props.totalElements}
                 onChangingPage = {(pageNumber) => {
-                  let optionsStr = getOptionsStr(pageNumber);
-                  props.loadFlatListAsync(`${FLATS_URL}${optionsStr}`);
+                  clearOptions();
+                  let { name, country, city, MGLower, MGUpper, priceLower, priceUpper } = pagingOptions;
+                  let opt_str = `?size=${props.pageSize}&page=${pageNumber}`;
+                  if (name !== "") opt_str += `&name=${name}`;
+                  if (country !== "") opt_str += `&country=${country}`;
+                  if (city !== "") opt_str += `&city=${city}`;
+                  if (MGLower !== "") opt_str += `&guestsFrom=${MGLower}`;
+                  if (MGUpper !== "") opt_str += `&guestsTo=${MGUpper}`;
+                  if (priceLower !== "") opt_str += `&priceFrom=${priceLower}`;
+                  if (priceUpper !== "") opt_str += `&priceTo=${priceUpper}`;
+                  props.loadFlatListAsync(`${FLATS_URL}${opt_str}`);
                 }}/>
             </div>
           </div>

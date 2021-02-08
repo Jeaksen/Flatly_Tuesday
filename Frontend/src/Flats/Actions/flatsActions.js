@@ -70,7 +70,7 @@ export function loadFlatListAsync(URL, pageNumber) {
   }
   return async (dispatch) => {
     dispatch(flatListLoading(true));
-    let promise = fetchGet(FLATS_URL);
+    let promise = fetchGet(URL);
     promise.then(response => response.json())
         .then(json => dispatch(flatListLoaded(json)))
         .then(() => dispatch(flatListLoading(false)))
