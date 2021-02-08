@@ -27,7 +27,7 @@ var currentBRadious=initBRadious
 function GetFormatedDate({date,prefix}){
     return(
         <View style={styles.DateInput}>
-            <Text>{prefix}: {date.getFullYear()}-{date.getMonth()}-{date.getDate()}</Text>
+            <Text>{prefix}: {date.getFullYear()}-{date.getMonth()+1}-{date.getDate()}</Text>
         </View>
     );
 }
@@ -94,6 +94,8 @@ export default class FilterPopUp extends Component{
         this.setState({GuestsTo: ""});
         this.setState({DateFromFilter: ""});
         this.setState({DataToFilter: ""});
+        this.setState({DateFrom: new Date()});
+        this.setState({DateTo: new Date()});
         this.fetchData(token)
     }
     fetchData(token){
@@ -138,10 +140,10 @@ export default class FilterPopUp extends Component{
             'priceTo':    this.state.PriceTo,
             'guestsFrom': this.state.GuestsFrom,
             'guestsTo':   this.state.GuestsTo,
-            'DateFrom' :  this.state.DateFromFilter,
-            'DateTo':     this.state.DataToFilter,
+            'dateFrom' :  this.state.DateFromFilter,
+            'dateTo':     this.state.DataToFilter,
         }
-        console.log("running handle search"+ this.state.FlatName +"|")
+        //console.log("running handle search"+ this.state.DateFromFilter +"|" + this.state.DataToFilter)
         this.props.handleSearch(data);
     }
 
@@ -219,16 +221,26 @@ export default class FilterPopUp extends Component{
         this.setState({ CalendarMode: mode })
         this.CalendarRef.current.showModal()
     }
+    convto2dig=(data)=>{
+        if (data<10)
+        {
+            return "0"+data;
+        }
+        else{
+            return data;
+        }
+    }
     setCalendarDate = (date)=>{
         //console.log("The mode: " + this.state.CalendarMode)
         if(this.state.CalendarMode=="From")
         {
             this.setState({ DateFrom: date })
-            this.setState({DateFromFilter : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`})
+           // console.log("ustawiam DateFromFilter na : "+`${date.getFullYear()}-${this.convto2dig(date.getMonth()+1)}-${this.convto2dig(date.getDate())}`)
+            this.setState({DateFromFilter : `${date.getFullYear()}-${this.convto2dig(date.getMonth()+1)}-${this.convto2dig(date.getDate())}`})
         }
         else{
             this.setState({ DateTo: date })
-            this.setState({DataToFilter : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`})
+            this.setState({DataToFilter : `${date.getFullYear()}-${this.convto2dig(date.getMonth()+1)}-${this.convto2dig(date.getDate())}`})
         }
     }
 
@@ -238,7 +250,8 @@ export default class FilterPopUp extends Component{
         data.forEach(element => {
             newData.push({ label: element, value: element })
         });
-        console.log("newdata: " + newData)
+        //console.log("newdata: " + newData)
+        //console.log("changeto2D" + data)
         return (newData);
     }
     render(){

@@ -23,6 +23,9 @@ function ListItem({ item, navigation, token }) {
             <Text style={styles.itemOwner}>{`${item.customer.name} ${item.customer.surname}`}</Text>
             <Text style={styles.itemLocalization}>{item.flat.address.city}</Text>
           </View>
+          <View style={styles.itemrow}>
+            <Text style={styles.itemLocalization}>{item.flat.address.country}</Text>
+          </View>
           <Text style={styles.itemName}>{item.flat.name}</Text>
           <Text style={styles.itemData}>{`${item.startDate}-${item.endDate}`}</Text>
           </TouchableOpacity>
@@ -30,27 +33,13 @@ function ListItem({ item, navigation, token }) {
     );
 }
 
-function createAlert() {
-  Alert.alert(
-    "Warning",
-    "Are you sure you want to cancel this booking?",
-    [
-      {
-        text: "NO",
-        onPress: () => console.log("NO Pressed"),
-        style: "cancel"
-      },
-      { text: "YES", onPress: () => console.log("YES Pressed") }
-    ],
-    { cancelable: false }
-  );
-}
 
 export default function BookingScreen({navigation}) {
   const [isLoading, setLoading] = useState(true);
   const [flats, setFlats] = useState([]);
   const [searchString, setSearchString] = useState('');
   const FilterRef = useRef(null);
+  const LoadingRef = useRef(null);
 
   const token = navigation.getParam('token');
   const flagSize=150
@@ -60,20 +49,26 @@ export default function BookingScreen({navigation}) {
   const bigButtonW = 3*buttonW + 2*centerMargin
   //const [searchLength, setSearchLength] = useState({last: 111, newest: 0})
 
-  const onRefresh = () => {
-    console.log(isLoading);
-    fetchData(false);
+  const ustawLoading =(mode) =>
+  {
+    setLoading(mode);
+    if(mode==true)
+    {
+      LoadingRef.current.show()
+    }
+    else{
+      LoadingRef.current.hide()
+    }
   }
 
   const filterData = (data) => {
     let url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings?`;
-    console.log("data.flatName:"+ data.flatName)
     if(data.flatName!="")  url +=`&name=${data.flatName}`;
     if(data.Country!="")   url +=`&country=${data.Country}`;
     if(data.City!="")      url +=`&city=${data.City}`;
     if(data.dateFrom!="")  url +=`&dateFrom=${data.dateFrom}`;
     if(data.dateTo!="")    url +=`&dateTo=${data.dateTo}`;
-    setLoading(true);
+    ustawLoading(true);
     fetch(url, {
       method: "GET",
       headers: {
@@ -85,13 +80,14 @@ export default function BookingScreen({navigation}) {
       .then(response => response.content)
       .then((response) => setFlats(response))
       .catch((error) => console.error(error))
-      .finally(() => setTimeout(()=>setLoading(false),1000));
+      .finally(() => setTimeout(()=>ustawLoading(false),1000));
+
   }
 
   const fetchData = () => {
     //.log("token (Flats): "+token)
     const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings";
-    setLoading(true);
+    ustawLoading(true);
 
     let bookings=[]
     fetch(url, {
@@ -107,7 +103,7 @@ export default function BookingScreen({navigation}) {
       .then(response => bookings = response.content)
       .then(() => setFlats(bookings))
       .catch((error) => console.error(error))
-      .finally(() => setTimeout(()=>setLoading(false),1000));
+      .finally(() => setTimeout(()=>ustawLoading(false),1000));
   }
 
   useEffect(() => {
@@ -115,8 +111,9 @@ export default function BookingScreen({navigation}) {
   }, []);
 
   const FilterManager =() =>{
-    console.log("filter manager")
+    //console.log("filter manager")
     FilterRef.current.animateView()
+    FilterRef.current.setToken(token);
   }
   
   return (
@@ -127,13 +124,14 @@ export default function BookingScreen({navigation}) {
       </View>     
 
       <View>
-      { isLoading ? <LoadingAnim/>:
+      <LoadingAnim ref={LoadingRef}/>
+      { isLoading ? <View/>:
         <View>
           {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
-          <FlatList style={{marginBottom: 80}}
+          <FlatList style={{marginBottom: 140}}
             data={flats.length > 0 ? flats.slice(0, flats.length) : []}
             renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id.toString()}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
             />
         </View>}

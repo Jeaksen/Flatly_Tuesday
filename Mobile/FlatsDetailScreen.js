@@ -4,6 +4,7 @@ import { HeaderBackButton } from 'react-navigation-stack';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements'
 import HeaderNavBar from './HeaderNavBar';
+import home from './assets/home.png'
 
 const {width, height} = Dimensions.get("screen")
 const butColor = '#38373c';
@@ -13,16 +14,15 @@ export default function FlatsDetailScreen({route, navigation}) {
     const item = navigation.getParam('flat');
     const token=navigation.getParam('token');
 
-    const [base ,setBase] = useState(`data:image/png;base64,${item.images[0].data}`);
+    const [base ,setBase] = useState(`./assets/home.png`);
     const [ImagesList,setImagesList] = useState([])
     const [currentImage,setCurrentImage] = useState(0)
 
-    useEffect(() => {fetchData();},[]);
+    useEffect(() => {fetchData();loadDefault();},[]);
 
     const fetchData = () => {
         let TmpImagesList=[]
         const url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/${item.id}`;
-  
         console.log("Fetchuje !!!")
         fetch(url, {
           method: "GET",
@@ -36,19 +36,24 @@ export default function FlatsDetailScreen({route, navigation}) {
           .then(response => {TmpImagesList = response.images})
           .catch((error) => console.error(error))
           .finally(() => {setImagesList(TmpImagesList)})
-      }
-
-      let buttonEnable=true
-      const moveRight = () =>{
+    }
+    const loadDefault =()=>{
+        if(item.images!=null)
+        {
+            setBase(`data:image/png;base64,${item.images[0].data}`);
+        }
+    }
+    let buttonEnable=true
+    const moveRight = () =>{
           console.log("right")
           move(1)
-      }
-      const moveLeft = () =>{
+    }
+    const moveLeft = () =>{
         console.log("left")
         move(-1)
-      }
-      const move = (direction) =>{
-        if(!buttonEnable) return
+    }
+    const move = (direction) =>{
+        if(!buttonEnable || item.images==null) return
         let tmp = currentImage + direction;
         console.log("ImagesListLength: "+ImagesList.length + " currentImage: "+currentImage)
         if (tmp<0)
@@ -63,18 +68,22 @@ export default function FlatsDetailScreen({route, navigation}) {
         console.log("tmp: "+tmp)
         setBase(`data:image/png;base64,${ImagesList[tmp].data}`);
         buttonEnable=true;
-      }
+    }
 
     return (
         <SafeAreaView >
             <View style={styles.circle}></View>
-            <HeaderNavBar page={"Flats"} navigation={navigation}/>
+            <HeaderNavBar page={"Flats"} navigation={navigation}  token={token}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.name}</Text>
                     <View style={styles.container}>
+                        {item.images!=null ?
                         <Image
                             style={styles.flag}
-                            source={{uri: base}}/> 
+                            source={{uri: base}}/>:
+                        <Image
+                            style={styles.flag}
+                            source={home}/> }
                     </View>
             </View>
             <View style={styles.midPanel}>
@@ -91,7 +100,7 @@ export default function FlatsDetailScreen({route, navigation}) {
                     <Text style={styles.infoBoldLeft}> {`${item.price} PLN/Night`} </Text>
                 </View>
                 <Text style={styles.info}> {`Location:  ${item.address.city}, ${item.address.country}`} </Text>
-                <Text style={styles.info}> {`Address:  ${item.address.streetName} ${item.address.buildingNumber}${item.address.flatNumber ? "/"+item.address.flatNumber : " "}, ${item.address.postCode}`} </Text>
+                <Text style={styles.info}> {`Address:  ${item.address.streetName} ${item.address.buildingNumber}${item.address.flatNumber!=null &&item.address.flatNumber!='null' ? "/"+item.address.flatNumber : ""}, ${item.address.postCode}`} </Text>
                 <Text style={styles.info}> {`Flat type:  ${item.flatType}`} </Text>
                 <View  style={styles.button}>
                     <Button title="Back" color='black' onPress={() => navigation.navigate('Flats')}></Button>
