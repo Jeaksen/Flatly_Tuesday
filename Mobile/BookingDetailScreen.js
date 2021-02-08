@@ -12,11 +12,12 @@ const butsize=50;
 
 export default function BookingDetailScreen({route, navigation}) {
     const item = navigation.getParam('booking');
-
+    const token = navigation.getParam('token');
+    
     return (
         <SafeAreaView >
             <View style={styles.circle}></View>
-            <HeaderNavBar page={"Bookings"} navigation={navigation}/>
+            <HeaderNavBar page={"Bookings"} navigation={navigation}  token={token}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.flat.name}</Text>
             </View>
@@ -24,7 +25,7 @@ export default function BookingDetailScreen({route, navigation}) {
                 <View style={styles.row}>
                     <Text style={styles.infoBold}> {`Person renting:  ${item.customer.name} ${item.customer.surname}` } </Text>
                 </View>
-                <Text style={styles.info}> {`Date:  ${item.startDate}-${item.endDate}`} </Text>
+                <Text style={styles.info}> {`Date:  (${item.startDate}) - (${item.endDate})`} </Text>
                 <Text style={styles.info}> {`Customer number:  ${item.customer.phoneNo}`} </Text>
                 <Text style={styles.info}> {`Booking Price:  ${item.price} PLN`} </Text>
                 <Text style={styles.info}> {`Number of Guests:  ${item.noOfGuests}`} </Text>

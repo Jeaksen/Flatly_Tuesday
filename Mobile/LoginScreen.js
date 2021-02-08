@@ -141,7 +141,7 @@ export default function LoginScreen({navigation}) {
         textAlign: 'center',
         borderBottomColor: 'orange',
         borderBottomWidth: 2,
-        width: 90,
+        width: 120,
     },
     loginButton:{
         marginTop: 20,

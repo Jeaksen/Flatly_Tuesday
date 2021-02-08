@@ -7,6 +7,7 @@ import FilterPopUp from './FilterPopUp';
 import flatData from './server/db.json';
 import HeaderNavBar from './HeaderNavBar';
 import LoadingAnim from './LoadingAnim';
+import home from './assets/home.png'
 
 const {width,height} = Dimensions.get("screen")
 const flagSize=100
@@ -33,7 +34,9 @@ function ListItem({ item, navigation, token }) {
                        <Image
                           style={styles.itemFlag}
                           source={{uri: `data:image/png;base64,${item.images[0].data}`}}/> :
-                          <View/>}
+                        <Image
+                        style={styles.itemFlag}
+                        source={home}/> }
                       <View/>
                     </View>
                 </View>
@@ -47,6 +50,7 @@ export default function FlatsScreen({navigation}) {
     const [flats, setFlats] = useState([]);
     const [searchString, setSearchString] = useState('');
     const FilterRef = useRef(null);
+    const LoadingRef = useRef(null);
 
     const token=navigation.getParam('token')
     const flagSize=150
@@ -56,6 +60,17 @@ export default function FlatsScreen({navigation}) {
     const bigButtonW = 3*buttonW + 2*centerMargin
     //const [searchLength, setSearchLength] = useState({last: 111, newest: 0})
   
+    const ustawLoading =(mode) =>
+    {
+      setLoading(mode);
+      if(mode==true)
+      {
+        LoadingRef.current.show()
+      }
+      else{
+        LoadingRef.current.hide()
+      }
+    }
     const filterData = (data) => {
       let url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats?`;
       console.log("data.flatName:"+ data.flatName)
@@ -66,7 +81,7 @@ export default function FlatsScreen({navigation}) {
       if(data.priceTo!="")   url +=`&priceTo=${data.priceTo}`;
       if(data.guestsFrom!="")url +=`&guestsFrom=${data.guestsFrom}`;
       if(data.guestsTo!="")  url +=`&guestsTo=${data.guestsTo}`;
-      setLoading(true);
+      ustawLoading(true);
       fetch(url, {
         method: "GET",
         headers: {
@@ -78,14 +93,13 @@ export default function FlatsScreen({navigation}) {
         .then(response => response.content)
         .then((response) => setFlats(response))
         .catch((error) => console.error(error))
-        .finally(() => setTimeout(()=>setLoading(false),1000));
+        .finally(() => setTimeout(()=>ustawLoading(false),1000));
     }
   
     const fetchData = () => {
       //.log("token (Flats): "+token)
       const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats";
-      setLoading(true);
-
+      ustawLoading(true);
       fetch(url, {
         method: "GET",
         headers: {
@@ -99,7 +113,7 @@ export default function FlatsScreen({navigation}) {
         .then(response => response.content)
         .then((response) => setFlats(response))
         .catch((error) => console.error(error))
-        .finally(() => setTimeout(()=>setLoading(false),1000));
+        .finally(() => setTimeout(()=>ustawLoading(false),1000));
     }
   
     useEffect(() => {
@@ -120,13 +134,14 @@ export default function FlatsScreen({navigation}) {
         </View>     
 
         <View>
-        { isLoading ? <LoadingAnim/>:
+        <LoadingAnim ref={LoadingRef}/>
+        { isLoading ? <View/>:
           <View>
             {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
-            <FlatList style={{marginBottom: 120}}
+            <FlatList style={{marginBottom: 140}}
               data={flats.length > 0 ? flats.slice(0, flats.length) : []}
               renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => fetchData()}/>}
               />
           </View>}
