@@ -89,7 +89,7 @@ class BookingsMainService implements BookingsService {
             repository.save(toCancel);
             result.add(toCancel.getId());
         }
-        logger.info("Bookings with id {} requested to be cancelled, but no such booking was found.",
+        logger.info("Bookings with id {} cancelled",
                 result.stream().map(Object::toString).collect(Collectors.joining(",")));
         return result;
     }
