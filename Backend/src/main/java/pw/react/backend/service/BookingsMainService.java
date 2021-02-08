@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import pw.react.backend.dao.BookingsRepository;
 import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
+import pw.react.backend.model.Flat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,11 +41,15 @@ class BookingsMainService implements BookingsService {
     }
 
     @Override
-    public Booking postBooking(Booking booking) {
+    public Booking postBooking(Booking booking, long customerId, long flatId) {
         Booking result = new Booking();
         Booking toSave = booking;
+
+        toSave.setCustomerId(customerId);
+        Flat flat = new Flat();
+        flat.setId(flatId);
+        toSave.setFlat(flat);
         try {
-            toSave.setCustomerId(booking.getCustomer().getId());
             result = repository.save(toSave);
         } catch (DataIntegrityViolationException e) {
             logger.error(String.format("Failed to save booking %s", e.getMessage()));
