@@ -1,7 +1,7 @@
-export const BACKEND_URL = 'http://localhost:8080/';
-export const FLATS_URL = 'http://localhost:8080/flats/';
-export const BOOKINGS_URL = 'http://localhost:8080/bookings/';
-export const LOGIN_URL = 'http://localhost:8080/login';
+export const BACKEND_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/';
+export const FLATS_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/';
+export const BOOKINGS_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings/';
+export const LOGIN_URL = 'http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/login';
 export const  mainURL = "http://localhost:8080";
 
 export const DEBUGGING = false;
