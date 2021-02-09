@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, FlatList, StyleSheet, Text, TextInput, StatusBar, Image, Dimensions,Animated,Button } from 'react-native';
 import { HeaderBackButton } from 'react-navigation-stack';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Icon } from 'react-native-elements'
+import { Icon } from 'react-native-elements';
+import { useIsFocused } from '@react-navigation/native';
 import HeaderNavBar from './HeaderNavBar';
 import home from './assets/home.png'
 
@@ -13,16 +14,17 @@ const butsize=50;
 export default function FlatsDetailScreen({route, navigation}) {
     const item = navigation.getParam('flat');
     const token = navigation.getParam('token');
+    const ID = item.id;
 
     const [base ,setBase] = useState(`./assets/home.png`);
     const [ImagesList,setImagesList] = useState([])
     const [currentImage,setCurrentImage] = useState(0)
 
-    useEffect(() => {loadDefault();fetchData();},[]);
+    useEffect(() => {loadDefault();fetchData();},[navigation]);
 
     const fetchData = () => {
         let TmpImagesList=[]
-        const url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/${item.id}`;
+        const url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/${ID}`;
         fetch(url, {
           method: "GET",
           headers: {
@@ -69,7 +71,7 @@ export default function FlatsDetailScreen({route, navigation}) {
     return (
         <SafeAreaView >
             <View style={styles.circle}></View>
-            <HeaderNavBar page={"Flats"} navigation={navigation}  token={token}/>
+            <HeaderNavBar page={"Flats"} navigation={navigation} token={token}/>
             <View style={styles.topPanel}>
                     <Text style={styles.title}>{item.name}</Text>
                     <View style={styles.container}>
@@ -96,10 +98,10 @@ export default function FlatsDetailScreen({route, navigation}) {
                     <Text style={styles.infoBoldLeft}> {`${item.price} PLN/Night`} </Text>
                 </View>
                 <Text style={styles.info}> {`Location:  ${item.address.city}, ${item.address.country}`} </Text>
-                <Text style={styles.info}> {`Address:  ${item.address.streetName} ${item.address.buildingNumber}${item.address.flatNumber!=null &&item.address.flatNumber!='null' ? "/"+item.address.flatNumber : ""}, ${item.address.postCode}`} </Text>
+                <Text style={styles.info}> {`Address:  ${item.address.streetName} ${item.address.buildingNumber}${item.address.flatNumber!=null && item.address.flatNumber!='null' && item.address.flatNumber!="" ? "/"+item.address.flatNumber : ""}, ${item.address.postCode}`} </Text>
                 <Text style={styles.info}> {`Flat type:  ${item.flatType}`} </Text>
                 <View  style={styles.button}>
-                    <Button title="Back" color='black' onPress={() => navigation.navigate('Flats')}></Button>
+                    <Button title="Back" color='black' onPress={() => navigation.navigate('Flats',{token: token})}></Button>
                 </View>
             </View>
         </SafeAreaView>

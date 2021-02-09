@@ -37,7 +37,7 @@ export default function BookingDetailScreen({route, navigation}) {
                         <Button title="Go to Flat Details" color='black' onPress={() => navigation.navigate('FlatDetails', {flat: item.flat, token: token})}></Button>
                     </View>
                     <View  style={styles.button}>
-                        <Button title="Back" color='black' onPress={() => navigation.navigate('Bookings')}></Button>
+                        <Button title="Back" color='black' onPress={() => navigation.navigate('Bookings', {token: token})}></Button>
                     </View>
                 </View>
             </View>
