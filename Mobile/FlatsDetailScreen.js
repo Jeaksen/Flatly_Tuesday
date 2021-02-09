@@ -41,19 +41,18 @@ export default function FlatsDetailScreen({route, navigation}) {
             setBase(`data:image/png;base64,${item.images[0].data}`);
         }
     }
-    let buttonEnable=true
+    
     const moveRight = () =>{
-          console.log("right")
-          move(1)
+        console.log("right")
+        move(1)
     }
     const moveLeft = () =>{
         console.log("left")
         move(-1)
     }
     const move = (direction) =>{
-        if(!buttonEnable || item.images==null) return
         let tmp = currentImage + direction;
-        console.log("ImagesListLength: "+ImagesList.length + " currentImage: "+currentImage)
+        console.log("ImagesListLength: "+ ImagesList.length + " currentImage: "+ currentImage)
         if (tmp<0)
         {
             tmp =ImagesList.length-1;
@@ -63,9 +62,8 @@ export default function FlatsDetailScreen({route, navigation}) {
             tmp=0;
         }
         setCurrentImage(tmp);
-        console.log("tmp: "+tmp)
+        console.log("tmp: " + tmp)
         setBase(`data:image/png;base64,${ImagesList[tmp].data}`);
-        buttonEnable=true;
     }
 
     return (
