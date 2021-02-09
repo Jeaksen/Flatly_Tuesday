@@ -1,4 +1,4 @@
-package pw.react.backend.controller;
+package pw.react.backend.controller.external;
 
 
 import org.slf4j.Logger;
@@ -12,12 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pw.react.backend.appException.UnauthorizedException;
+import pw.react.backend.controller.internal.BookingsController;
 import pw.react.backend.dao.specifications.BookingSpecification;
 import pw.react.backend.model.Booking;
-import pw.react.backend.model.Flat;
 import pw.react.backend.model.InboundBooking;
-import pw.react.backend.service.BookingsService;
 import pw.react.backend.service.FlatsService;
+import pw.react.backend.service.bookings.BookingsService;
 import pw.react.backend.service.general.SecurityProvider;
 
 import static java.util.stream.Collectors.joining;
@@ -70,14 +70,19 @@ public class BookingsExtController
         booking.setEndDate(inboundBooking.getEndDate());
         booking.setPrice(inboundBooking.getPrice());
         booking.setNoOfGuests(inboundBooking.getNoOfGuests());
-        if (securityService.isApiKeyValid(apiKey)) {
-            Booking result = bookingsService.postBooking(booking, inboundBooking.getCustomerId(), inboundBooking.getFlatId());
-            if (result.getId() == 0) {
-                return ResponseEntity.badRequest().body(result);
+        if (securityService.isApiKeyValid(apiKey))
+        {
+            var flat = flatsService.getFlat(inboundBooking.getFlatId());
+            if (flat.isPresent())
+            {
+                booking.setFlat(flat.get());
+                var result = bookingsService.postBooking(booking, inboundBooking.getCustomerId(), inboundBooking.getFlatId());
+                if (result.getId() == 0) {
+                    return ResponseEntity.badRequest().body(Booking.EMPTY);
+                }
+                return ResponseEntity.ok(result);
             }
-            long id = result.getFlat().getId();
-            result.setFlat(flatsService.getFlat(id).get());
-            return ResponseEntity.ok(result);
+            return ResponseEntity.badRequest().body(Booking.EMPTY);
         }
         throw new UnauthorizedException("Unauthorized access to resources.");
     }
@@ -92,9 +97,6 @@ public class BookingsExtController
             if (booking == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Booking.EMPTY);
             }
-            //Customer customer = tutaj wlepic request po customera do api bookly
-            // NIE trzeba bo bookly ma dane o customerze
-            //booking.setCustomer(customer);
             return ResponseEntity.ok(booking);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Booking.EMPTY);

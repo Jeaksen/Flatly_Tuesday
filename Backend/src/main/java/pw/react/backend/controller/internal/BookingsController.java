@@ -1,4 +1,4 @@
-package pw.react.backend.controller;
+package pw.react.backend.controller.internal;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,18 +17,14 @@ import pw.react.backend.dao.specifications.BookingSpecification;
 import pw.react.backend.model.Booking;
 import pw.react.backend.model.Customer;
 import pw.react.backend.model.InboundCustomer;
-import pw.react.backend.service.BookingsService;
+import pw.react.backend.service.bookings.BookingsService;
 import pw.react.backend.service.FlatsService;
 import pw.react.backend.service.general.SecurityProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 
 import static java.util.stream.Collectors.joining;
 

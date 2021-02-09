@@ -1,4 +1,4 @@
-package pw.react.backend.controller;
+package pw.react.backend.controller.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

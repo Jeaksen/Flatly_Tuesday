@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pw.react.backend.dao.FlatRepository;
 import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Flat;
+import pw.react.backend.service.bookings.BookingsService;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,9 +40,10 @@ public class FlatMainService implements FlatsService
     public Flat updateFlat(Long flatId, Flat updatedFlat, List<MultipartFile> newImages)
     {
         Flat result = Flat.Empty;
-        if (repository.existsById(flatId))
+        var savedFlat = getFlat(flatId);
+        if (savedFlat.isPresent())
         {
-            updatedFlat.setId(flatId);
+            updatedFlat.getAddress().setId(savedFlat.get().getAddress().getId());
             result = repository.save(updatedFlat);
             imageService.deleteRemovedImages(updatedFlat.getImages(), result.getId());
             if (!newImages.isEmpty())
@@ -63,10 +65,11 @@ public class FlatMainService implements FlatsService
         boolean result = false;
         if (repository.existsById(flatId))
         {
-            bookingsService.cancelBookingsByFlatId(flatId);
-            repository.deleteById(flatId);
+            var cancelledBookings =  bookingsService.cancelBookingsByFlatId(flatId);
             imageService.deleteImagesForFlat(flatId);
-            logger.info("Flat with id {} deleted.", flatId);
+            repository.deleteById(flatId);
+            logger.info(String.format("Cancelled bookings: %s", cancelledBookings.toString()));
+            logger.info(String.format("Flat with id %d deleted.", flatId));
             result = true;
         }
         return result;
@@ -76,6 +79,8 @@ public class FlatMainService implements FlatsService
     public long[] getBookedFlatsIndexes(BookingDatesSpecification bookingDatesSpecification)
     {
         var bookings = bookingsService.getBookingsInDateRange(bookingDatesSpecification);
+        if (bookings.isEmpty())
+            return new long[]{};
         return bookings.stream().mapToLong(booking -> booking.getFlat().getId()).toArray();
     }
 
