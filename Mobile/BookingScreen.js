@@ -27,7 +27,7 @@ function ListItem({ item, navigation, token }) {
             <Text style={styles.itemLocalization}>{item.flat.address.country}</Text>
           </View>
           <Text style={styles.itemName}>{item.flat.name}</Text>
-          <Text style={styles.itemData}>{`${item.startDate}-${item.endDate}`}</Text>
+          <Text style={styles.itemData}>{`(${item.startDate}) - (${item.endDate})`}</Text>
           </TouchableOpacity>
         </View>
     );
@@ -85,7 +85,6 @@ export default function BookingScreen({navigation}) {
   }
 
   const fetchData = () => {
-    //.log("token (Flats): "+token)
     const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/bookings";
     ustawLoading(true);
 
@@ -93,10 +92,8 @@ export default function BookingScreen({navigation}) {
     fetch(url, {
       method: "GET",
       headers: {
-          //'Content-Type': 'application/json',
           'Accept': '*/*',
           'security-header': token
-          
         },
       })
       .then((response) => response.json())
@@ -111,7 +108,6 @@ export default function BookingScreen({navigation}) {
   }, []);
 
   const FilterManager =() =>{
-    //console.log("filter manager")
     FilterRef.current.animateView()
     FilterRef.current.setToken(token);
   }
@@ -127,7 +123,6 @@ export default function BookingScreen({navigation}) {
       <LoadingAnim ref={LoadingRef}/>
       { isLoading ? <View/>:
         <View>
-          {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
           <FlatList style={{marginBottom: 140}}
             data={flats.length > 0 ? flats.slice(0, flats.length) : []}
             renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
@@ -202,7 +197,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    //marginTop: StatusBar.currentHeight || 0,
   },
   input: {
     borderRadius: 3,

@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     topPanel:{
-        height: 0.1*height,
+        height: 0.2*height,
     },
     midPanel:{
         flexDirection:'row',

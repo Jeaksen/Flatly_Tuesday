@@ -99,7 +99,6 @@ export default class FilterPopUp extends Component{
         this.fetchData(token)
     }
     fetchData(token){
-        //console.log("token (FilterPopUp): "+token)
         const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/metadata/countries"; 
         
         let tmpCountries=[]
@@ -143,7 +142,6 @@ export default class FilterPopUp extends Component{
             'dateFrom' :  this.state.DateFromFilter,
             'dateTo':     this.state.DataToFilter,
         }
-        //console.log("running handle search"+ this.state.DateFromFilter +"|" + this.state.DataToFilter)
         this.props.handleSearch(data);
     }
 
@@ -355,7 +353,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         width: 300,
         marginBottom: 15,
-        marginTop: 10,
+        marginTop: 20,
     },
     SearchButton:{
         marginTop: 20,

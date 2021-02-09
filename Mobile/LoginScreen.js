@@ -38,9 +38,7 @@ export default function LoginScreen({navigation}) {
             headers: {
                 'Content-Type': 'multipart/form-data;',
                 'Accept': '*/*',
-                //'security-header' : 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiaWQiOjEsImlhdCI6MTYxMjcxODM3OH0.ctlB10GVA9pMvzNuRRBzKn3ktOuU9R3kYHgwYYPI31Mm31FPs1wusfXkTKj0YLOBruU5Wr5VIZEdRBVOwt022Q',    
             },
-            //body: JSON.stringify({username: username, password: password})
             body: formdata
         })
         .then(response => {

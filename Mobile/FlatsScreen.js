@@ -73,7 +73,6 @@ export default function FlatsScreen({navigation}) {
     }
     const filterData = (data) => {
       let url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats?`;
-      console.log("data.flatName:"+ data.flatName)
       if(data.flatName!="")  url +=`&name=${data.flatName}`;
       if(data.Country!="")   url +=`&country=${data.Country}`;
       if(data.City!="")      url +=`&city=${data.City}`;
@@ -97,16 +96,13 @@ export default function FlatsScreen({navigation}) {
     }
   
     const fetchData = () => {
-      //.log("token (Flats): "+token)
       const url ="http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats";
       ustawLoading(true);
       fetch(url, {
         method: "GET",
         headers: {
-            //'Content-Type': 'application/json',
             'Accept': '*/*',
             'security-header': token
-            
           },
         })
         .then((response) => response.json())
@@ -121,7 +117,6 @@ export default function FlatsScreen({navigation}) {
     }, []);
 
     const FilterManager =() =>{
-      //console.log("filter manager")
       FilterRef.current.animateView();
       FilterRef.current.setToken(token);
     }
@@ -137,7 +132,6 @@ export default function FlatsScreen({navigation}) {
         <LoadingAnim ref={LoadingRef}/>
         { isLoading ? <View/>:
           <View>
-            {/* <Text style={styles.lenCount}>{flats.length > 0 ? `Found ${flats.length} flats` : `No flats found`}</Text> */}
             <FlatList style={{marginBottom: 140}}
               data={flats.length > 0 ? flats.slice(0, flats.length) : []}
               renderItem={({ item }) => <ListItem item={item} navigation={navigation} token={token}/>}
@@ -194,7 +188,6 @@ export default function FlatsScreen({navigation}) {
     },
     container: {
       flex: 1,
-      //marginTop: StatusBar.currentHeight || 0,
     },
     input: {
       borderRadius: 3,

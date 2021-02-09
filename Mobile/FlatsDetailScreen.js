@@ -12,7 +12,7 @@ const butsize=50;
 
 export default function FlatsDetailScreen({route, navigation}) {
     const item = navigation.getParam('flat');
-    const token=navigation.getParam('token');
+    const token = navigation.getParam('token');
 
     const [base ,setBase] = useState(`./assets/home.png`);
     const [ImagesList,setImagesList] = useState([])
@@ -23,11 +23,9 @@ export default function FlatsDetailScreen({route, navigation}) {
     const fetchData = () => {
         let TmpImagesList=[]
         const url =`http://flatly-env.eba-pftr9jj2.eu-central-1.elasticbeanstalk.com/flats/${item.id}`;
-        console.log("Fetchuje !!!")
         fetch(url, {
           method: "GET",
           headers: {
-              //'Content-Type': 'application/json',
               'Accept': '*/*',
               'security-header': token
             },
