@@ -86,8 +86,12 @@ public class FlatImageService implements ImageService
     @Override
     public void deleteRemovedImages(List<FlatImage> updatedImages, long flatId)
     {
-        var imageIds = updatedImages.stream().map(FlatImage::getId).collect(Collectors.toList());
-        repository.deleteByFlatIdAndIdNotIn(flatId, imageIds);
+        if (updatedImages.isEmpty())
+            deleteImagesForFlat(flatId);
+        else {
+            var imageIds = updatedImages.stream().map(FlatImage::getId).collect(Collectors.toList());
+            repository.deleteByFlatIdAndIdNotIn(flatId, imageIds);
+        }
         logger.info(String.format("Removing ids no in %s", updatedImages.stream().map(FlatImage::getId).collect(joining(","))));
     }
 

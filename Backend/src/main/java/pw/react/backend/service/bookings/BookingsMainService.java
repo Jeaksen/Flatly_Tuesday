@@ -1,4 +1,4 @@
-package pw.react.backend.service;
+package pw.react.backend.service.bookings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +11,9 @@ import org.springframework.stereotype.Service;
 import pw.react.backend.dao.BookingsRepository;
 import pw.react.backend.dao.specifications.BookingDatesSpecification;
 import pw.react.backend.model.Booking;
-import pw.react.backend.model.Flat;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,18 +39,20 @@ class BookingsMainService implements BookingsService {
     }
 
     @Override
-    public Booking postBooking(Booking booking, long customerId, long flatId) {
+    public Booking postBooking(Booking booking, long customerId, long flatId)
+    {
         Booking result = new Booking();
-        Booking toSave = booking;
 
-        toSave.setCustomerId(customerId);
-        Flat flat = new Flat();
-        flat.setId(flatId);
-        toSave.setFlat(flat);
-        toSave.setPrice(2423);
         try {
-            result = repository.save(toSave);
-        } catch (DataIntegrityViolationException e) {
+            booking.setCustomerId(customerId);
+            booking.setPrice((int) ChronoUnit.DAYS.between(booking.getStartDate(), booking.getEndDate()) * booking.getFlat().getPrice());
+            try {
+                result = repository.save(booking);
+            } catch (DataIntegrityViolationException e) {
+                logger.error(String.format("Failed to save booking %s", e.getMessage()));
+            }
+        } catch (Exception e)
+        {
             logger.error(String.format("Failed to save booking %s", e.getMessage()));
         }
         return result;
@@ -87,9 +86,7 @@ class BookingsMainService implements BookingsService {
     @Override
     public List<Long> cancelBookingsByFlatId(Long flatId) {
         List<Long> result = new ArrayList<>();
-        List<Booking> bookingsToCancel = repository.findAll().stream()
-                .filter(booking -> booking.getFlat() != null &&  booking.getFlat().getId() == flatId)
-                .collect(Collectors.toList());
+        List<Booking> bookingsToCancel = repository.findAllByFlatId(flatId);
         for (Booking toCancel : bookingsToCancel) {
             toCancel.setActive(FALSE);
             toCancel.setFlat(null);

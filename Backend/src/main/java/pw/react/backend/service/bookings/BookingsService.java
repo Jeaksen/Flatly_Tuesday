@@ -1,4 +1,4 @@
-package pw.react.backend.service;
+package pw.react.backend.service.bookings;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
